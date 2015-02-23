@@ -1,0 +1,22 @@
+{
+    "name": "owl/mvc",
+    "keywords": ["framework", "mvc", "swoole", "restful"],
+    "homepage": "https://github.com/yeaha/owl-mvc",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "YangYi",
+            "email": "yangyi.cn.gz@gmail.com",
+            "homepage": "https://github.com/yeaha"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7.0"
+    },
+    "autoload": {
+        "psr-4": {"Owl\\": "src"}
+    }
+}
