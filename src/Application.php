@@ -90,6 +90,11 @@ class Application {
         return $this;
     }
 
+    /**
+     * 清除所有已添加的中间件
+     *
+     * @return void
+     */
     public function resetMiddleware() {
         $this->middleware->reset();
     }
