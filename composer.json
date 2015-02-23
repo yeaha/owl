@@ -11,7 +11,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.0"
+        "php": ">=5.5.0",
+        "ext-swoole": "~1.7.9"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7.0"

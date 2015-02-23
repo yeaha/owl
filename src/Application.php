@@ -36,6 +36,11 @@ namespace Owl;
  *
  * $app->start();
  */
+
+if (!extension_loaded('swoole')) {
+    throw new \Exception('Require php extension "swoole"');
+}
+
 class Application {
     protected $callback;
     protected $exception_handler;
