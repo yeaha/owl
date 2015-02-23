@@ -32,18 +32,22 @@ namespace Owl;
  *     echo "after 3\n";
  * });
  *
- * // 这里传递的参数会在调用时传递给每个中间件函数
- * $middleware->execute(1, 2, 3);
- *
- * // 执行结果:
  * // before 1
  * // before 2
  * // after 2
  * // after 1
+ * $middleware->execute(1, 2, 3);
+ *
  */
 class Middleware {
     protected $handlers = [];
 
+    /**
+     * 添加一个新的中间件到队列中
+     *
+     * @param callable $handler
+     * @return $this
+     */
     public function insert($handler) {
         if (!is_callable($handler)) {
             throw new \Exception('Middleware handler is not callable.');
@@ -54,6 +58,9 @@ class Middleware {
     }
 
     /**
+     * 执行队列里的所有中间件
+     * 调用此方法传递的任意参数都会被传递给每个中间件
+     *
      * @return void
      */
     public function execute() {
@@ -83,6 +90,11 @@ class Middleware {
         }
     }
 
+    /**
+     * 清空中间件队列
+     *
+     * @return void
+     */
     public function reset() {
         $this->handlers = [];
     }
