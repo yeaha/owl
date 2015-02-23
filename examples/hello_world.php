@@ -8,23 +8,23 @@ $port = 12345;
 
 $app = new \Owl\Application($ip, $port);
 
-$app->middleware(function($request, $response, $next) {
+$app->middleware(function($request, $response) {
     $start = microtime(true);
 
-    yield $next;
+    yield true;
 
     $use_time = (microtime(true) - $start) * 1000;
     $response->setHeader('use-time', (int)$use_time.'ms');
 });
 
-$app->middleware(function($request, $response, $next) {
+$app->middleware(function($request, $response) {
     if ($request->getRequestPath() === '/') {
         $response->setBody('hello world!');
     } else {
         throw \Owl\Http\Exception::factory(404);
     }
 
-    yield $next;
+    yield true;
 });
 
 $app->setExceptionHandler(function($exception, $request, $response) {

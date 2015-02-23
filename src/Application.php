@@ -6,27 +6,27 @@ namespace Owl;
  *
  * $app = new \Owl\Application('127.0.0.1', 12345);
  *
- * $app->middleware(function($request, $response, $next) {
+ * $app->middleware(function($request, $response) {
  *     $start = microtime(true);
  *
- *     yield $next;
+ *     yield true;
  *
  *     $use_time = (microtime(true) - $start) * 1000;
  *     $response->setHeader('use-time', (int)$use_time.'ms');
  * });
  *
- * $app->middelware(function($request, $response, $next) {
- *     yield $next;
+ * $app->middelware(function($request, $response) {
+ *     yield true;
  *
  *     $logger = new \Monolog\Logger;
  *     $logger->debug(sprintf('Request %s, status: %d'), $request->getRequestURI(), $response->getStatus());
  * });
  *
  * $router = new \Owl\Mvc\Router;
- * $app->middleware(function($request, $response, $next) use ($router) {
+ * $app->middleware(function($request, $response) use ($router) {
  *     $router->dispatch($request, $response);
  *
- *     yield $next;
+ *     yield true;
  * });
  *
  * $app->setExceptionHandler(function($exception, $request, $response) {
@@ -42,9 +42,8 @@ if (!extension_loaded('swoole')) {
 }
 
 class Application {
-    protected $callback;
     protected $exception_handler;
-    protected $middleware = [];
+    protected $middleware;
     protected $server;
 
     public function __construct($ip, $port) {
@@ -54,8 +53,10 @@ class Application {
             $request = new \Owl\Http\Request($request);
             $response = new \Owl\Http\Response($response);
 
-            $this->callback($request, $response);
+            $this->execute($request, $response);
         });
+
+        $this->middleware = new \Owl\Middleware;
     }
 
     /**
@@ -85,9 +86,12 @@ class Application {
      * @return $this
      */
     public function middleware(\Closure $handler) {
-        $this->middleware[] = $handler;
-        $this->callback = null;
+        $this->middleware->insert($handler);
         return $this;
+    }
+
+    public function resetMiddleware() {
+        $this->middleware->reset();
     }
 
     /**
@@ -108,26 +112,9 @@ class Application {
      * @param \Owl\Http\Response $response
      * @return void
      */
-    public function callback(\Owl\Http\Request $request, \Owl\Http\Response $response) {
-        $callback = $this->buildCallback();
-
+    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
         try {
-            $stack = [];
-
-            while ($callback) {
-                $generator = $callback($request, $response);
-
-                if (!$generator || !($generator instanceof \Generator)) {
-                    throw new \Exception('Missing "yield $next;" in middleware handler');
-                }
-
-                $callback = $generator->current();
-                $stack[] = $generator;
-            }
-
-            while ($generator = array_pop($stack)) {
-                $generator->next();
-            }
+            $this->middleware->execute($request, $response);
         } catch (\Exception $exception) {
             $handler = $this->exception_handler ?: function($exception, $request, $response) {
                 $response->setStatus(500);
@@ -138,30 +125,6 @@ class Application {
         }
 
         $response->end();
-    }
-
-    /**
-     * 把添加的中间件打包为单个回调函数
-     *
-     * @return \Closure
-     */
-    protected function buildCallback() {
-        if (!$this->middleware) {
-            return false;
-        }
-
-        if ($this->callback) {
-            return $this->callback;
-        }
-
-        $next = null;
-        foreach (array_reverse($this->middleware) as $handler) {
-            $next = function($request, $response) use ($handler, $next) {
-                return call_user_func($handler, $request, $response, $next);
-            };
-        }
-
-        return $this->callback = $next;
     }
 
     /**
