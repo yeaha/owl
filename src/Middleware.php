@@ -34,6 +34,12 @@ namespace Owl;
  *
  * // 这里传递的参数会在调用时传递给每个中间件函数
  * $middleware->execute(1, 2, 3);
+ *
+ * // 执行结果:
+ * // before 1
+ * // before 2
+ * // after 2
+ * // after 1
  */
 class Middleware {
     protected $handlers = [];
