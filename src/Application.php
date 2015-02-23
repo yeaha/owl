@@ -156,7 +156,7 @@ class Application {
             };
         }
 
-        return $next;
+        return $this->callback = $next;
     }
 
     /**
