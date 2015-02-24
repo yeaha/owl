@@ -1,7 +1,5 @@
 <?php
-require __DIR__ .'/../src/Application.php';
-
-\Owl\Application::registerNamespace('\Owl', __DIR__.'/../src');
+require __DIR__.'/../src/autoload.php';
 
 $ip = '127.0.0.1';
 $port = 12345;
