@@ -206,6 +206,8 @@ class View {
     /**
      * 显示已经生成好的块
      *
+     * @param string $name
+     * @param boolean $remove Remove content after show
      * @return void
      */
     protected function showBlock($name, $remove = true) {
