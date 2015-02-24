@@ -1,6 +1,46 @@
 <?php
 namespace Owl\Swoole;
 
+/**
+ * @example
+ *
+ * $app = new \Owl\Swoole\Application('127.0.0.1', 12345);
+ *
+ * $app->middleware(function($request, $response) {
+ *     $start = microtime(true);
+ *
+ *     yield true;
+ *
+ *     $use_time = (microtime(true) - $start) * 1000;
+ *     $response->setHeader('use-time', (int)$use_time.'ms');
+ * });
+ *
+ * $app->middelware(function($request, $response) {
+ *     yield true;
+ *
+ *     $logger = new \Monolog\Logger;
+ *     $logger->debug(sprintf('Request %s, status: %d'), $request->getRequestURI(), $response->getStatus());
+ * });
+ *
+ * $router = new \Owl\Mvc\Router;
+ * $app->middleware(function($request, $response) use ($router) {
+ *     $router->dispatch($request, $response);
+ *
+ *     yield true;
+ * });
+ *
+ * $app->setExceptionHandler(function($exception, $request, $response) {
+ *     $response->setStatus(500);
+ *     $response->setBody($exception->getMessage());
+ * });
+ *
+ * $app->start();
+ */
+
+if (!extension_loaded('swoole')) {
+    throw new \Exception('Require php extension "swoole"');
+}
+
 class Application extends \Owl\Application {
     protected $server;
 

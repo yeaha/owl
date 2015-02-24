@@ -4,7 +4,7 @@ namespace Owl;
 /**
  * @example
  *
- * $app = new \Owl\Application('127.0.0.1', 12345);
+ * $app = new \Owl\Application();
  *
  * $app->middleware(function($request, $response) {
  *     $start = microtime(true);
@@ -36,10 +36,6 @@ namespace Owl;
  *
  * $app->start();
  */
-
-if (!extension_loaded('swoole')) {
-    throw new \Exception('Require php extension "swoole"');
-}
 
 class Application {
     protected $exception_handler;
