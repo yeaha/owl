@@ -44,48 +44,18 @@ if (!extension_loaded('swoole')) {
 class Application {
     protected $exception_handler;
     protected $middleware;
-    protected $server;
 
-    public function __construct($ip, $port) {
-        $this->server = $server = new \swoole_http_server($ip, $port);
-
-        $server->on('Request', function($request, $response) {
-            $request = new \Owl\Http\Request($request);
-            $response = new \Owl\Http\Response($response);
-
-            $this->execute($request, $response);
-        });
-
+    public function __construct() {
         $this->middleware = new \Owl\Middleware;
-    }
-
-    /**
-     * 魔法方法，把方法调用代理到swoole server实例上
-     *
-     * @param string $method
-     * @param array $args
-     * @return mixed
-     */
-    public function __call($method, array $args) {
-        return call_user_func_array(array($this->server, $method), $args);
-    }
-
-    /**
-     * 获得swoole server实例
-     *
-     * @return \swoole_http_server
-     */
-    public function getSwooleServer() {
-        return $this->server;
     }
 
     /**
      * 添加中间件
      *
-     * @param \Closure $handler
+     * @param callable $handler
      * @return $this
      */
-    public function middleware(\Closure $handler) {
+    public function middleware($handler) {
         $this->middleware->insert($handler);
         return $this;
     }
@@ -105,9 +75,16 @@ class Application {
      * @param \Closure $handler
      * @return $this
      */
-    public function setExceptionHandler(\Closure $handler) {
+    public function setExceptionHandler($handler) {
         $this->exception_handler = $handler;
         return $this;
+    }
+
+    public function start() {
+        $request = new \Owl\Http\Request;
+        $response = new \Owl\Http\Response;
+
+        return $this->execute($request, $response);
     }
 
     /**
@@ -117,7 +94,7 @@ class Application {
      * @param \Owl\Http\Response $response
      * @return void
      */
-    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    protected function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
         try {
             $this->middleware->execute($request, $response);
         } catch (\Exception $exception) {
@@ -126,7 +103,7 @@ class Application {
                 $response->setBody('');
             };
 
-            $handler($exception, $request, $response);
+            call_user_func($handler, $exception, $request, $response);
         }
 
         $response->end();

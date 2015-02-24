@@ -2,44 +2,35 @@
 namespace Owl\Http;
 
 class Response {
-    protected $end = false;
-    protected $response;
     protected $body;
-    protected $status = 200;
-    protected $headers = [];
     protected $cookies = [];
-
-    public function __construct($response) {
-        $this->response = $response;
-    }
-
-    public function __get($key) {
-        return $this->response->$key;
-    }
-
-    public function __set($key, $value) {
-        $this->response->$key = $value;
-    }
-
-    public function __call($method, array $args) {
-        return call_user_func_array(array($this->response, $method), $args);
-    }
-
-    public function getStatus() {
-        return $this->status ?: 200;
-    }
+    protected $end = false;
+    protected $headers = [];
+    protected $status = 200;
 
     public function setStatus($status) {
         $this->status = (int)$status;
         return $this;
     }
 
+    public function getStatus() {
+        return $this->status ?: 200;
+    }
+
     public function setHeader($key, $value) {
-        $this->headers[strtolower($key)] = $value;
+        $key = implode('-', array_map('ucfirst', explode('-', $key)));
+        $this->headers[$key] = $value;
         return $this;
     }
 
-    public function setCookie() {
+    public function setCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true) {
+        if ($secure === null) {
+            $secure = isset($_SERVER['HTTPS']) ? (bool)$_SERVER['HTTPS'] : false;
+        }
+
+        $key = sprintf('%s@%s:%s', $name, $domain, $path);
+        $this->cookies[$key] = array($name, $value, $expire, $path, $domain, $secure, $httponly);
+        return $this;
     }
 
     public function setBody($body) {
@@ -47,32 +38,48 @@ class Response {
         return $this;
     }
 
-    public function end($body = null) {
-        if (!$this->end) {
-            $this->send($body);
-        }
-
-        $this->end = true;
+    public function getBody() {
+        return $this->body;
     }
 
-    protected function send($body = null) {
-        $response = $this->response;
+    public function end() {
+        if (!$this->end) {
+            $this->send();
+            $this->end = true;
+        }
+    }
 
-        $status = $this->status;
-        if ($status && $status !== 200) {
-            $response->status($status);
+    public function reset() {
+        $this->body = null;
+        $this->cookies = [];
+        $this->end = false;
+        $this->headers = [];
+        $this->status = 200;
+    }
+
+    protected function send() {
+        if (!headers_sent()) {
+            $status = $this->getStatus();
+            if ($status && $status !== 200) {
+                header(sprintf('HTTP/1.1 %d %s', $status, \Owl\HTTP::getStatusMessage($status)));
+            }
+
+            foreach ($this->headers as $key => $value) {
+                header(sprintf('%s: %s', $key, $value));
+            }
+
+            foreach ($this->cookies as $config) {
+                list($name, $value, $expire, $path, $domain, $secure, $httponly) = $config;
+                setCookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+            }
+            $this->cookie = array();
         }
 
-        // send header
-        foreach ($this->headers as $key => $value) {
-            $key = implode('-', array_map('ucfirst', explode('-', $key)));
-            $response->header($key, $value);
+        $body = $this->body;
+        if ($body instanceof \Closure) {
+            echo call_user_func($body);
+        } else {
+            echo $body;
         }
-
-        if ($body === null) {
-            $body = $this->body;
-        }
-
-        $response->end((string)$body);
     }
 }

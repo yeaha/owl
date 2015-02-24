@@ -6,7 +6,7 @@ require __DIR__ .'/../src/Application.php';
 $ip = '127.0.0.1';
 $port = 12345;
 
-$app = new \Owl\Application($ip, $port);
+$app = new \Owl\Swoole\Application($ip, $port);
 
 $app->middleware(function($request, $response) {
     $start = microtime(true);
