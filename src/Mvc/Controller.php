@@ -1,26 +1,68 @@
 <?php
-namespace Owl\Http;
+namespace Owl\Mvc;
 
-class Controller {
-    public function __beforeExecute($request, $response) {
+/**
+ * 控制器基类
+ */
+abstract class Controller {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function __beforeExecute(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
     }
 
-    public function __afterExecute($request, $response) {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function __afterExecute(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
     }
 
-    public function GET($request, $response) {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function GET(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
         throw \Owl\Http\Exception::factory(405);
     }
 
-    public function POST($request, $response) {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function POST(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
         throw \Owl\Http\Exception::factory(405);
     }
 
-    public function PUT($request, $response) {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function PUT(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
         throw \Owl\Http\Exception::factory(405);
     }
 
-    public function DELETE($request, $response) {
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function DELETE(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
+        throw \Owl\Http\Exception::factory(405);
+    }
+
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @param mixed $...
+     */
+    public function PATCH(/*\Owl\Http\Request $request, \Owl\Http\Response $response [, mixed $parameter1 [, mixed $...]]*/) {
         throw \Owl\Http\Exception::factory(405);
     }
 }
