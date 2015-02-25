@@ -42,6 +42,9 @@ class Router {
 
                 $this->namespace[$path] = $namespace;
             }
+
+            // 保证"/"设置一定在最后
+            krsort($this->namespace);
         }
     }
 
@@ -106,7 +109,7 @@ class Router {
     protected function dispatch($path) {
         do {
             if ($base_path = $this->base_path) {
-                if (stripos($path, $base_path) !== 0) {
+                if (stripos($this->normalizePath($path), $base_path) !== 0) {
                     break;
                 }
 
@@ -154,12 +157,16 @@ class Router {
      */
     protected function byPath($path) {
         $pathinfo = pathinfo(strtolower($path));
-        $path = $this->normalizePath($pathinfo['dirname'] .'/'. $pathinfo['filename']);
+        $path = ($pathinfo['dirname'] === '/')
+              ? $pathinfo['dirname'] . $pathinfo['basename']
+              : $pathinfo['dirname'] .'/'. $pathinfo['basename'];
+        $path = $this->normalizePath($path);
 
         // 路径对应的controller namespace
         foreach ($this->namespace as $ns_path => $ns) {
             $ns_path = $this->normalizePath($ns_path);
-            if ($ns_path != '/' && strpos($path.'/', $ns_path.'/') !== 0) {
+
+            if (strpos($path, $ns_path) !== 0) {
                 continue;
             }
 
