@@ -65,21 +65,20 @@ class Router {
             throw \Owl\Http\Exception::factory(404);
         }
 
-        if (!is_subclass_of($class, '\Owl\Mvc\Controller')) {
-            throw new \Exception('Invalid controller "'.$class.'", require subclass of "\Owl\Mvc\Controller"');
-        }
-
         $args = [$request, $response];
         if ($parameters) {
             $args = array_merge($args, $parameters);
         }
 
         $controller = new $class;
-        if ($data = call_user_func_array([$controller, '__beforeExecute'], $args)) {
+
+        // 如果__beforeExecute()返回了内容就直接返回内容
+        if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $args))) {
             if (!($data instanceof \Owl\Http\Response)) {
                 $response->setBody($data);
-                return $response;
             }
+
+            return $response;
         }
 
         $method = $request->getMethod();
@@ -91,12 +90,18 @@ class Router {
             throw \Owl\Http\Exception::factory(501);
         }
 
+        if (!is_callable([$controller, $method])) {
+            throw \Owl\Http\Exception::factory(405);
+        }
+
         $data = call_user_func_array([$controller, $method], $args);
         if (!($data instanceof \Owl\Http\Response)) {
             $response->setBody($data);
         }
 
-        $controller->__afterExecute($request, $response);
+        if (method_exists($controller, '__afterExecute')) {
+            $controller->__afterExecute($request, $response);
+        }
 
         return $response;
     }
