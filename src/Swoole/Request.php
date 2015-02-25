@@ -15,7 +15,7 @@ class Request extends \Owl\Http\Request {
         $this->get = isset($request->get) ? $request->get : [];
         $this->post = isset($request->post) ? $request->post : [];
         $this->cookies = isset($request->cookie) ? $request->cookie : [];
-        $this->server = isset($request->server) ? $request->server : [];
+        $this->server = isset($request->server) ? array_change_key_case($request->server, CASE_UPPER) : [];
         $this->headers = isset($request->header) ? $request->header : [];
     }
 }
