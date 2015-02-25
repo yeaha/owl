@@ -131,12 +131,12 @@ class View {
 
         try {
             extract($vars);
-
             require $file;
-        } finally {
+        } catch (\Exception $exception) {
             while (ob_get_level() > $level) {
                 ob_end_clean();
             }
+            throw $exception;
         }
 
         $output = ob_get_clean();
