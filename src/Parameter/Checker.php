@@ -1,12 +1,12 @@
 <?php
-namespace Owl;
+namespace Owl\Parameter;
 
 /**
  * 参数有效性检查，检查参数是否存在，值是否符合要求
  *
  * @example
  *
- * $checker = new \Owl\ParameterChecker;
+ * $checker = new \Owl\Parameter\Checker;
  * $checker->execute($parameters, array(
  *     'foo' => [
  *         'type' => 'integer',                 // 数据格式类型
@@ -32,7 +32,7 @@ namespace Owl;
  */
 
 
-class ParameterChecker {
+class Checker {
     protected $type_options = [
         'integer' => [
             'regexp' => '/^\d+$/',
@@ -191,7 +191,7 @@ class ParameterChecker {
     }
 
     protected function exception($parameter, $message) {
-        $exception = new \Exception($message);
+        $exception = new \Owl\Parameter\Exception($message);
         $exception->parameter = $parameter;
 
         return $exception;
