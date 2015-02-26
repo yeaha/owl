@@ -1,5 +1,6 @@
 <?php
 defined('DEBUG') or define('DEBUG', true);
+defined('TEST') or define('TEST', false);
 define('ROOT_DIR', __DIR__);
 
 require __DIR__.'/../../src/autoload.php';

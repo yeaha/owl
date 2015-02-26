@@ -90,7 +90,7 @@ class Application {
      * @param \Owl\Http\Response $response
      * @return void
      */
-    protected function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
         try {
             $this->middleware->execute($request, $response);
         } catch (\Exception $exception) {
@@ -102,7 +102,9 @@ class Application {
             call_user_func($handler, $exception, $request, $response);
         }
 
-        $response->end();
+        if (!TEST) {
+            $response->end();
+        }
     }
 
     /**
