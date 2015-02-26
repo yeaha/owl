@@ -7,6 +7,7 @@ class IndexTest extends \Tests\ControllerTest {
             'uri' => '/'
         ]);
 
+        $this->assertEquals(200, $response->getStatus());
         $this->assertRegExp('/<\/html>$/', $response->getBody());
     }
 
