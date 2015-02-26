@@ -4,21 +4,24 @@ namespace Tests\Mvc;
 class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testGet() {
         $request = \Owl\Http\Request::factory([
+            'uri' => '/foobar?a=b',
             'get' => [
                 'foo' => '1',
                 'bar' => '',
             ],
         ]);
 
+        $this->assertEquals('b', $request->get('a'));
         $this->assertEquals('1', $request->get('foo'));
         $this->assertSame('', $request->get('bar'));
         $this->assertTrue($request->hasGet('bar'));
         $this->assertFalse($request->hasGet('baz'));
-        $this->assertSame(['foo' => '1', 'bar' => ''], $request->get());
+        $this->assertSame(['a' => 'b', 'foo' => '1', 'bar' => ''], $request->get());
     }
 
     public function testPost() {
         $request = \Owl\Http\Request::factory([
+            'method' => 'post',
             'post' => [
                 'foo' => '1',
                 'bar' => '',

@@ -170,10 +170,19 @@ class Request {
         $_SERVER['REQUEST_METHOD'] = strtoupper($options['method']);
         $_SERVER['REQUEST_URI'] = $options['uri'];
 
+        if ($query = parse_url($options['uri'], PHP_URL_QUERY)) {
+            parse_str($query, $get);
+            $options['get'] = array_merge($get, $options['get']);
+        }
+
         $_COOKIE = $options['cookies'];
         $_GET = $options['get'];
         $_POST = $options['post'];
         $_REQUEST = array_merge($_GET, $_POST);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $_POST = [];
+        }
 
         foreach ($options['headers'] as $key => $value) {
             $key = 'HTTP_'. strtoupper(str_replace('-', '_', $key));
