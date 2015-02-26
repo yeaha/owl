@@ -18,8 +18,7 @@ class Response extends \Owl\Http\Response {
             $response->header($key, $value);
         }
 
-        foreach ($this->cookies as $config) {
-            list($name, $value, $expire, $path, $domain, $secure, $httponly) = $config;
+        foreach ($this->cookies as list($name, $value, $expire, $path, $domain, $secure, $httponly)) {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
