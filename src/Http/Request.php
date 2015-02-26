@@ -69,7 +69,7 @@ class Request {
             $pos = strpos($key, 'HTTP_');
 
             if ($pos !== false) {
-                $key = strtolower(str_replace('_', '-', substr($key, $pos)));
+                $key = strtolower(str_replace('_', '-', substr($key, 5)));
                 $headers[$key] = $value;
             }
         }
