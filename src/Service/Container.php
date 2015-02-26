@@ -3,7 +3,7 @@ namespace Owl\Service;
 
 /**
  * @example
- * $container = new \Owl\Service\Container;
+ * $container = \Owl\Service\Container::getInstance();
  *
  * $container->setServices([
  *     'mysql.master' => [
@@ -36,6 +36,8 @@ namespace Owl\Service;
  * $slave = $container->get('mysql.slave', 123);
  */
 class Container extends \Owl\Container {
+    static private $instance;
+
     protected function $router = [];
 
     public function setServices(array $services) {
@@ -87,5 +89,9 @@ class Container extends \Owl\Container {
             unset($options['class']);
             return new $class($options);
         });
+    }
+
+    static public function getInstance() {
+        return self::$instance ?: (self::$instance = new static);
     }
 }
