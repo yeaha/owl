@@ -38,7 +38,7 @@ namespace Owl\Service;
 class Container extends \Owl\Container {
     static private $instance;
 
-    protected function $router = [];
+    protected $router = [];
 
     public function setServices(array $services) {
         foreach ($services as $id => $options) {
