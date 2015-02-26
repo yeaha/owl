@@ -1,43 +1,16 @@
 <?php
-defined('DEBUG') or define('DEBUG', true);
-define('ROOT_DIR', __DIR__);
+require __DIR__.'/boot.php';
 
-require __DIR__.'/../../src/autoload.php';
+$config = parse_ini_file(ROOT_DIR.'/server.ini', true);
 
-\Owl\Application::registerNamespace('\\', __DIR__);
+$ip = $config['app_listener']['ip'];
+$port = $config['app_listener']['port'];
+$app = new \Owl\Swoole\Application($ip, $port);
+$app = __ini_app($app);
 
-$app = new \Owl\Swoole\Application('127.0.0.1', 12345);
+if (isset($config['swoole_setting']) && $config['swoole_setting']) {
+    $app->getSwooleServer()->set($config['swoole_setting']);
+}
 
-$app->middleware(function($request, $response) {
-    $start = microtime(true);
-
-    yield true;
-
-    $use_time = (microtime(true) - $start) * 1000;
-    $response->setHeader('use-time', (int)$use_time.'ms');
-});
-
-$router = new \Owl\Mvc\Router([
-    'namespace' => [
-        '/' => '\Controller',
-    ],
-]);
-$app->middleware(function($request, $response) use ($router) {
-    $router->execute($request, $response);
-
-    yield true;
-});
-
-$app->setExceptionHandler(function($exception, $request, $response) {
-    $status = 500;
-    if ($exception instanceof \Owl\Http\Exception) {
-        $status = $exception->getCode();
-    }
-
-    $response->setStatus($status);
-    $response->setBody($exception->getMessage());
-});
-
-echo "Listening http://127.0.0.1:12345/ ...\n";
-
+echo sprintf("Listening http://%s:%d/ ...\n", $ip, $port);
 $app->start();
