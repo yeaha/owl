@@ -269,13 +269,13 @@ class View {
      * @return string
      */
     protected function buildElement($tag, array $properties) {
-        $self_close = array(
+        $self_close = [
             'input' => true,
             'link' => true,
             'meta' => true,
-        );
+        ];
 
-        $props = array();
+        $props = [];
         foreach ($properties as $key => $value) {
             $props[] = $key.'="'.$value.'"';
         }

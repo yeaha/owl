@@ -32,7 +32,7 @@ class Http {
     const SERVICE_UNAVAILABLE = 503;
     const GATEWAY_TIMEOUT = 504;
 
-    static protected $status = array(
+    static protected $status = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',
@@ -72,7 +72,7 @@ class Http {
         502 => 'Bad Gateway',
         503 => 'Service Unavailable',
         504 => 'Gateway Time-out',
-    );
+    ];
 
     static public function getStatusMessage($code) {
         return self::$status[$code];

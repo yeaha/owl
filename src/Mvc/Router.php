@@ -86,7 +86,7 @@ class Router {
             $method = 'GET';
         }
 
-        if (!in_array($method, array('HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'))) {
+        if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
             throw \Owl\Http\Exception::factory(501);
         }
 
