@@ -1,5 +1,6 @@
 {
     "name": "owl/mvc",
+    "description": "RESTFul Web Framework",
     "keywords": ["framework", "mvc", "swoole", "restful"],
     "homepage": "https://github.com/yeaha/owl-mvc",
     "license": "MIT",
