@@ -129,4 +129,57 @@ class Request {
     public function isDelete() {
         return $this->getMethod() === 'DELETE';
     }
+
+    /**
+     * 构造http请求对象，供测试使用
+     *
+     * @example
+     * $request = Request::factory([
+     *     'uri' => '/',
+     *     'method' => 'post',
+     *     'cookies' => [
+     *         $key => $value,
+     *         ...
+     *     ],
+     *     'headers' => [
+     *         $key => $value,
+     *         ...
+     *     ],
+     *     'get' => [
+     *         $key => $value,
+     *         ...
+     *     ],
+     *     'post' => [
+     *         $key => $value,
+     *         ...
+     *     ],
+     * ]);
+     */
+    static public function factory(array $options = []) {
+        $options = array_merge([
+            'uri' => '/',
+            'method' => 'GET',
+            'cookies' => [],
+            'headers' => [],
+            'get' => [],
+            'post' => [],
+        ], $options);
+
+        $_SERVER = [];
+
+        $_SERVER['REQUEST_METHOD'] = strtoupper($options['method']);
+        $_SERVER['REQUEST_URI'] = $options['uri'];
+
+        $_COOKIE = $options['cookies'];
+        $_GET = $options['get'];
+        $_POST = $options['post'];
+        $_REQUEST = array_merge($_GET, $_POST);
+
+        foreach ($options['headers'] as $key => $value) {
+            $key = 'HTTP_'. strtoupper(str_replace('-', '_', $key));
+            $_SERVER[$key] = $value;
+        }
+
+        return new Request;
+    }
 }
