@@ -41,3 +41,27 @@ function __ini_app(\Owl\Application $app) {
 
     return $app;
 }
+
+function __get_fpm_app() {
+    $app = new \Owl\Application;
+
+    return __ini_app($app);
+}
+
+function __get_swoole_app() {
+    $config = parse_ini_file(ROOT_DIR.'/server.ini', true);
+
+    $ip = $config['app_listener']['ip'];
+    $port = $config['app_listener']['port'];
+    $app = new \Owl\Swoole\Application($ip, $port);
+
+    if (isset($config['swoole_setting']) && $config['swoole_setting']) {
+        $app->getSwooleServer()->set($config['swoole_setting']);
+    }
+
+    $app->getSwooleServer()->on('start', function() use ($config) {
+        echo sprintf("Listening http://%s:%d/ ...\n", $config['app_listener']['ip'], $config['app_listener']['port']);
+    });
+
+    return __ini_app($app);
+}
