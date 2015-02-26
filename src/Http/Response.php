@@ -23,14 +23,24 @@ class Response {
         return $this;
     }
 
+    public function getHeader($key) {
+        $key = implode('-', array_map('ucfirst', explode('-', $key)));
+
+        return isset($this->headers[$key]) ? $this->headers[$key] : false;
+    }
+
     public function setCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true) {
         if ($secure === null) {
             $secure = isset($_SERVER['HTTPS']) ? (bool)$_SERVER['HTTPS'] : false;
         }
 
         $key = sprintf('%s@%s:%s', $name, $domain, $path);
-        $this->cookies[$key] = array($name, $value, $expire, $path, $domain, $secure, $httponly);
+        $this->cookies[$key] = [$name, $value, $expire, $path, $domain, $secure, $httponly];
         return $this;
+    }
+
+    public function getCookies() {
+        return $this->cookies;
     }
 
     public function setBody($body) {
@@ -60,19 +70,20 @@ class Response {
     protected function send() {
         if (!headers_sent()) {
             $status = $this->getStatus();
-            if ($status && $status !== 200) {
+            if ($status !== 200) {
                 header(sprintf('HTTP/1.1 %d %s', $status, \Owl\HTTP::getStatusMessage($status)));
             }
 
             foreach ($this->headers as $key => $value) {
                 header(sprintf('%s: %s', $key, $value));
             }
+            $this->headers = [];
 
             foreach ($this->cookies as $config) {
                 list($name, $value, $expire, $path, $domain, $secure, $httponly) = $config;
                 setCookie($name, $value, $expire, $path, $domain, $secure, $httponly);
             }
-            $this->cookie = array();
+            $this->cookie = [];
         }
 
         $body = $this->body;
