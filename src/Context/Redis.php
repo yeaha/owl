@@ -1,6 +1,16 @@
 <?php
 namespace Owl\Context;
 
+/**
+ * @example
+ * $config = array(
+ *     'token' => (string),                 // 必须，上下文存储唯一标识
+ *     'service' => (\Owl\Service\Redis),   // 必须，用于存储的redis服务名
+ *     'ttl' => (integer),                  // 可选，生存期，单位：秒，默认：0
+ * );
+ *
+ * $context = new \Owl\Context\Redis($config);
+ */
 class Redis extends \Owl\Context\Adapter {
     protected $data;
     protected $saved_keys;
@@ -21,16 +31,18 @@ class Redis extends \Owl\Context\Adapter {
     }
 
     public function set($key, $val) {
-        if (isset($this->data[$key]) && $this->data[$key] === $val)
+        if (isset($this->data[$key]) && $this->data[$key] === $val) {
             return true;
+        }
 
         $this->data[$key] = $val;
         $this->dirty = true;
     }
 
     public function get($key = null) {
-        if ($key === null)
+        if ($key === null) {
             return $this->data;
+        }
 
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
@@ -40,15 +52,16 @@ class Redis extends \Owl\Context\Adapter {
     }
 
     public function remove($key) {
-        if (!isset($this->data[$key]))
+        if (!isset($this->data[$key])) {
             return false;
+        }
 
         unset($this->data[$key]);
         $this->dirty = true;
     }
 
     public function clear() {
-        $this->data = array();
+        $this->data = [];
         $this->dirty = true;
     }
 
@@ -60,8 +73,9 @@ class Redis extends \Owl\Context\Adapter {
     }
 
     public function save() {
-        if (!$this->dirty)
+        if (!$this->dirty) {
             return true;
+        }
 
         $this->dirty = false;
 
@@ -70,7 +84,7 @@ class Redis extends \Owl\Context\Adapter {
 
         if (!$data = $this->data) {
             $redis->delete($token);
-            $this->saved_keys = array();
+            $this->saved_keys = [];
             return true;
         }
 
@@ -78,13 +92,15 @@ class Redis extends \Owl\Context\Adapter {
 
         $redis->multi(\Redis::PIPELINE);
 
-        foreach ($removed_keys as $key)
+        foreach ($removed_keys as $key) {
             $redis->hDel($token, $key);
+        }
 
         $redis->hMSet($token, $data);
 
-        if ($ttl = (int)$this->getConfig('ttl'))
+        if ($ttl = (int)$this->getConfig('ttl')) {
             $redis->setTimeout($token, $ttl);
+        }
 
         $redis->exec();
 
@@ -93,12 +109,12 @@ class Redis extends \Owl\Context\Adapter {
     }
 
     protected function getService() {
-        if (!$service = $this->getConfig('service'))
-            throw new \RuntimeException('Require redis service for context');
+        $service = $this->getConfig('service');
 
-        if ($service instanceof \Lysine\Service\Redis)
-            return $service;
+        if (!$service || !($service instanceof \Owl\Service\Redis)) {
+            throw new \Exception('Invalid redis service.');
+        }
 
-        return service($service);
+        return $service;
     }
 }
