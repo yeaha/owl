@@ -8,7 +8,7 @@ trait Singleton {
     protected function __construct() {}
 
     public function __clone() {
-        throw new \RuntimeException('Cloning '. __CLASS__ .' is not allowed');
+        throw new \Exception('Cloning '. __CLASS__ .' is not allowed');
     }
 
     static public function getInstance() {
