@@ -11,7 +11,7 @@ namespace Owl\Context;
  *
  * $context = new \Owl\Context\Redis($config);
  */
-class Redis extends \Owl\Context\Adapter {
+class Redis extends \Owl\Context {
     protected $data;
     protected $saved_keys;
     protected $dirty = false;

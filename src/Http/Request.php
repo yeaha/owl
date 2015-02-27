@@ -97,6 +97,54 @@ class Request {
         return pathinfo($this->getRequestPath(), PATHINFO_EXTENSION) ?: 'html';
     }
 
+    public function getIP($proxy = null) {
+        $ip = $proxy
+            ? $this->getServer('http_x_forwarded_for') ?: $this->getServer('remote_addr')
+            : $this->getServer('remote_addr');
+
+        if (strpos($ip, ',') === false) {
+            return $ip;
+        }
+
+        // private ip range, ip2long()
+        $private = array(
+            array(0, 50331647),             // 0.0.0.0, 2.255.255.255
+            array(167772160, 184549375),    // 10.0.0.0, 10.255.255.255
+            array(2130706432, 2147483647),  // 127.0.0.0, 127.255.255.255
+            array(2851995648, 2852061183),  // 169.254.0.0, 169.254.255.255
+            array(2886729728, 2887778303),  // 172.16.0.0, 172.31.255.255
+            array(3221225984, 3221226239),  // 192.0.2.0, 192.0.2.255
+            array(3232235520, 3232301055),  // 192.168.0.0, 192.168.255.255
+            array(4294967040, 4294967295),  // 255.255.255.0 255.255.255.255
+        );
+
+        $ip_set = array_map('trim', explode(',', $ip));
+
+        // 检查是否私有地址，如果不是就直接返回
+        foreach ($ip_set as $key => $ip) {
+            $long = ip2long($ip);
+
+            if ($long === false) {
+                unset($ip_set[$key]);
+                continue;
+            }
+
+            $is_private = false;
+
+            foreach ($private as $m) {
+                list($min, $max) = $m;
+                if ($long >= $min && $long <= $max) {
+                    $is_private = true;
+                    break;
+                }
+            }
+
+            if (!$is_private) return $ip;
+        }
+
+        return array_shift($ip_set) ?: '0.0.0.0';
+    }
+
     public function getMethod() {
         $method = strtoupper($this->getServer('REQUEST_METHOD'));
 
@@ -163,12 +211,17 @@ class Request {
             'headers' => [],
             'get' => [],
             'post' => [],
+            'ip' => '',
         ], $options);
 
         $_SERVER = [];
 
         $_SERVER['REQUEST_METHOD'] = strtoupper($options['method']);
         $_SERVER['REQUEST_URI'] = $options['uri'];
+
+        if ($options['ip']) {
+            $_SERVER['REMOTE_ADDR'] = $options['ip'];
+        }
 
         if ($query = parse_url($options['uri'], PHP_URL_QUERY)) {
             parse_str($query, $get);

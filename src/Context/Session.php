@@ -1,7 +1,7 @@
 <?php
 namespace Owl\Context;
 
-class Session extends Adapter {
+class Session extends \Owl\Context {
     public function set($key, $val) {
         $token = $this->getToken();
 

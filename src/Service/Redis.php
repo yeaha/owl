@@ -25,6 +25,10 @@ class Redis implements \Owl\Service\IService {
         }
     }
 
+    public function destroy() {
+        $this->disconnect();
+    }
+
     public function getConfig($key = null) {
         if ($key === null) {
             return $this->config;
@@ -68,15 +72,15 @@ class Redis implements \Owl\Service\IService {
         }
 
         if (!$conn) {
-            throw new \Lysine\Service\ConnectionException('Cannot connect redis');
+            throw new \Owl\Service\Exception('Cannot connect redis');
         }
 
         if ($config['password'] && !$handler->auth($config['password'])) {
-            throw new \Lysine\Service\ConnectionException('Invalid redis password');
+            throw new \Owl\Service\Exception('Invalid redis password');
         }
 
         if ($config['database'] && !$handler->select($config['database'])) {
-            throw new \Lysine\Service\ConnectionException('Select redis database['.$config['database'].'] failed');
+            throw new \Owl\Service\Exception('Select redis database['.$config['database'].'] failed');
         }
 
         if (isset($config['prefix'])) {
