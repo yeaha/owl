@@ -36,7 +36,7 @@ namespace Owl\Service;
  * $slave = $container->get('mysql.slave', 123);
  */
 class Container extends \Owl\Container {
-    static private $instance;
+    use \Owl\Traits\Singleton;
 
     protected $router = [];
 
@@ -89,9 +89,5 @@ class Container extends \Owl\Container {
             unset($options['class']);
             return new $class($options);
         });
-    }
-
-    static public function getInstance() {
-        return self::$instance ?: (self::$instance = new static);
     }
 }
