@@ -27,5 +27,24 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase {
 
         $middleware->execute();
         $this->assertSame([1, 3, 4, 2], $data);
+
+        // test execute empty queue
+        $middleware->reset();
+        $middleware->execute();
+    }
+
+    public function testHandleGenerator() {
+        $middleware = new \Owl\Middleware;
+        $middleware->insert(function() {});
+
+        $this->setExpectedExceptionRegExp('\Exception', '/yield/');
+        $middleware->execute();
+    }
+
+    public function testInvalidHandler() {
+        $middleware = new \Owl\Middleware;
+
+        $this->setExpectedExceptionRegExp('\Exception', '/is not callable/');
+        $middleware->insert(1);
     }
 }
