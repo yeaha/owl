@@ -52,16 +52,15 @@ function __get_fpm_app() {
 function __get_swoole_app() {
     $config = parse_ini_file(ROOT_DIR.'/server.ini', true);
 
-    $ip = $config['app_listener']['ip'];
-    $port = $config['app_listener']['port'];
-    $app = new \Owl\Swoole\Application($ip, $port);
+    $public_listener = $config['public_listener'];
+    $app = new \Owl\Swoole\Application($public_listener['ip'], $public_listener['port']);
 
     if (isset($config['swoole_setting']) && $config['swoole_setting']) {
         $app->getSwooleServer()->set($config['swoole_setting']);
     }
 
-    $app->getSwooleServer()->on('start', function() use ($config) {
-        echo sprintf("Listening http://%s:%d/ ...\n", $config['app_listener']['ip'], $config['app_listener']['port']);
+    $app->getSwooleServer()->on('start', function() use ($public_listener) {
+        echo sprintf("Listening http://%s:%d/ ...\n", $public_listener['ip'], $public_listener['port']);
     });
 
     return __ini_app($app);
