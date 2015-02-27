@@ -21,6 +21,17 @@ class Redis implements \Owl\Service\IService {
 
     public function __construct(array $config = []) {
         if ($config) {
+            (new \Owl\Parameter\Checker)->execute($config, [
+                'host' => ['type' => 'ip', 'required' => false],
+                'port' => ['type' => 'integer', 'required' => false],
+                'timeout' => ['type' => 'integer', 'required' => false],
+                'prefix' => ['type' => 'string', 'required' => false],
+                'persistent_id' => ['type' => 'string', 'required' => false, 'allow_empty' => true],
+                'unix_socket' => ['type' => 'string', 'required' => false],
+                'password' => ['type' => 'string', 'required' => false, 'allow_empty' => true],
+                'database' => ['type' => 'integer', 'required' => false],
+            ]);
+
             $this->config = array_merge($this->config, $config);
         }
     }

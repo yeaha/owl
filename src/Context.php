@@ -11,6 +11,10 @@ abstract class Context {
     abstract public function clear();
 
     public function __construct(array $config) {
+        (new \Owl\Parameter\Checker)->execute($config, [
+            'token' => ['type' => 'string'],
+        ]);
+
         $this->config = $config;
     }
 
@@ -25,11 +29,7 @@ abstract class Context {
     }
 
     public function getToken() {
-        if (!$token = $this->getConfig('token')) {
-            throw new \UnexpectedValueException('Undefined context save token');
-        }
-
-        return $token;
+        return $this->getConfig('token');
     }
 
     // 保存上下文数据，根据需要重载

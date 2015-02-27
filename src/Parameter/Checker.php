@@ -28,6 +28,10 @@ namespace Owl\Parameter;
  *             ],
  *         ],
  *     ],
+ *     'baz' => [
+ *         'type' => 'object',                  // 对象类型检查
+ *         'instanceof' => '\Baz'               // 对象所属类检查
+ *     ]
  * ));
  */
 
@@ -48,6 +52,9 @@ class Checker {
         ],
         'uri' => [
             'regexp' => '#^/(?:[^?]*)?(?:\?[^\#]*)?(?:\#[0-9a-z\-\_\/]*)?$#',
+        ],
+        'ip' => [
+            'regexp' => '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/',
         ],
     ];
 
@@ -115,6 +122,8 @@ class Checker {
             return $this->checkHash($key, $value, $option);
         case 'array':
             return $this->checkArray($key, $value, $option);
+        case 'object':
+            return $this->checkObject($key, $value, $option);
         default:
             return $this->checkLiteral($key, $value, $option);
         }
@@ -162,7 +171,7 @@ class Checker {
      */
     protected function checkHash($key, $value, array $option) {
         if (!is_array($value) || array_values($value) === $value) {
-            throw $this->exception($key, sprintf('Parameter value is not hash type'));
+            throw $this->exception($key, 'Parameter value is not hash type');
         }
 
         if (isset($option['keys']) && $option['keys']) {
@@ -180,13 +189,29 @@ class Checker {
      */
     protected function checkArray($key, $value, array $option) {
         if (!is_array($value) || array_values($value) !== $value) {
-            throw $this->exception($key, sprintf('Parameter value is not array type'));
+            throw $this->exception($key, 'Parameter value is not array type');
         }
 
         if (isset($option['element']) && $option['element']) {
             foreach ($value as $element) {
                 $this->execute($element, $option['element']);
             }
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param array $option
+     * @return void
+     */
+    public function checkObject($key, $value, array $option) {
+        if (!is_object($value)) {
+            $this->exception($key, 'Parameter value is not object');
+        }
+
+        if (isset($option['instanceof']) && !($value instanceof $option['instanceof'])) {
+            $this->exception($key, sprintf('Parameter value must instanceof "%s"', $option['instanceof']));
         }
     }
 

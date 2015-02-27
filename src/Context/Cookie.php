@@ -30,17 +30,12 @@ class Cookie extends \Owl\Context {
     protected $response;
 
     public function __construct(array $config) {
+        (new \Owl\Parameter\Checker)->execute($config, [
+            'request' => ['type' => 'object', 'instanceof' => '\Owl\Http\Request'],
+            'response' => ['type' => 'object', 'instanceof' => '\Owl\Http\Response'],
+        ]);
+
         parent::__construct($config);
-
-        $request = $this->getConfig('request');
-        if (!$request || !($request instanceof \Owl\Http\Request)) {
-            throw new \Exception('Invalid "request" config');
-        }
-
-        $response = $this->getConfig('response');
-        if (!$response || !($response instanceof \Owl\Http\Response)) {
-            throw new \Exception('Invalid "response" config');
-        }
     }
 
     public function set($key, $val) {
