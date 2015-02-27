@@ -181,8 +181,8 @@ abstract class Data {
      * @throws \UnexpectedValueException 如果属性未定义
      * @throws \UnexpectedValueException 把null赋值给一个不允许为null的属性
      * @throws \UnexpectedValueException 值没有通过设定的正则表达式检查
-     * @throws \RuntimeException 属性被标记为“废弃”
-     * @throws \RuntimeException 属性不允许更新修改
+     * @throws \Exception 属性被标记为“废弃”
+     * @throws \Exception 属性不允许更新修改
      */
     public function set($key, $value, array $options = null) {
         $defaults = ['force' => false, 'strict' => true];
