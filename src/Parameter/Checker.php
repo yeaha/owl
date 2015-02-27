@@ -98,7 +98,7 @@ class Checker {
      *
      * @param array $values
      * @param array $options
-     * @return void
+     * @return true
      */
     public function execute(array $values, array $options) {
         foreach ($options as $key => $option) {
@@ -114,6 +114,8 @@ class Checker {
 
             $this->check($key, $values[$key], $option);
         }
+
+        return true;
     }
 
     protected function check($key, $value, array $option) {
