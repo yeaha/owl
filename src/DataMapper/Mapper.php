@@ -20,41 +20,41 @@ abstract class Mapper {
      * 根据主键值返回查询到的单条记录
      *
      * @param string|integer|array $id 主键值
-     * @param IService [$service] 存储服务连接
+     * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
      * @return array 数据结果
      */
-    abstract protected function doFind($id, \Owl\Service\IService $service = null, $collection = null);
+    abstract protected function doFind($id, \Owl\Service $service = null, $collection = null);
 
     /**
      * 插入数据到存储服务
      *
      * @param Data $data Data实例
-     * @param IService [$service] 存储服务连接
+     * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
      * @return array 新的主键值
      */
-    abstract protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null);
+    abstract protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
 
     /**
      * 更新数据到存储服务
      *
      * @param Data $data Data实例
-     * @param IService [$service] 存储服务连接
+     * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
      * @return boolean
      */
-    abstract protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null);
+    abstract protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
 
     /**
      * 从存储服务删除数据
      *
      * @param Data $data Data实例
-     * @param IService [$service] 存储服务连接
+     * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
      * @return boolean
      */
-    abstract protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null);
+    abstract protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
 
     /**
      * @param string $class
@@ -109,7 +109,7 @@ abstract class Mapper {
     /**
      * 获得存储服务连接实例
      *
-     * @return IService
+     * @return Owl\Service
      * @throws \RuntimeException Data class没有配置存储服务
      */
     public function getService() {

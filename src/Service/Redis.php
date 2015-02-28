@@ -5,7 +5,7 @@ if (!extension_loaded('redis')) {
     throw new \RuntimeException('Require redis extension!');
 }
 
-class Redis implements \Owl\Service\IService {
+class Redis extends \Owl\Service {
     protected $config = array(
         'host' => '127.0.0.1',
         'port' => 6379,
@@ -38,16 +38,6 @@ class Redis implements \Owl\Service\IService {
 
     public function destroy() {
         $this->disconnect();
-    }
-
-    public function getConfig($key = null) {
-        if ($key === null) {
-            return $this->config;
-        }
-
-        return isset($this->config[$key])
-             ? $this->config[$key]
-             : false;
     }
 
     public function __destruct() {

@@ -1,7 +1,7 @@
 <?php
 namespace Tests\Mock\DataMapper;
 
-class Service implements \Owl\Service\IService {
+class Service implements \Owl\Service {
     protected $data = array();
 
     public function __construct(array $config = array()) {

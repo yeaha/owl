@@ -19,7 +19,7 @@ abstract class CacheMapper extends \Owl\DataMapper\DB\Mapper {
         return parent::refresh($data);
     }
 
-    protected function doFind($id, \Lysine\Service\IService $service = null, $collection = null) {
+    protected function doFind($id, \Owl\Service $service = null, $collection = null) {
         if ($record = $this->getCache($id)) {
             return $record;
         }

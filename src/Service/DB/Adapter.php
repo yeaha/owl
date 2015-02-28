@@ -3,8 +3,7 @@ namespace Owl\Service\DB;
 
 use Owl\Service\DB\Expr;
 
-abstract class Adapter implements \Owl\Service\IService {
-    protected $options;
+abstract class Adapter extends \Owl\Service {
     protected $handler;
 
     protected $identifier_symbol = '`';
@@ -14,12 +13,11 @@ abstract class Adapter implements \Owl\Service\IService {
 
     abstract public function lastID($table = null, $column = null);
 
-    public function __construct(array $options = []) {
-        if (!isset($options['dsn'])) {
+    public function __construct(array $config = []) {
+        if (!isset($config['dsn'])) {
             throw new \InvalidArgumentException('Invalid database config, require "dsn" key.');
         }
-
-        $this->options = $options;
+        parent::__construct($config);
     }
 
     public function __destruct() {
@@ -45,10 +43,10 @@ abstract class Adapter implements \Owl\Service\IService {
             return $this->handler;
         }
 
-        $dsn = $this->options['dsn'];
-        $user = isset($this->options['user']) ? $this->options['user'] : null;
-        $password = isset($this->options['password']) ? $this->options['password'] : null;
-        $options = isset($this->options['options']) ? $this->options['options'] : [];
+        $dsn = $this->getConfig('dsn');
+        $user = $this->getConfig('user') ?: null;
+        $password = $this->getConfig('password') ?: null;
+        $options = $this->getConfig('options') ?: [];
 
         $options[\PDO::ATTR_ERRMODE] = \PDO::ERRMODE_EXCEPTION;
         $options[\PDO::ATTR_STATEMENT_CLASS] = ['\Owl\Service\DB\Statement'];

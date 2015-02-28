@@ -2,7 +2,7 @@
 namespace Owl\DataMapper\DB;
 
 class Mapper extends \Owl\DataMapper\Mapper {
-    public function select(\Owl\Service\IService $service = null, $collection = null) {
+    public function select(\Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
         $primary_key = $this->getPrimaryKey();
@@ -24,7 +24,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $select;
     }
 
-    protected function doFind($id, \Owl\Service\IService $service = null, $collection = null) {
+    protected function doFind($id, \Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
 
@@ -36,7 +36,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $select->limit(1)->execute()->fetch();
     }
 
-    protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null) {
+    protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
         $record = $this->unpack($data);
@@ -58,7 +58,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $id;
     }
 
-    protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null) {
+    protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
         $record = $this->unpack($data, ['dirty' => true]);
@@ -68,7 +68,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $service->update($collection, $record, $where, $params);
     }
 
-    protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service\IService $service = null, $collection = null) {
+    protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
 
@@ -77,7 +77,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $service->delete($collection, $where, $params);
     }
 
-    protected function whereID(\Owl\Service\IService $service, $id) {
+    protected function whereID(\Owl\Service $service, $id) {
         $primary_key = $this->getPrimaryKey();
         $key_count = count($primary_key);
 

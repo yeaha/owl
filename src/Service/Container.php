@@ -82,7 +82,7 @@ class Container extends \Owl\Container {
             }
 
             $class = $options['class'];
-            if (is_subclass_of($class, '\Owl\Service\IService')) {
+            if (is_subclass_of($class, '\Owl\Service')) {
                 throw new \UnexpectedValueException();
             }
 

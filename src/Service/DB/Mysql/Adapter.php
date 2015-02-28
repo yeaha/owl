@@ -8,14 +8,14 @@ if (!extension_loaded('pdo_mysql')) {
 class Adapter extends \Owl\Service\DB\Adapter {
     protected $identifier_symbol = '`';
 
-    public function __construct(array $options = []) {
-        parent::__construct($options);
-
-        if (isset($this->options['options'])) {
-            $this->options['options'][\PDO::MYSQL_ATTR_FOUND_ROWS] = true;
+    public function __construct(array $config = []) {
+        if (isset($config['options'])) {
+            $config['options'][\PDO::MYSQL_ATTR_FOUND_ROWS] = true;
         } else {
-            $this->options['options'] = [\PDO::MYSQL_ATTR_FOUND_ROWS => true];
+            $config['options'] = [\PDO::MYSQL_ATTR_FOUND_ROWS => true];
         }
+
+        parent::__construct($config);
     }
 
     public function lastID($table = null, $column = null) {
