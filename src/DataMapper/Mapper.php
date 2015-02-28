@@ -64,12 +64,28 @@ abstract class Mapper {
         $this->options = $this->normalizeOptions($class::getOptions());
     }
 
-    public function __before($event, \Owl\DataMapper\Data $data) {
+    protected function __beforeSave(\Owl\DataMapper\Data $data) {}
+    protected function __afterSave(\Owl\DataMapper\Data $data) {}
+
+    protected function __beforeInsert(\Owl\DataMapper\Data $data) {}
+    protected function __afterInsert(\Owl\DataMapper\Data $data) {}
+
+    protected function __beforeUpdate(\Owl\DataMapper\Data $data) {}
+    protected function __afterUpdate(\Owl\DataMapper\Data $data) {}
+
+    protected function __beforeDelete(\Owl\DataMapper\Data $data) {}
+    protected function __afterDelete(\Owl\DataMapper\Data $data) {}
+
+    final private function __before($event, \Owl\DataMapper\Data $data) {
+        $event = ucfirst($event);
         call_user_func([$data, '__before'.$event]);
+        call_user_func([$this, '__before'.$event], $data);
     }
 
-    public function __after($event, \Owl\DataMapper\Data $data) {
+    final private function __after($event, \Owl\DataMapper\Data $data) {
+        $event = ucfirst($event);
         call_user_func([$data, '__after'.$event]);
+        call_user_func([$this, '__after'.$event], $data);
     }
 
     /**

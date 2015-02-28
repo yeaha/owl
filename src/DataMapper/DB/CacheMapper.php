@@ -6,15 +6,15 @@ abstract class CacheMapper extends \Owl\DataMapper\DB\Mapper {
     abstract protected function deleteCache($id);
     abstract protected function saveCache($id, array $record);
 
-    protected function __after($event, $data) {
-        parent::__after($event, $data);
-
-        if ($event == 'update' || $event == 'delete') {
-            $this->deleteCache($data->id());
-        }
+    protected function __afterUpdate(\Owl\DataMapper\Data $data) {
+        $this->deleteCache($data->id());
     }
 
-    public function refresh(Data $data) {
+    protected function __afterDelete(\Owl\DataMapper\Data $data) {
+        $this->deleteCache($data->id());
+    }
+
+    public function refresh(\Owl\DataMapper\Data $data) {
         $this->deleteCache($data->id());
         return parent::refresh($data);
     }
