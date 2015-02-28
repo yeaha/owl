@@ -101,6 +101,22 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         $checker->execute(array('foo' => array('bar' => 'a')), $options);
     }
 
+    public function testHashTypeException() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $options = array(
+            'foo' => array(
+                'type' => 'hash',
+            ),
+        );
+
+        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/is not hash type/');
+        $checker->execute(
+            array('foo' => array(1, 2, 3)),
+            $options
+        );
+    }
+
     public function testArrayType() {
         $checker = new \Owl\Parameter\Checker;
 
