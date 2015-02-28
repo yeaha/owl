@@ -9,6 +9,8 @@ class IndexTest extends \Tests\ControllerTest {
 
         $this->assertEquals(200, $response->getStatus());
         $this->assertRegExp('/<\/html>$/', $response->getBody());
+        $this->assertEquals('bar', $response->getCookie('foo'));
+        $this->assertFalse($response->getCookie('bar'));
     }
 
     public function testPost() {

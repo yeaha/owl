@@ -13,4 +13,9 @@ class Response extends \Owl\Http\Response {
     public function getCookies($path = '/') {
         return $this->cookies->get($path);
     }
+
+    public function getCookie($key, $path = '/') {
+        $cookies = $this->cookies->get($path);
+        return isset($cookies[$key]) ? $cookies[$key] : false;
+    }
 }
