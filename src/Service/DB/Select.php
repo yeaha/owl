@@ -174,7 +174,7 @@ class Select {
      *
      * @example
      * // select foo, count(1) from foobar group by foo having count(1) > 2
-     * $select->setcolumns('foo', new Expr('count(1) as count'))->group('foo', 'count(1) > ?', 2);
+     * $select->setcolumns('foo', new Expr('count(1) as count'))->groupBy('foo', 'count(1) > ?', 2);
      */
     public function groupBy($columns, $having = null, $having_params = null) {
         $having_params = ($having === null || $having_params === null)
@@ -193,10 +193,10 @@ class Select {
      *
      * @example
      *
-     * $select->order('foo');
-     * $select->order(new Expr('foo desc'));
-     * $select->order(['foo' => 'desc', 'bar' => 'asc']);
-     * $select->order('foo', 'bar', new Expr('baz desc'));
+     * $select->orderBy('foo');
+     * $select->orderBy(new Expr('foo desc'));
+     * $select->orderBy(['foo' => 'desc', 'bar' => 'asc']);
+     * $select->orderBy('foo', 'bar', new Expr('baz desc'));
      */
     public function orderBy($expressions) {
         $expressions = is_array($expressions) ? $expressions : func_get_args();
@@ -382,11 +382,11 @@ class Select {
             $offset = $this->offset;
             $order = $this->order_by;
 
-            $this->order(null)->limit(0)->offset(0);
+            $this->orderBy(null)->limit(0)->offset(0);
 
             $total = $this->count();
 
-            $this->order($order)->limit($limit)->offset($offset);
+            $this->orderBy($order)->limit($limit)->offset($offset);
         }
 
         return self::buildPageInfo($total, $size, $current);
@@ -461,7 +461,7 @@ class Select {
      * <code>
      * // 找出符合条件的前5条
      * // select * from "users" where id > 100 order by create_time desc limit 5
-     * $select = $adapter->select('users')->where('id > ?', 100)->order('create_time desc')->limit(5);
+     * $select = $adapter->select('users')->where('id > ?', 100)->orderBy('create_time desc')->limit(5);
      *
      * // 因为DELETE语句不支持order by / limit / offset
      * // 删除符合条件的，不仅仅是前5条
