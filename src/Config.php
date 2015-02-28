@@ -26,7 +26,7 @@ class Config {
         self::$config = array_merge(self::$config, $config);
     }
 
-    static public function get($key = null) {
+    static public function get($keys = null) {
         $keys = $keys === null
               ? null
               : is_array($keys) ? $keys : func_get_args();
