@@ -205,10 +205,10 @@ class Select {
         foreach ($expressions as $expression) {
             if ($expression instanceof Expr) {
                 $order_by[] = $expression;
-            } elseif (is_string($expression)) {
+            } elseif (is_string($expressions)) {
                 $order_by[] = $this->adapter->quoteIdentifier($expression);
-            } elseif ($expression) {
-                foreach ($expression as $column => $sort) {
+            } elseif ($expressions) {
+                foreach ($expressions as $column => $sort) {
                     $column = $this->adapter->quoteIdentifier($column);
                     $sort = (strtoupper($sort) === 'DESC') ? 'DESC' : '';
 
@@ -299,7 +299,7 @@ class Select {
         }
 
         if ($this->order_by) {
-            $sql .= ' ORDER BY '. $this->order_by;
+            $sql .= ' ORDER BY '. implode(', ', $this->order_by);
         }
 
         if ($this->limit) {
@@ -534,14 +534,14 @@ class Select {
     /**
      * where in 子查询语句
      *
-     * @param string $col
+     * @param string $column
      * @param array|Select $relation
      * @param boolean $in
      * @return $this
      */
-    protected function whereSub($col, $relation, $in) {
-        $col = $this->adapter->quoteIdentifier($col);
-        $params = array();
+    protected function whereSub($column, $relation, $in) {
+        $column = $this->adapter->quoteIdentifier($column);
+        $params = [];
 
         if ($relation instanceof Select) {
             list($sql, $params) = $relation->compile();
@@ -551,8 +551,8 @@ class Select {
         }
 
         $where = $in
-               ? sprintf('%s IN (%s)', $col, $sub)
-               : sprintf('%s NOT IN (%s)', $col, $sub);
+               ? sprintf('%s IN (%s)', $column, $sub)
+               : sprintf('%s NOT IN (%s)', $column, $sub);
 
         $this->where[] = [$where, $params];
         return $this;

@@ -34,6 +34,10 @@ abstract class Adapter extends \Owl\Service {
              : $this->connect()->$method();
     }
 
+    public function destroy() {
+        $this->disconnect();
+    }
+
     public function isConnected() {
         return $this->handler instanceof \PDO;
     }
@@ -135,6 +139,29 @@ abstract class Adapter extends \Owl\Service {
         $sth->setFetchMode(\PDO::FETCH_ASSOC);
 
         return $sth;
+    }
+
+    public function quote($value) {
+        if (is_array($value)) {
+            foreach ($value as $k => $v) {
+                $value[$k] = $this->quote($v);
+            }
+            return $value;
+        }
+
+        if ($value instanceof Expr) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return 'NULL';
+        }
+
+        return $this->connect()->quote($value);
     }
 
     public function quoteIdentifier($identifier) {
