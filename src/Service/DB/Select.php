@@ -176,7 +176,7 @@ class Select {
      * // select foo, count(1) from foobar group by foo having count(1) > 2
      * $select->setcolumns('foo', new Expr('count(1) as count'))->group('foo', 'count(1) > ?', 2);
      */
-    public function group($columns, $having = null, $having_params = null) {
+    public function groupBy($columns, $having = null, $having_params = null) {
         $having_params = ($having === null || $having_params === null)
                        ? []
                        : is_array($having_params) ? $having_params : array_slice(func_get_args(), 2);
@@ -198,7 +198,7 @@ class Select {
      * $select->order(['foo' => 'desc', 'bar' => 'asc']);
      * $select->order('foo', 'bar', new Expr('baz desc'));
      */
-    public function order($expressions) {
+    public function orderBy($expressions) {
         $expressions = is_array($expressions) ? $expressions : func_get_args();
 
         $order_by = [];

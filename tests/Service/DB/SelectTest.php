@@ -16,7 +16,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
         $select = $this->select('mytable');
         $this->assertEquals((string)$select, 'SELECT * FROM "mytable"');
 
-        $select->order(['id' => 'desc']);
+        $select->orderBy(['id' => 'desc']);
         $this->assertEquals((string)$select, 'SELECT * FROM "mytable" ORDER BY "id" DESC');
 
         $select->limit(10);
@@ -101,7 +101,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 
     public function testUpdateWithGroupBy() {
         $this->setExpectedException('\LogicException');
-        $this->select('mytable')->where('id = 1')->group('email')->update(array('name' => 'yangyi'));
+        $this->select('mytable')->where('id = 1')->groupBy('email')->update(array('name' => 'yangyi'));
     }
 
     public function testDeleteWithoutWhere() {
@@ -121,6 +121,6 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 
     public function testDeleteWithGroupBy() {
         $this->setExpectedException('\LogicException');
-        $this->select('mytable')->where('id = 1')->group('email')->delete();
+        $this->select('mytable')->where('id = 1')->groupBy('email')->delete();
     }
 }
