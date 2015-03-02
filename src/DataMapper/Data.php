@@ -11,34 +11,21 @@ abstract class Data {
     static protected $mapper = '\Owl\DataMapper\Mapper';
 
     /**
-     * 存储服务名
-     * @var string
+     * Mapper配置信息
+     * @var array
      */
-    static protected $service;
-
-    /**
-     * 存储集合名
-     * @var string
-     */
-    static protected $collection;
+    static protected $mapper_options = [
+        'service' => '',        // 存储服务名
+        'collection' => '',     // 存储集合名
+        'readonly' => false,    // 是否只读
+        'strict' => false,      // 是否所有属性默认开启严格模式
+    ];
 
     /**
      * 属性定义
      * @var array
      */
     static protected $attributes = [];
-
-    /**
-     * 是否只读
-     * @var boolean
-     */
-    static protected $readonly = false;
-
-    /**
-     * 是否所有属性默认开启严格模式
-     * @var
-     */
-    static protected $strict = false;
 
     /**
      * 是否新对象，还没有保存到存储服务内的
@@ -474,13 +461,8 @@ abstract class Data {
      * )
      */
     final static public function getOptions() {
-        $options = array(
-            'service' => static::$service,
-            'collection' => static::$collection,
-            'attributes' => static::$attributes,
-            'readonly' => static::$readonly,
-            'strict' => static::$strict,
-        );
+        $options = static::$mapper_options;
+        $options['attributes'] = static::$attributes;
 
         $called_class = get_called_class();
         if ($called_class == __CLASS__) {

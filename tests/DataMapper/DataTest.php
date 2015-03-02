@@ -270,8 +270,10 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 namespace Tests\Mock\DataMapper;
 
 class FooData extends \Owl\DataMapper\Data {
-    static protected $service = 'foo.service';
-    static protected $collection = 'foo.collection';
+    static protected $mapper_options = [
+        'service' => 'foo.service',
+        'collection' => 'foo.collection',
+    ];
     static protected $attributes = array(
         'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         'foo' => array('type' => 'string'),
@@ -279,8 +281,10 @@ class FooData extends \Owl\DataMapper\Data {
 }
 
 class BarData extends FooData {
-    static protected $service = 'bar.service';
-    static protected $collection = 'bar.collection';
+    static protected $mapper_options = [
+        'service' => 'bar.service',
+        'collection' => 'bar.collection',
+    ];
     static protected $attributes = array(
         'bar' => array('type' => 'string'),
     );
