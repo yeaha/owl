@@ -52,6 +52,13 @@ class Response {
         return $this->body;
     }
 
+    public function redirect($url, $status = 303) {
+        $this->setHeader('Location', $url);
+        $this->setStatus($status);
+
+        return $this;
+    }
+
     public function end() {
         if (!$this->end) {
             $this->send();
