@@ -31,7 +31,19 @@ namespace Owl\Parameter;
  *     'baz' => [
  *         'type' => 'object',                  // 对象类型检查
  *         'instanceof' => '\Baz'               // 对象所属类检查
- *     ]
+ *     ],
+ *     'x' => [
+ *         'type' => 'json',
+ *         'keys' => [
+ *             // ...
+ *         ],
+ *     ],
+ *     'y' => [
+ *         'type' => 'json',
+ *         'element' => [
+ *             // ...
+ *         ],
+ *     ],
  * ));
  */
 
@@ -124,6 +136,8 @@ class Checker {
             return $this->checkHash($key, $value, $option);
         case 'array':
             return $this->checkArray($key, $value, $option);
+        case 'json':
+            return $this->checkJson($key, $value, $option);
         case 'object':
             return $this->checkObject($key, $value, $option);
         default:
@@ -202,18 +216,52 @@ class Checker {
     }
 
     /**
+     * 检查对象类型
+     *
      * @param string $key
      * @param mixed $value
      * @param array $option
      * @return void
      */
-    public function checkObject($key, $value, array $option) {
+    protected function checkObject($key, $value, array $option) {
         if (!is_object($value)) {
             $this->exception($key, 'Parameter value is not object');
         }
 
         if (isset($option['instanceof']) && !($value instanceof $option['instanceof'])) {
             $this->exception($key, sprintf('Parameter value must instanceof "%s"', $option['instanceof']));
+        }
+    }
+
+    /**
+     * 检查json数组内容
+     *
+     * @param string $key
+     * @param mixed $value
+     * @param array $option
+     * @return void
+     */
+    protected function checkJson($key, $value, array $options) {
+        if ($value === '') {
+            if ($option['allow_empty']) {
+                return;
+            }
+
+            throw $this->exception($key, 'Parameter value not allow empty string');
+        }
+
+        $value = json_decode($value, true);
+
+        if ($value === null && ($error = json_last_error_msg())) {
+            throw $this->exception($key, 'Parameter json_decode() failed, '. $error);
+        }
+
+        if (isset($option['keys']) && $option['keys']) {
+            $this->execute($value, $option['keys']);
+        } elseif (isset($option['element']) && $option['element']) {
+            foreach ($value as $element) {
+                $this->execute($element, $option['element']);
+            }
         }
     }
 
