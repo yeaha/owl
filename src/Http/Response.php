@@ -94,6 +94,10 @@ class Response {
         }
 
         $body = $this->body;
+        if (in_array($this->getStatus(), [204, 304])) {
+            $body = '';
+        }
+
         if ($body instanceof \Closure) {
             echo call_user_func($body);
         } else {
