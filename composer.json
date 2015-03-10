@@ -1,8 +1,8 @@
 {
-    "name": "owl/mvc",
+    "name": "yeaha/owl",
     "description": "RESTFul Web Framework",
     "keywords": ["framework", "mvc", "swoole", "restful"],
-    "homepage": "https://github.com/yeaha/owl-mvc",
+    "homepage": "https://github.com/yeaha/owl",
     "license": "MIT",
     "authors": [
         {
@@ -13,10 +13,9 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "ext-swoole": "~1.7.9"
     },
     "require-dev": {
-        "phpunit/phpunit": "~3.7.0"
+        "phpunit/phpunit": "~4.5.0"
     },
     "autoload": {
         "psr-4": {"Owl\\": "src"}
