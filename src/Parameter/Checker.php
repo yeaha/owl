@@ -70,6 +70,8 @@ class Checker {
         ],
     ];
 
+    protected $path;
+
     /**
      * 格式化并补全配置
      *
@@ -110,9 +112,12 @@ class Checker {
      *
      * @param array $values
      * @param array $options
+     * @param array $path
      * @return true
      */
-    public function execute(array $values, array $options) {
+    public function execute(array $values, array $options, array $path = []) {
+        $this->path = $path;
+
         foreach ($options as $key => $option) {
             $option = $this->normalizeOption($option);
 
@@ -159,20 +164,20 @@ class Checker {
                 return;
             }
 
-            throw $this->exception($key, 'Parameter value not allow empty string');
+            throw $this->exception($key, 'value not allow empty string');
         }
 
         if (isset($option['eq'])) {
             if ($value !== $option['eq']) {
-                throw $this->exception($key, sprintf('Parameter value must equal "%s", current value is "%s"', $option['eq'], $value));
+                throw $this->exception($key, sprintf('value must equal "%s", current value is "%s"', $option['eq'], $value));
             }
         } elseif ($option['enum']) {
             if (!in_array($value, $option['enum'], true)) {
-                throw $this->exception($key, sprintf('Parameter value must be one of [%s], current value is "%s"', implode(', ', $option['enum']), $value));
+                throw $this->exception($key, sprintf('value must be one of [%s], current value is "%s"', implode(', ', $option['enum']), $value));
             }
         } elseif ($option['regexp']) {
             if (!preg_match($option['regexp'], $value)) {
-                throw $this->exception($key, sprintf('Parameter value mismatch regexp %s, current value is "%s"', $option['regexp'], $value));
+                throw $this->exception($key, sprintf('value mismatch regexp %s, current value is "%s"', $option['regexp'], $value));
             }
         }
     }
@@ -187,11 +192,12 @@ class Checker {
      */
     protected function checkHash($key, $value, array $option) {
         if (!is_array($value) || array_values($value) === $value) {
-            throw $this->exception($key, 'Parameter value is not hash type');
+            throw $this->exception($key, 'value is not hash type');
         }
 
         if (isset($option['keys']) && $option['keys']) {
-            $this->execute($value, $option['keys']);
+            $this->path[] = $key;
+            $this->execute($value, $option['keys'], $this->path);
         }
     }
 
@@ -205,12 +211,13 @@ class Checker {
      */
     protected function checkArray($key, $value, array $option) {
         if (!is_array($value) || array_values($value) !== $value) {
-            throw $this->exception($key, 'Parameter value is not array type');
+            throw $this->exception($key, 'value is not array type');
         }
 
         if (isset($option['element']) && $option['element']) {
+            $this->path[] = $key;
             foreach ($value as $element) {
-                $this->execute($element, $option['element']);
+                $this->execute($element, $option['element'], $this->path);
             }
         }
     }
@@ -225,11 +232,11 @@ class Checker {
      */
     protected function checkObject($key, $value, array $option) {
         if (!is_object($value)) {
-            $this->exception($key, 'Parameter value is not object');
+            $this->exception($key, 'value is not object');
         }
 
         if (isset($option['instanceof']) && !($value instanceof $option['instanceof'])) {
-            $this->exception($key, sprintf('Parameter value must instanceof "%s"', $option['instanceof']));
+            $this->exception($key, sprintf('value must instanceof "%s"', $option['instanceof']));
         }
     }
 
@@ -247,25 +254,29 @@ class Checker {
                 return;
             }
 
-            throw $this->exception($key, 'Parameter value not allow empty string');
+            throw $this->exception($key, 'value not allow empty string');
         }
 
         $value = json_decode($value, true);
 
         if ($value === null && ($error = json_last_error_msg())) {
-            throw $this->exception($key, 'Parameter json_decode() failed, '. $error);
+            throw $this->exception($key, 'json_decode() failed, '. $error);
         }
 
+        $this->path[] = $key;
         if (isset($option['keys']) && $option['keys']) {
-            $this->execute($value, $option['keys']);
+            $this->execute($value, $option['keys'], $this->path);
         } elseif (isset($option['element']) && $option['element']) {
             foreach ($value as $element) {
-                $this->execute($element, $option['element']);
+                $this->execute($element, $option['element'], $this->path);
             }
         }
     }
 
     protected function exception($parameter, $message) {
+        $this->path[] = $parameter;
+        $message = 'Parameter ['.implode('->', $this->path).'], '.$message;
+
         $exception = new \Owl\Parameter\Exception($message);
         $exception->parameter = $parameter;
 
