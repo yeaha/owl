@@ -34,10 +34,6 @@ abstract class Adapter extends \Owl\Service {
              : $this->connect()->$method();
     }
 
-    public function destroy() {
-        $this->disconnect();
-    }
-
     public function isConnected() {
         return $this->handler instanceof \PDO;
     }

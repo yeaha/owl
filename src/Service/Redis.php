@@ -36,10 +36,6 @@ class Redis extends \Owl\Service {
         }
     }
 
-    public function destroy() {
-        $this->disconnect();
-    }
-
     public function __destruct() {
         if (!$this->isPersistent()) {
             $this->disconnect();

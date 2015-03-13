@@ -4,7 +4,7 @@ namespace Owl;
 abstract class Service {
     protected $config = [];
 
-    abstract public function destroy();
+    abstract public function disconnect();
 
     public function __construct(array $config = []) {
         $this->config = $config;
