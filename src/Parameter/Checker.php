@@ -73,41 +73,6 @@ class Checker {
     protected $path;
 
     /**
-     * 格式化并补全配置
-     *
-     * @param array $option
-     * @return array
-     */
-    public function normalizeOption(array $option) {
-        if (isset($option['type']) && isset($this->type_options[$option['type']])) {
-            $option = array_merge($this->type_options[$option['type']], $option);
-        }
-
-        // 默认配置补全
-        $option = array_merge([
-            'type' => 'string',
-            'required' => true,     // 是否允许不传
-            'allow_empty' => false, // 允许空字符串
-            'regexp' => '',         // 正则检查
-            'enum' => [],           // 枚举内容检查
-        ], $option);
-
-        if (isset($option['eq'])) {
-            $option['eq'] = (string)$option['eq'];
-        }
-
-        if ($option['enum']) {
-            $enum = array();
-            foreach ($option['enum'] as $value) {
-                $enum[] = (string)$value;
-            }
-            $option['enum'] = $enum;
-        }
-
-        return $option;
-    }
-
-    /**
      * 检查参数内容是否符合配置要求
      *
      * @param array $values
@@ -271,6 +236,41 @@ class Checker {
                 $this->execute($element, $option['element'], $this->path);
             }
         }
+    }
+
+    /**
+     * 格式化并补全配置
+     *
+     * @param array $option
+     * @return array
+     */
+    private function normalizeOption(array $option) {
+        if (isset($option['type']) && isset($this->type_options[$option['type']])) {
+            $option = array_merge($this->type_options[$option['type']], $option);
+        }
+
+        // 默认配置补全
+        $option = array_merge([
+            'type' => 'string',
+            'required' => true,     // 是否允许不传
+            'allow_empty' => false, // 允许空字符串
+            'regexp' => '',         // 正则检查
+            'enum' => [],           // 枚举内容检查
+        ], $option);
+
+        if (isset($option['eq'])) {
+            $option['eq'] = (string)$option['eq'];
+        }
+
+        if ($option['enum']) {
+            $enum = array();
+            foreach ($option['enum'] as $value) {
+                $enum[] = (string)$value;
+            }
+            $option['enum'] = $enum;
+        }
+
+        return $option;
     }
 
     protected function exception($parameter, $message) {
