@@ -19,9 +19,11 @@ namespace Owl\Parameter;
  *     'bar' => [],                             // 不指定任何配置就用默认配置
  *     'foobar' => [
  *         'type' => 'hash',                    // 字典类型
+ *         'allow_empty' => true,               // 是否允许空hash数组
  *         'keys' => [                          // 声明字典值配置
  *             'foo' => [                       // 字典和数组都可以任意嵌套
  *                 'type' => 'array',           // 数组类型
+ *                 'allow_empty' => true,       // 是否允许空数组
  *                 'element' => [               // 数组每个元素的值配置
  *                     'bar' => [],
  *                 ],
@@ -156,8 +158,16 @@ class Checker {
      * @return void
      */
     protected function checkHash($key, $value, array $option) {
-        if (!is_array($value) || array_values($value) === $value) {
+        if (!is_array($value) || ($value && array_values($value) === $value)) {
             throw $this->exception($key, 'value is not hash type');
+        }
+
+        if (!$value) {
+            if (!$option['allow_empty']) {
+                throw $this->exception($key, 'value not allow empty hash');
+            }
+
+            return;
         }
 
         if (isset($option['keys']) && $option['keys']) {
@@ -175,8 +185,16 @@ class Checker {
      * @return void
      */
     protected function checkArray($key, $value, array $option) {
-        if (!is_array($value) || array_values($value) !== $value) {
+        if (!is_array($value) || ($value && array_values($value) !== $value)) {
             throw $this->exception($key, 'value is not array type');
+        }
+
+        if (!$value) {
+            if (!$option['allow_empty']) {
+                throw $this->exception($key, 'value not allow empty array');
+            }
+
+            return;
         }
 
         if (isset($option['element']) && $option['element']) {

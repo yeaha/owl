@@ -117,6 +117,30 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
+    public function testEmptyHashException() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $checker->execute(
+            array('foo' => array()),
+            array(
+                'foo' => array(
+                    'type' => 'hash',
+                    'allow_empty' => true,
+                ),
+            )
+        );
+
+        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/not allow empty hash/');
+        $checker->execute(
+            array('foo' => array()),
+            array(
+                'foo' => array(
+                    'type' => 'hash',
+                ),
+            )
+        );
+    }
+
     public function testArrayType() {
         $checker = new \Owl\Parameter\Checker;
 
@@ -153,6 +177,30 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
                 )
             )
         ), $options);
+    }
+
+    public function testEmptyArrayException() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $checker->execute(
+            array('foo' => array()),
+            array(
+                'foo' => array(
+                    'type' => 'array',
+                    'allow_empty' => true,
+                ),
+            )
+        );
+
+        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/not allow empty array/');
+        $checker->execute(
+            array('foo' => array()),
+            array(
+                'foo' => array(
+                    'type' => 'array',
+                ),
+            )
+        );
     }
 
     public function testURLType() {
