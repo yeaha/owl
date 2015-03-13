@@ -228,10 +228,11 @@ class Checker {
             throw $this->exception($key, 'json_decode() failed, '. $error);
         }
 
-        $this->path[] = $key;
         if (isset($option['keys']) && $option['keys']) {
+            $this->path[] = $key;
             $this->execute($value, $option['keys'], $this->path);
         } elseif (isset($option['element']) && $option['element']) {
+            $this->path[] = $key;
             foreach ($value as $element) {
                 $this->execute($element, $option['element'], $this->path);
             }
