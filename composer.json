@@ -1,6 +1,5 @@
 {
     "name": "yeaha/owl",
-    "version": "0.1",
     "description": "RESTFul Web Framework",
     "keywords": ["framework", "mvc", "swoole", "restful"],
     "homepage": "https://github.com/yeaha/owl",
