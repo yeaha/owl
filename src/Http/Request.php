@@ -7,6 +7,7 @@ class Request {
     protected $cookies;
     protected $headers;
     protected $server;
+    protected $parameters;
 
     public function __construct() {
         $this->reset();
@@ -18,6 +19,7 @@ class Request {
         $this->cookies = $_COOKIE;
         $this->server = $_SERVER;
         $this->headers = null;
+        $this->parameters = [];
     }
 
     public function get($key = null) {
@@ -42,6 +44,28 @@ class Request {
 
     public function hasPost($key) {
         return array_key_exists($key, $this->post);
+    }
+
+    /**
+     * 设置自定义参数
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setParameter($key, $value) {
+        $this->parameters[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 获取自定义参数
+     *
+     * @param string $key
+     * @return mixed|false
+     */
+    public function getParameter($key) {
+        return isset($this->parameters[$key]) ? $this->parameters[$key] : false;
     }
 
     public function getServer($key = null) {
