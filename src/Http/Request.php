@@ -68,6 +68,10 @@ class Request {
         return isset($this->parameters[$key]) ? $this->parameters[$key] : false;
     }
 
+    public function getParameters() {
+        return $this->parameters;
+    }
+
     public function getServer($key = null) {
         if ($key === null) {
             return $this->server;
