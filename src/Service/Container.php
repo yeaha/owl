@@ -42,7 +42,7 @@ class Container extends \Owl\Container {
 
     public function setServices(array $services) {
         foreach ($services as $id => $options) {
-            $this->defineService($id, $options);
+            $this->setService($id, $options);
         }
 
         return $this;
@@ -82,7 +82,7 @@ class Container extends \Owl\Container {
             }
 
             $class = $options['class'];
-            if (is_subclass_of($class, '\Owl\Service')) {
+            if (!is_subclass_of($class, '\Owl\Service')) {
                 throw new \UnexpectedValueException();
             }
 
