@@ -78,12 +78,12 @@ class Container extends \Owl\Container {
     protected function setService($id, array $options) {
         $this->set($id, function() use ($options) {
             if (!isset($options['class'])) {
-                throw new \InvalidArgumentException();
+                throw new \InvalidArgumentException('Require service class name');
             }
 
             $class = $options['class'];
             if (!is_subclass_of($class, '\Owl\Service')) {
-                throw new \UnexpectedValueException();
+                throw new \UnexpectedValueException('Require subclass of "\Owl\Service"');
             }
 
             unset($options['class']);
