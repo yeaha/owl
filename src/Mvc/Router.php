@@ -65,15 +65,12 @@ class Router {
             throw \Owl\Http\Exception::factory(404);
         }
 
-        $args = [$request, $response];
-        if ($parameters) {
-            $args = array_merge($args, $parameters);
-        }
-
         $controller = new $class;
+        $controller->request = $request;
+        $controller->response = $response;
 
         // 如果__beforeExecute()返回了内容就直接返回内容
-        if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $args))) {
+        if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $parameters))) {
             if (!($data instanceof \Owl\Http\Response)) {
                 $response->setBody($data);
             }
@@ -94,7 +91,7 @@ class Router {
             throw \Owl\Http\Exception::factory(405);
         }
 
-        $data = call_user_func_array([$controller, $method], $args);
+        $data = call_user_func_array([$controller, $method], $parameters);
         if (!($data instanceof \Owl\Http\Response)) {
             $response->setBody($data);
         }
