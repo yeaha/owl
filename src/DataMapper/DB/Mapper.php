@@ -14,7 +14,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
             $select = new \Owl\Service\DB\Select($service, $collection);
         }
 
-        $select->setCols(array_keys($this->getAttributes()));
+        $select->setColumns(array_keys($this->getAttributes()));
 
         $mapper = $this;
         $select->setProcessor(function($record) use ($mapper) {
