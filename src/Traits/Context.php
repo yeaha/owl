@@ -44,7 +44,7 @@ trait Context {
         return $this->getContextHandler(true)->save();
     }
 
-    public function setContextHandler(\Owl\Context\Adapter $handler) {
+    public function setContextHandler(\Owl\Context $handler) {
         $this->context_handler = $handler;
     }
 
