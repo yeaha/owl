@@ -323,12 +323,21 @@ abstract class Data {
         $mapper = static::getMapper();
         $json = [];
 
-        foreach ($this->pick() as $key => $value) {
+        foreach ($this->toArray() as $key => $value) {
             $attribute = $mapper->getAttribute($key);
             $json[$key] = Type::factory($attribute['type'])->toJSON($value, $attribute);
         }
 
         return $json;
+    }
+
+    /**
+     * 获得所有属性值，以数组形式返回
+     *
+     * @return array
+     */
+    public function toArray() {
+        return $this->pick();
     }
 
     /**
