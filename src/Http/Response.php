@@ -78,7 +78,7 @@ class Response {
         if (!headers_sent()) {
             $status = $this->getStatus();
             if ($status !== 200) {
-                header(sprintf('HTTP/1.1 %d %s', $status, \Owl\HTTP::getStatusMessage($status)));
+                header(sprintf('HTTP/1.1 %d %s', $status, \Owl\Http::getStatusMessage($status)));
             }
 
             foreach ($this->headers as $key => $value) {
