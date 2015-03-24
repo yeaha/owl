@@ -205,10 +205,10 @@ class Select {
         foreach ($expressions as $expression) {
             if ($expression instanceof Expr) {
                 $order_by[] = $expression;
-            } elseif (is_string($expressions)) {
+            } elseif (is_string($expression)) {
                 $order_by[] = $this->adapter->quoteIdentifier($expression);
-            } elseif ($expressions) {
-                foreach ($expressions as $column => $sort) {
+            } elseif ($expression) {
+                foreach ($expression as $column => $sort) {
                     $column = $this->adapter->quoteIdentifier($column);
                     $sort = (strtoupper($sort) === 'DESC') ? 'DESC' : '';
 
