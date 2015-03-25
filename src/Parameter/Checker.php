@@ -231,7 +231,7 @@ class Checker {
      * @param array $option
      * @return void
      */
-    protected function checkJson($key, $value, array $options) {
+    protected function checkJson($key, $value, array $option) {
         if ($value === '') {
             if ($option['allow_empty']) {
                 return;
