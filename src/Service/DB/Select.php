@@ -519,13 +519,56 @@ class Select {
      * 以iterator的形式返回查询结果
      * 通过遍历iterator的方式处理查询结果，避免过大的内存占用
      *
-     * @return \Owl\Service\DB\SelectIterator
+     * @return void
      */
     public function iterator() {
         $res = $this->execute();
 
         while ($row = $res->fetch()) {
             yield $this->process($row);
+        }
+    }
+
+    /**
+     * 分批遍历查询结果
+     * 每批次获取一定数量，遍历完一批再继续下一批
+     *
+     * 避免mysql buffered query遍历巨大的查询结果导致的内存溢出问题
+     *
+     * @param integer $size
+     * @return void
+     */
+    public function batchIterator($size = 1000) {
+        $limit_copy = $this->limit;
+        $offset_copy = $this->offset;
+
+        $limit = $limit_copy ?: -1;
+        $offset = $offset_copy;
+
+        if (0 < $limit && $limit < $size) {
+            $size = $limit;
+        }
+
+        try {
+            do {
+                $res = $this->limit($size)->offset($offset)->execute();
+
+                $found = false;
+                while ($row = $res->fetch()) {
+                    if ($limit-- === 0) {
+                        break;
+                    }
+
+                    $found = true;
+
+                    yield $this->process($row);
+                }
+
+                $offset += $size;
+            } while ($found);
+        } finally {
+            // retrieve limit & offset
+            $this->limit($limit_copy)->offset($offset_copy);
         }
     }
 
