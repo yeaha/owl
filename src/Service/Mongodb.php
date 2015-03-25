@@ -1,5 +1,5 @@
 <?php
-namespace \Owl\Service;
+namespace Owl\Service;
 
 if (!extension_loaded('mongo')) {
     throw new \Exception('Require "mongo" extension');
