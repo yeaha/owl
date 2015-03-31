@@ -38,6 +38,22 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals((string)$select, 'SELECT count(1) FROM "mytable" ORDER BY "id" DESC');
     }
 
+    public function testOrderBy() {
+        $select = $this->select('mytable');
+
+        $select->orderBy('foo');
+        $this->assertEquals((string)$select, 'SELECT * FROM "mytable" ORDER BY "foo"');
+
+        $select->orderBy(new Expr('foo desc'));
+        $this->assertEquals((string)$select, 'SELECT * FROM "mytable" ORDER BY foo desc');
+
+        $select->orderBy(['foo' => 'desc', 'bar' => 'asc']);
+        $this->assertEquals((string)$select, 'SELECT * FROM "mytable" ORDER BY "foo" DESC, "bar"');
+
+        $select->orderBy('foo', 'bar', new Expr('baz desc'));
+        $this->assertEquals((string)$select, 'SELECT * FROM "mytable" ORDER BY "foo", "bar", baz desc');
+    }
+
     public function testWhere() {
         $select = $this->select('mytable');
 

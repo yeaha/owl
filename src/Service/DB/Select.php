@@ -202,20 +202,22 @@ class Select {
         $expressions = is_array($expressions) ? $expressions : func_get_args();
 
         $order_by = [];
-        foreach ($expressions as $expression) {
+        foreach ($expressions as $key => $expression) {
             if ($expression instanceof Expr) {
                 $order_by[] = $expression;
-            } elseif (is_string($expression)) {
-                $order_by[] = $this->adapter->quoteIdentifier($expression);
-            } elseif ($expression) {
-                foreach ($expression as $column => $sort) {
-                    $column = $this->adapter->quoteIdentifier($column);
-                    $sort = (strtoupper($sort) === 'DESC') ? 'DESC' : '';
-
-                    $order_by[] = $sort ? $column.' '.$sort : $column;
-                }
             } else {
-                throw new \Exception('Invalid "ORDER BY" expression.');
+                if (is_numeric($key)) {
+                    $column = $expression;
+                    $sort = 'ASC';
+                } else {
+                    $column = $key;
+                    $sort = $expression;
+                }
+
+                $column = $this->adapter->quoteIdentifier($column);
+                $sort = (strtoupper($sort) === 'DESC') ? 'DESC' : '';
+
+                $order_by[] = $sort ? $column.' '.$sort : $column;
             }
         }
 
