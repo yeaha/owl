@@ -173,6 +173,7 @@ class Checker {
         if (isset($option['keys']) && $option['keys']) {
             $this->path[] = $key;
             $this->execute($value, $option['keys'], $this->path);
+            array_pop($this->path);
         }
     }
 
@@ -202,6 +203,7 @@ class Checker {
             foreach ($value as $element) {
                 $this->execute($element, $option['element'], $this->path);
             }
+            array_pop($this->path);
         }
     }
 
@@ -249,11 +251,13 @@ class Checker {
         if (isset($option['keys']) && $option['keys']) {
             $this->path[] = $key;
             $this->execute($value, $option['keys'], $this->path);
+            array_pop($this->path);
         } elseif (isset($option['element']) && $option['element']) {
             $this->path[] = $key;
             foreach ($value as $element) {
                 $this->execute($element, $option['element'], $this->path);
             }
+            array_pop($this->path);
         }
     }
 
