@@ -10,6 +10,8 @@ class Request extends \Owl\Http\Request {
     }
 
     public function reset() {
+        parent::reset();
+
         $request = $this->request;
 
         $this->get = isset($request->get) ? $request->get : [];

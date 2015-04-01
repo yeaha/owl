@@ -8,6 +8,7 @@ class Request {
     protected $headers;
     protected $server;
     protected $parameters;
+    protected $method;
 
     public function __construct() {
         $this->reset();
@@ -20,6 +21,7 @@ class Request {
         $this->server = $_SERVER;
         $this->headers = null;
         $this->parameters = [];
+        $this->method = null;
     }
 
     public function get($key = null) {
@@ -174,6 +176,10 @@ class Request {
     }
 
     public function getMethod() {
+        if ($this->method) {
+            return $this->method;
+        }
+
         $method = strtoupper($this->getServer('REQUEST_METHOD'));
 
         if ($method !== 'POST') {
@@ -187,7 +193,7 @@ class Request {
             $method = $_method;
         }
 
-        return strtoupper($method);
+        return $this->method = strtoupper($method);
     }
 
     public function isGet() {
