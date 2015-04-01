@@ -382,13 +382,17 @@ class Select {
         if ($total === null) {
             $limit = $this->limit;
             $offset = $this->offset;
-            $order = $this->order_by;
+            $order_by = $this->order_by;
 
-            $this->orderBy(null)->limit(0)->offset(0);
+            $this->order_by = [];
+            $this->limit = 0;
+            $this->offset = 0;
 
             $total = $this->count();
 
-            $this->orderBy($order)->limit($limit)->offset($offset);
+            $this->order_by = $order_by;
+            $this->limit = $limit;
+            $this->offset = $offset;
         }
 
         return self::buildPageInfo($total, $size, $current);
