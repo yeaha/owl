@@ -224,12 +224,15 @@ abstract class Mapper {
         $types = Type::getInstance();
         $values = [];
 
-        foreach ($record as $key => $value) {
-            $attribute = $this->getAttribute($key);
+        $attributes = $this->getAttributes();
 
-            if ($attribute && !$attribute['deprecated']) {
-                $values[$key] = $types->get($attribute['type'])->restore($value, $attribute);
+        foreach ($record as $key => $value) {
+            if (!isset($attributes[$key])) {
+                continue;
             }
+
+            $attribute = $attributes[$key];
+            $values[$key] = $types->get($attribute['type'])->restore($value, $attribute);
         }
 
         if ($data) {
