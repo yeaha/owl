@@ -26,10 +26,10 @@ namespace Owl\Service;
  *     ],
  * ]);
  *
- * $container->setRouter('mysql.slave', function($id) {
+ * $container->setRouter('mysql.slave', function($id) use ($container) {
  *     $service_id = ($id % 2) ? 1 : 2;
  *
- *     return $this->get('mysql.slave.'. $service_id);
+ *     return $container->get('mysql.slave.'. $service_id);
  * });
  *
  * $master = $container->get('mysql.master');
@@ -49,8 +49,6 @@ class Container extends \Owl\Container {
     }
 
     public function setRouter($id, \Closure $handler) {
-        $handler->bindTo($this);
-
         $this->router[$id] = $handler;
         return $this;
     }
