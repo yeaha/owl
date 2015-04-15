@@ -141,7 +141,7 @@ class Type {
 
 Type::getInstance()
     ->register('mixed', '\Owl\DataMapper\Type\Mixed')
-    ->register('datetime', '\Owl\DataMapper\Type\DateTime')
+    ->register('datetime', '\Owl\DataMapper\Type\Datetime')
     ->register('integer', '\Owl\DataMapper\Type\Integer')
     ->register('json', '\Owl\DataMapper\Type\Json')
     ->register('numeric', '\Owl\DataMapper\Type\Numeric')
