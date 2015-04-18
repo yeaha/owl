@@ -159,6 +159,11 @@ class Router {
      */
     protected function byPath($path) {
         $pathinfo = pathinfo(strtolower($path));
+
+        if ($pathinfo['dirname'] === '\\') {
+            $pathinfo['dirname'] = '/';
+        }
+
         $path = ($pathinfo['dirname'] === '/')
               ? $pathinfo['dirname'] . $pathinfo['basename']
               : $pathinfo['dirname'] .'/'. $pathinfo['basename'];

@@ -24,6 +24,7 @@ class View {
             throw new \Exception('View directory "'.$directory.'" not exist!');
         }
 
+        $directory = realpath($directory);
         $this->directory = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
     }
 
