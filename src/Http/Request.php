@@ -212,6 +212,11 @@ class Request {
         return $this->getMethod() === 'DELETE';
     }
 
+    public function isAjax() {
+        $val = $this->getHeader('x-requested-with');
+        return $val && (strtolower($val) === 'xmlhttprequest');
+    }
+
     /**
      * 构造http请求对象，供测试使用
      *
