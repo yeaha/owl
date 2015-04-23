@@ -26,6 +26,8 @@ class Http {
     const REQUEST_ENTITY_TOO_LARGE = 413;
     const UNSUPPORTED_MEDIA_TYPE = 415;
     const EXPECTATION_FAILED = 417;
+    const UNPROCESSABLE_ENTITY = 422;
+    const PRECONDITION REQUIRED = 428;
     const INTERNAL_SERVER_ERROR = 500;
     const NOT_IMPLEMENTED = 501;
     const BAD_GATEWAY = 502;
@@ -67,6 +69,8 @@ class Http {
         415 => 'Unsupported Media Type',
         416 => 'Requested range not satisfiable',
         417 => 'Expectation Failed',
+        422 => 'Unprocessable Entity',
+        428 => 'Precondition Required',
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
         502 => 'Bad Gateway',
