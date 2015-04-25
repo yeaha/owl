@@ -253,7 +253,7 @@ class Request {
             'ip' => '',
         ], $options);
 
-        $_SERVER = [];
+        self::resetServer();
 
         $_SERVER['REQUEST_METHOD'] = strtoupper($options['method']);
         $_SERVER['REQUEST_URI'] = $options['uri'];
@@ -282,5 +282,14 @@ class Request {
         }
 
         return new Request;
+    }
+
+    static private function resetServer() {
+        foreach ($_SERVER as $key => $value) {
+            if (strpos($key, 'HTTP_') === 0) {
+                unset($_SERVER[$key]);
+            }
+        }
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
     }
 }
