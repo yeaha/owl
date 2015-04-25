@@ -20,4 +20,9 @@ trait Singleton {
 
         return static::$__instances__[$class];
     }
+
+    static public function resetInstance() {
+        $class = get_called_class();
+        unset(static::$__instances__[$class]);
+    }
 }
