@@ -92,7 +92,7 @@ class Application {
      */
     public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
         try {
-            $this->middleware->execute($request, $response);
+            $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
             $handler = $this->exception_handler ?: function($exception, $request, $response) {
                 $response->setStatus(500);

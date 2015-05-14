@@ -63,16 +63,16 @@ class Middleware {
      *
      * @return void
      */
-    public function execute() {
-        if (!$this->handlers) {
+    public function execute(array $arguments = [], array $handlers = []) {
+        $handlers = $handlers ?: $this->handlers;
+
+        if (!$handlers) {
             return;
         }
 
-        $args = func_get_args();
-
         $stack = [];
-        foreach ($this->handlers as $handler) {
-            $generator = call_user_func_array($handler, $args);
+        foreach ($handlers as $handler) {
+            $generator = call_user_func_array($handler, $arguments);
 
             if (!$generator || !($generator instanceof \Generator)) {
                 throw new \Exception('Middleware handler need "yield"!');
