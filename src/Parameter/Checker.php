@@ -51,6 +51,11 @@ namespace Owl\Parameter;
 
 
 class Checker {
+    /**
+     * 数据类型检查配置
+     *
+     * @var array
+     */
     protected $type_options = [
         'integer' => [
             'regexp' => '/^\d+$/',
@@ -72,6 +77,11 @@ class Checker {
         ],
     ];
 
+    /**
+     * 当前检查路径
+     *
+     * @var array
+     */
     protected $path = [];
 
     /**
