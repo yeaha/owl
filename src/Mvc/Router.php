@@ -138,6 +138,8 @@ class Router {
             $rules = $this->rewrite;
         }
 
+        $path = rtrim($path, '/') ?: '/';
+
         foreach ($rules as $regexp => $class) {
             if (preg_match($regexp, $path, $match)) {
                 if (is_array($class)) {
