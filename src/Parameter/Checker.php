@@ -58,9 +58,6 @@ class Checker {
         'numeric' => [
             'regexp' => '/^\d+(?:\.\d+)?$/',
         ],
-        'telphone' => [
-            'regexp' => '/^1[34578]\d{9}$/',
-        ],
         'url' => [
             'regexp' => '#^[a-z]+://[0-9a-z\-\.]+\.[0-9a-z]{1,4}(?:\d+)?(?:/[^\?]*)?(?:\?[^\#]*)?(?:\#[0-9a-z\-\_\/]*)?$#',
         ],
@@ -70,9 +67,12 @@ class Checker {
         'ip' => [
             'regexp' => '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/',
         ],
+        'uuid' => [
+            'regexp' => '/^[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[0-9a-f]{12}$/i',
+        ],
     ];
 
-    protected $path;
+    protected $path = [];
 
     /**
      * 检查参数内容是否符合配置要求
@@ -82,9 +82,7 @@ class Checker {
      * @param array $path
      * @return true
      */
-    public function execute(array $values, array $options, array $path = []) {
-        $this->path = $path;
-
+    public function execute(array $values, array $options) {
         foreach ($options as $key => $option) {
             $option = $this->normalizeOption($option);
 
@@ -172,7 +170,7 @@ class Checker {
 
         if (isset($option['keys']) && $option['keys']) {
             $this->path[] = $key;
-            $this->execute($value, $option['keys'], $this->path);
+            $this->execute($value, $option['keys']);
             array_pop($this->path);
         }
     }
@@ -201,7 +199,7 @@ class Checker {
         if (isset($option['element']) && $option['element']) {
             $this->path[] = $key;
             foreach ($value as $element) {
-                $this->execute($element, $option['element'], $this->path);
+                $this->execute($element, $option['element']);
             }
             array_pop($this->path);
         }
@@ -250,12 +248,12 @@ class Checker {
 
         if (isset($option['keys']) && $option['keys']) {
             $this->path[] = $key;
-            $this->execute($value, $option['keys'], $this->path);
+            $this->execute($value, $option['keys']);
             array_pop($this->path);
         } elseif (isset($option['element']) && $option['element']) {
             $this->path[] = $key;
             foreach ($value as $element) {
-                $this->execute($element, $option['element'], $this->path);
+                $this->execute($element, $option['element']);
             }
             array_pop($this->path);
         }
@@ -298,7 +296,7 @@ class Checker {
 
     protected function exception($parameter, $message) {
         $this->path[] = $parameter;
-        $message = 'Parameter ['.implode('->', $this->path).'], '.$message;
+        $message = 'Parameter ['.implode('=>', $this->path).'], '.$message;
 
         $exception = new \Owl\Parameter\Exception($message);
         $exception->parameter = $parameter;
