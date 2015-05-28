@@ -142,6 +142,12 @@ class Checker {
             throw $this->exception($key, 'value not allow empty string');
         }
 
+        if ($option['type'] === 'bool') {
+            if (!is_bool($value)) {
+                throw $this->exception($key, sprintf('value must be TRUE or FALSE, current value is "%s"', $value));
+            }
+        }
+
         if (isset($option['eq'])) {
             if ($value !== $option['eq']) {
                 throw $this->exception($key, sprintf('value must equal "%s", current value is "%s"', $option['eq'], $value));

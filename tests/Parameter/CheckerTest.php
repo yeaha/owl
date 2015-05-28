@@ -69,6 +69,16 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         $checker->execute(array('foo' => '12.'), array('foo' => array('type' => 'numeric')));
     }
 
+    public function testBoolType() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $checker->execute(array('foo' => true), array('foo' => array('type' => 'bool')));
+        $checker->execute(array('foo' => false), array('foo' => array('type' => 'bool')));
+
+        $this->setExpectedException('\Owl\Parameter\Exception');
+        $checker->execute(array('foo' => 0), array('foo' => array('type' => 'bool')));
+    }
+
     public function testHashType() {
         $checker = new \Owl\Parameter\Checker;
 
