@@ -101,7 +101,7 @@ class Response {
         if ($body instanceof \Closure) {
             echo call_user_func($body);
         } else {
-            echo $body;
+            echo (string)$body;
         }
     }
 }
