@@ -104,7 +104,7 @@ class Router {
             throw \Owl\Http\Exception::factory(404);
         }
 
-        list($class, $parameters) = $resutl;
+        list($class, $parameters) = $result;
 
         if (!class_exists($class)) {
             throw \Owl\Http\Exception::factory(404);
