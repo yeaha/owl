@@ -18,9 +18,7 @@ function __ini_app(\Owl\Application $app) {
     });
 
     $router = new \Owl\Mvc\Router([
-        'namespace' => [
-            '/' => '\Controller',
-        ],
+        'namespace' => '\Controller',
     ]);
     $app->middleware(function($request, $response) use ($router) {
         $router->execute($request, $response);
