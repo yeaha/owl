@@ -4,10 +4,7 @@ namespace Tests\Mvc;
 class RouterTest extends \PHPUnit_Framework_TestCase {
     public function testDispatchByPath() {
         $router = new \Tests\Mock\Mvc\Router([
-            'namespace' => [
-                '/' => '\Controller',
-                '/admin' => '\Admin\Controller',
-            ],
+            'namespace' => '\Controller',
         ]);
 
         $this->assertSame(['\Controller\Index', []], $router->testDispatch('/'));
@@ -15,20 +12,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar'));
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar/'));
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/FOO/BAR'));
-
-        $this->assertSame(['\Admin\Controller\Index', []], $router->testDispatch('/admin/'));
-        $this->assertSame(['\Admin\Controller\Index', []], $router->testDispatch('/admin'));
-
-        $this->assertSame(['\Admin\Controller\Foo\Bar', []], $router->testDispatch('/admin/foo/bar'));
-        $this->assertSame(['\Admin\Controller\Foo\Bar', []], $router->testDispatch('/admin/foo/bar/'));
     }
 
     public function testDisaptchByRewrite() {
         $router = new \Tests\Mock\Mvc\Router([
-            'namespace' => [
-                '/' => '\Controller',
-                '/admin' => '\Admin\Controller',
-            ],
+            'namespace' => '\Controller',
             'rewrite' => [
                 '#^/user/(\d+)$#' => '\Controller\User',
                 '#^/link/([0-9a-zA-Z]+)#' => '\Controller\Link',
@@ -43,15 +31,37 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function testDispatchBasePath() {
         $router = new \Tests\Mock\Mvc\Router([
             'base_path' => '/foobar',
-            'namespace' => [
-                '/' => '\Controller',
+            'namespace' => '\Controller',
+            'rewrite' => [
+                '#^/baz#' => '\Controller\Baz',
             ],
         ]);
 
         $this->assertSame(['\Controller\Index', []], $router->testDispatch('/foobar'));
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foobar/foo/bar'));
+        $this->assertSame(['\Controller\Baz', []], $router->testDispatch('/foobar/baz'));
 
         $this->setExpectedException('\Owl\Http\Exception', null, 404);
         $router->testDispatch('/baz');
+    }
+
+    public function testDelegate() {
+        $router = new \Tests\Mock\Mvc\Router([
+            'base_path' => '/foo/bar',
+            'namespace' => '\Controller',
+        ]);
+
+        $admin_router = new \Tests\Mock\Mvc\Router([
+            'namespace' => '\Admin\Controller',
+            'rewrite' => [
+                '#^/baz#' => '\Admin\Controller\Baz',
+            ],
+        ]);
+
+        $router->delegate('/admin', $admin_router);
+
+        $this->assertSame(['\Controller\Baz', []], $router->testDispatch('/foo/bar/baz'));
+        $this->assertSame(['\Admin\Controller\Index', []], $router->testDispatch('/foo/bar/admin'));
+        $this->assertSame(['\Admin\Controller\Baz', []], $router->testDispatch('/foo/bar/admin/baz'));
     }
 }

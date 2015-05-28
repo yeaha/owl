@@ -1,51 +1,93 @@
 <?php
 namespace Owl\Mvc;
 
+/**
+ * @example
+ *
+ * $router = new Router([
+ *     'base_path' => '/foobar',        // optional
+ *     'namespace' => '\Controller',
+ *     'rewrite' => [                   // optional
+ *         '#^/user(\d+)?$#i' => '\Controller\User',
+ *     ],
+ * ]);
+ *
+ * $admin_router = new Rounter([
+ *     'namespace' => '\Admin\Controller',
+ *     'rewrite' => [
+ *         '#^/user/(\d)?#' => '\Admin\Controller\User',
+ *     ],
+ * ]);
+ * $router->delegate('/admin', $admin_router);
+ */
 class Router {
-    protected $base_path;
+    /**
+     * @var array
+     */
+    protected $config;
 
     /**
-     * @example
-     * [
-     *     '/' => '\Controller',
-     *     '/admin/' => '\Admin\Controller',
-     * ]
+     * @var array
      */
-    protected $namespace = [];
-
-    /**
-     * @example
-     * [
-     *     '#^/user(\d+)?$#i' => '\Controller\User',
-     *     '#^/admin(?:/)?#' => [
-     *         '#^/admin/user/(\d)?#' => '\Admin\Controller\User',
-     *     ],
-     * ]
-     */
-    protected $rewrite = [];
+    protected $children = [];
 
     public function __construct(array $config = []) {
+        (new \Owl\Parameter\Checker)->execute($config, [
+            'namespace' => ['type' => 'string'],
+            'base_path' => ['type' => 'string', 'required' => false, 'regexp' => '#^/.+#'],
+            'rewrite' => ['type' => 'hash', 'required' => false, 'allow_empty' => true],
+        ]);
+
+        if (substr($config['namespace'], -1, 1) !== '\\') {
+            $config['namespace'] = $config['namespace'].'\\';
+        }
+
         if (isset($config['base_path'])) {
-            $this->base_path = $this->normalizePath($config['base_path']);
+            $config['base_path'] = $this->normalizePath($config['base_path']);
         }
 
-        if (isset($config['rewrite'])) {
-            $this->rewrite = $config['rewrite'];
+        $this->config = $config;
+    }
+
+    /**
+     * @param string $key
+     * @return mixed|false
+     */
+    public function getConfig($key) {
+        return isset($this->config[$key])
+             ? $this->config[$key]
+             : false;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setConfig($key, $value) {
+        $this->config[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 把指定路径的访问委托到另外一个router
+     *
+     * @param string $path
+     * @param Owl\Mvc\Router $router
+     * @return $this
+     */
+    public function delegate($path, Router $router) {
+        $path = $this->normalizePath($path);
+
+        if ($base_path = $this->getConfig('base_path')) {
+            $path = $base_path .ltrim($path, '/');
         }
 
-        if (isset($config['namespace'])) {
-            foreach ($config['namespace'] as $path => $namespace) {
-                $path = strtolower($this->normalizePath($path));
+        $router->setConfig('base_path', $path);
 
-                $namespace = implode('\\', array_map('ucfirst', explode('\\', $namespace)));
-                $namespace = '\\'.trim($namespace, '\\');
+        $this->children[$path] = $router;
 
-                $this->namespace[$path] = $namespace;
-            }
-
-            // 保证"/"设置一定在最后
-            krsort($this->namespace);
-        }
+        return $this;
     }
 
     /**
@@ -58,8 +100,11 @@ class Router {
      * @throws \Exception Invalid controller class.
      */
     public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
-        $path = $this->normalizePath($request->getRequestPath());
-        list($class, $parameters) = $this->dispatch($path);
+        if (!$result = $this->dispatch($request->getRequestPath())) {
+            throw \Owl\Http\Exception::factory(404);
+        }
+
+        list($class, $parameters) = $resutl;
 
         if (!class_exists($class)) {
             throw \Owl\Http\Exception::factory(404);
@@ -106,24 +151,22 @@ class Router {
     /**
      * @param string $path
      * @return [string $class, array $parameters]
-     * @throws \Owl\Http\Exception 404
      */
-    protected function dispatch($path) {
-        do {
-            if ($base_path = $this->base_path) {
-                if (stripos($this->normalizePath($path), $base_path) !== 0) {
-                    break;
-                }
-
-                $path = '/'.substr($path, strlen($base_path));
+    public function dispatch($path) {
+        $path = $this->normalizePath($path);
+        foreach ($this->children as $delegate_path => $router) {
+            if (strpos($path, $delegate_path) === 0) {
+                return $router->dispatch($path);
             }
+        }
 
-            if ($result = $this->byRewrite($path) ?: $this->byPath($path)) {
-                return $result;
-            }
-        } while (false);
+        $dispatch_path = $this->trimBasePath($path);
 
-        throw \Owl\Http\Exception::factory(404);
+        if ($result = $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path)) {
+            return $result;
+        }
+
+        return false;
     }
 
     /**
@@ -135,7 +178,7 @@ class Router {
      */
     protected function byRewrite($path, array $rules = null) {
         if ($rules === null) {
-            $rules = $this->rewrite;
+            $rules = $this->getConfig('rewrite') ?: [];
         }
 
         if ($path !== '/') {
@@ -173,32 +216,49 @@ class Router {
               : $pathinfo['dirname'] .'/'. $pathinfo['basename'];
         $path = $this->normalizePath($path);
 
-        // 路径对应的controller namespace
-        foreach ($this->namespace as $ns_path => $ns) {
-            $ns_path = $this->normalizePath($ns_path);
-
-            if (strpos($path, $ns_path) !== 0) {
-                continue;
-            }
-
-            $class = [];
-            $path = substr($path, strlen($ns_path)) ?: '/Index';
-            foreach (explode('/', $path) as $word) {
-                if ($word) {
-                    $class[] = ucfirst($word);
-                }
-            }
-            $class = $ns.'\\'.implode('\\', array_map('ucfirst', $class));
-
-            return [$class, []];
+        if ($path === '/') {
+            $path = '/index';
         }
 
-        return false;
+        $class = [];
+        foreach (explode('/', $path) as $word) {
+            if ($word) {
+                $class[] = $word;
+            }
+        }
+        $class = $this->getConfig('namespace').implode('\\', array_map('ucfirst', $class));
+        return [$class, []];
     }
 
     protected function normalizePath($path) {
-        if ($path === '/') { return '/'; }
+        if ($path === '/') {
+            return '/';
+        }
 
-        return rtrim($path, '/') .'/';
+        if (substr($path, -1, 1) !== '/') {
+            $path .= '/';
+        }
+
+        return $path;
+    }
+
+    /**
+     * 去掉路径内的base_path
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function trimBasePath($path) {
+        $base_path = $this->getConfig('base_path');
+
+        if (!$base_path || $base_path === '/') {
+            return $path;
+        }
+
+        if (stripos($path, $base_path) !== 0) {
+            throw \Owl\Http\Exception::factory(404);
+        }
+
+        return '/'.substr($path, strlen($base_path));
     }
 }
