@@ -47,7 +47,7 @@ class Registry {
      * @return void
      */
     public function set(Data $data) {
-        $class = self::normalizeClassName(get_class($data));
+        $class = get_class($data);
         if (!$this->isEnabled()) {
             return false;
         }
@@ -72,7 +72,6 @@ class Registry {
      * @return Data|false
      */
     public function get($class, $id) {
-        $class = self::normalizeClassName($class);
         if (!$this->isEnabled()) {
             return false;
         }
@@ -91,7 +90,6 @@ class Registry {
      * @return void
      */
     public function remove($class, $id) {
-        $class = self::normalizeClassName($class);
         if (!$this->isEnabled()) {
             return false;
         }
@@ -130,16 +128,6 @@ class Registry {
         }
 
         return $class.'@'.$key;
-    }
-
-    /**
-     * 格式化类名字符串
-     *
-     * @param string $class
-     * @return string
-     */
-    static private function normalizeClassName($class) {
-        return trim(strtolower($class), '\\');
     }
 
     static private $instance;
