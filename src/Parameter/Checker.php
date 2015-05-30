@@ -295,10 +295,6 @@ class Checker {
             'enum' => [],           // 枚举内容检查
         ], $option);
 
-        if (isset($option['eq'])) {
-            $option['eq'] = (string)$option['eq'];
-        }
-
         if ($option['enum']) {
             $enum = array();
             foreach ($option['enum'] as $value) {
