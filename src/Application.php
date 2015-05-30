@@ -22,9 +22,11 @@ namespace Owl;
  *     $logger->debug(sprintf('Request %s, status: %d'), $request->getRequestURI(), $response->getStatus());
  * });
  *
- * $router = new \Owl\Mvc\Router;
+ * $router = new \Owl\Mvc\Router([
+ *     'namespace' => '\Controller',
+ * ]);
  * $app->middleware(function($request, $response) use ($router) {
- *     $router->dispatch($request, $response);
+ *     $router->execute($request, $response);
  *
  *     yield true;
  * });
