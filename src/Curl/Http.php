@@ -78,6 +78,7 @@ class Http extends \Owl\Curl {
 
         $message = array();
         $message['info'] = $this->getInfo();
+        $this->close();
 
         $header_size = $message['info']['header_size'];
         $message['header'] = preg_split('/\r\n/', substr($result, 0, $header_size), 0, PREG_SPLIT_NO_EMPTY);
