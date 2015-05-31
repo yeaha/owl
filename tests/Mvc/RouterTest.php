@@ -64,4 +64,44 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['\Admin\Controller\Index', []], $router->testDispatch('/foo/bar/admin'));
         $this->assertSame(['\Admin\Controller\Baz', []], $router->testDispatch('/foo/bar/admin/baz'));
     }
+
+    public function testMiddleware() {
+        $router = new \Tests\Mock\Mvc\Router([
+            'namespace' => '\Controller',
+        ]);
+
+        $router->middleware('/foobar', function($request, $response) {
+            $response->setBody('foobar');
+
+            yield false;
+        });
+
+        $request = \Owl\Http\Request::factory([
+            'uri' => '/foobar/baz',
+            'method' => 'GET',
+        ]);
+        $response = new \Owl\Http\Response;
+
+        $router->execute($request, $response);
+        $this->assertEquals('foobar', $response->getBody());
+    }
+
+    public function testExceptionHandler() {
+        $router = new \Tests\Mock\Mvc\Router([
+            'namespace' => '\Controller',
+        ]);
+
+        $router->setExceptionHandler(function($exception, $request, $response) {
+            $response->setBody('page not found');
+        });
+
+        $request = \Owl\Http\Request::factory([
+            'uri' => '/foobar/baz',
+            'method' => 'GET',
+        ]);
+        $response = new \Owl\Http\Response;
+
+        $router->execute($request, $response);
+        $this->assertEquals('page not found', $response->getBody());
+    }
 }

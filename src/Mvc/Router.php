@@ -27,6 +27,21 @@ class Router {
     protected $config;
 
     /**
+     * @var \Owl\middleware
+     */
+    protected $middleware;
+
+    /**
+     * @var array
+     */
+    protected $middleware_handlers = [];
+
+    /**
+     * @var callable
+     */
+    protected $exception_handler;
+
+    /**
      * @var array
      */
     protected $children = [];
@@ -47,6 +62,8 @@ class Router {
         }
 
         $this->config = $config;
+
+        $this->middleware = new \Owl\Middleware;
     }
 
     /**
@@ -91,15 +108,93 @@ class Router {
     }
 
     /**
+     * 给指定路径的请求绑定中间件
+     *
+     * @param string $path
+     * @param callable $handler
+     * @return $this
+     */
+    public function middleware($path, $handler = null) {
+        if ($handler === null) {
+            $handler = $path;
+            $path = '/';
+        }
+
+        $path = $this->normalizePath($path);
+        $this->middleware_handlers[$path][] = $handler;
+
+        return $this;
+    }
+
+    /**
+     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Response $response
+     * @return void
+     */
+    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+        try {
+            $handlers = $this->getMiddlewareHandlers($request);
+            if (!$handlers) {
+                $this->respond($request, $response);
+
+                return;
+            }
+
+            $handlers[] = function($request, $response) {
+                $this->respond($request, $response);
+
+                yield true;
+            };
+
+            $this->middleware->execute([$request, $response], $handlers);
+        } catch (\Exception $exception) {
+            if ($this->exception_handler) {
+                call_user_func($this->exception_handler, $exception, $request, $response);
+            } else {
+                throw $exception;
+            }
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return [string $class, array $parameters]
+     */
+    public function dispatch($path) {
+        $path = $this->normalizePath($path);
+        foreach ($this->children as $delegate_path => $router) {
+            if (strpos($path, $delegate_path) === 0) {
+                return $router->dispatch($path);
+            }
+        }
+
+        $dispatch_path = $this->trimBasePath($path);
+
+        if ($result = $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path)) {
+            return $result;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param callable $handler
+     * @return $this
+     */
+    public function setExceptionHandler($handler) {
+        $this->exception_handler = $handler;
+        return $this;
+    }
+
+    /**
      * @param \Owl\Http\Request $request
      * @param \Owl\Http\Response $response
      * @return \Owl\Http\Response $response
      *
      * @throws \Owl\Http\Exception 404
      * @throws \Owl\Http\Exception 501
-     * @throws \Exception Invalid controller class.
      */
-    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response) {
         if (!$result = $this->dispatch($request->getRequestPath())) {
             throw \Owl\Http\Exception::factory(404);
         }
@@ -146,27 +241,6 @@ class Router {
         }
 
         return $response;
-    }
-
-    /**
-     * @param string $path
-     * @return [string $class, array $parameters]
-     */
-    public function dispatch($path) {
-        $path = $this->normalizePath($path);
-        foreach ($this->children as $delegate_path => $router) {
-            if (strpos($path, $delegate_path) === 0) {
-                return $router->dispatch($path);
-            }
-        }
-
-        $dispatch_path = $this->trimBasePath($path);
-
-        if ($result = $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path)) {
-            return $result;
-        }
-
-        return false;
     }
 
     /**
@@ -230,6 +304,10 @@ class Router {
         return [$class, []];
     }
 
+    /**
+     * @param string $path
+     * @return string
+     */
     protected function normalizePath($path) {
         if ($path === '/') {
             return '/';
@@ -260,5 +338,28 @@ class Router {
         }
 
         return '/'.substr($path, strlen($base_path));
+    }
+
+    /**
+     * get middleware handlers by request path
+     *
+     * @param Owl\Http\Request $request
+     * @return array
+     */
+    protected function getMiddlewareHandlers(\Owl\Http\Request $request) {
+        if (!$this->middleware_handlers) {
+            return [];
+        }
+
+        $request_path = $this->normalizePath($request->getRequestPath());
+        $request_path = $this->trimBasePath($request_path);
+
+        foreach ($this->middleware_handlers as $path => $handlers) {
+            if (strpos($request_path, $path) === 0) {
+                return $handlers;
+            }
+        }
+
+        return [];
     }
 }
