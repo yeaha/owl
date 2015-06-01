@@ -63,6 +63,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['\Controller\Baz', []], $router->testDispatch('/foo/bar/baz'));
         $this->assertSame(['\Admin\Controller\Index', []], $router->testDispatch('/foo/bar/admin'));
         $this->assertSame(['\Admin\Controller\Baz', []], $router->testDispatch('/foo/bar/admin/baz'));
+
+        $admin_router->middleware(function($request, $response) {
+            $response->setBody('admin router');
+            yield false;
+        });
+
+        $response = $router->testExecute('/foo/bar/admin');
+        $this->assertEquals('admin router', $response->getBody());
     }
 
     public function testMiddleware() {
@@ -76,13 +84,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             yield false;
         });
 
-        $request = \Owl\Http\Request::factory([
-            'uri' => '/foobar/baz',
-            'method' => 'GET',
-        ]);
-        $response = new \Owl\Http\Response;
-
-        $router->execute($request, $response);
+        $response = $router->testExecute('/foobar/baz');
         $this->assertEquals('foobar', $response->getBody());
     }
 
@@ -95,13 +97,19 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             $response->setBody('page not found');
         });
 
-        $request = \Owl\Http\Request::factory([
-            'uri' => '/foobar/baz',
-            'method' => 'GET',
+        $admin_router = new \Tests\Mock\Mvc\Router([
+            'namespace' => '\Admin\Controller',
         ]);
-        $response = new \Owl\Http\Response;
+        $router->delegate('/admin', $admin_router);
 
-        $router->execute($request, $response);
+        $admin_router->setExceptionHandler(function($exception, $request, $response) {
+            $response->setBody('admin page not found');
+        });
+
+        $response = $router->testExecute('/foobar/baz');
         $this->assertEquals('page not found', $response->getBody());
+
+        $response = $router->testExecute('/admin/baz');
+        $this->assertEquals('admin page not found', $response->getBody());
     }
 }

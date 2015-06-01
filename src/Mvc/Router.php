@@ -97,10 +97,12 @@ class Router {
         $path = $this->normalizePath($path);
 
         if ($base_path = $this->getConfig('base_path')) {
-            $path = $base_path .ltrim($path, '/');
+            $base_path = $base_path .ltrim($path, '/');
+        } else {
+            $base_path = $path;
         }
 
-        $router->setConfig('base_path', $path);
+        $router->setConfig('base_path', $base_path);
 
         $this->children[$path] = $router;
 
@@ -129,24 +131,25 @@ class Router {
     /**
      * @param \Owl\Http\Request $request
      * @param \Owl\Http\Response $response
-     * @return void
+     * @return $response
      */
     public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+        if ($router = $this->getDelegateRouter($request)) {
+            return $router->execute($request, $response);
+        }
+
         try {
-            $handlers = $this->getMiddlewareHandlers($request);
-            if (!$handlers) {
+            if (!$handlers = $this->getMiddlewareHandlers($request)) {
                 $this->respond($request, $response);
+            } else {
+                $handlers[] = function($request, $response) {
+                    $this->respond($request, $response);
 
-                return;
+                    yield true;
+                };
+
+                $this->middleware->execute([$request, $response], $handlers);
             }
-
-            $handlers[] = function($request, $response) {
-                $this->respond($request, $response);
-
-                yield true;
-            };
-
-            $this->middleware->execute([$request, $response], $handlers);
         } catch (\Exception $exception) {
             if ($this->exception_handler) {
                 call_user_func($this->exception_handler, $exception, $request, $response);
@@ -154,22 +157,8 @@ class Router {
                 throw $exception;
             }
         }
-    }
 
-    /**
-     * @param string $path
-     * @return [string $class, array $parameters]
-     */
-    public function dispatch($path) {
-        $path = $this->normalizePath($path);
-        foreach ($this->children as $delegate_path => $router) {
-            if (strpos($path, $delegate_path) === 0) {
-                return $router->dispatch($path);
-            }
-        }
-
-        $dispatch_path = $this->trimBasePath($path);
-        return $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path);
+        return $response;
     }
 
     /**
@@ -190,7 +179,8 @@ class Router {
      * @throws \Owl\Http\Exception 501
      */
     protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response) {
-        list($class, $parameters) = $this->dispatch($request->getRequestPath());
+        $path = $this->getRequestPath($request);
+        list($class, $parameters) = $this->byRewrite($path) ?: $this->byPath($path);
 
         if (!class_exists($class)) {
             throw \Owl\Http\Exception::factory(404);
@@ -342,8 +332,7 @@ class Router {
             return [];
         }
 
-        $request_path = $this->normalizePath($request->getRequestPath());
-        $request_path = $this->trimBasePath($request_path);
+        $request_path = $this->getRequestPath($request);
 
         foreach ($this->middleware_handlers as $path => $handlers) {
             if (strpos($request_path, $path) === 0) {
@@ -352,5 +341,38 @@ class Router {
         }
 
         return [];
+    }
+
+    /**
+     * 获得托管的下级router
+     *
+     * @param Owl\Http\Request $request
+     * @return Owl\Mvc\Router | false
+     */
+    protected function getDelegateRouter(\Owl\Http\Request $request) {
+        if (!$this->children) {
+            return false;
+        }
+
+        $path = $this->getRequestPath($request);
+
+        foreach ($this->children as $delegate_path => $router) {
+            if (strpos($path, $delegate_path) === 0) {
+                return $router;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 获得请求路径，去掉了base_path后的内容
+     *
+     * @param Owl\Http\Request $request
+     * @return string
+     */
+    protected function getRequestPath(\Owl\Http\Request $request) {
+        $path = $this->normalizePath($request->getRequestPath());
+        return $this->trimBasePath($path);
     }
 }
