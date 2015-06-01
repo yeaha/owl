@@ -169,12 +169,7 @@ class Router {
         }
 
         $dispatch_path = $this->trimBasePath($path);
-
-        if ($result = $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path)) {
-            return $result;
-        }
-
-        return false;
+        return $this->byRewrite($dispatch_path) ?: $this->byPath($dispatch_path);
     }
 
     /**
@@ -195,11 +190,7 @@ class Router {
      * @throws \Owl\Http\Exception 501
      */
     protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response) {
-        if (!$result = $this->dispatch($request->getRequestPath())) {
-            throw \Owl\Http\Exception::factory(404);
-        }
-
-        list($class, $parameters) = $result;
+        list($class, $parameters) = $this->dispatch($request->getRequestPath());
 
         if (!class_exists($class)) {
             throw \Owl\Http\Exception::factory(404);
