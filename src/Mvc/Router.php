@@ -125,6 +125,8 @@ class Router {
         $path = $this->normalizePath($path);
         $this->middleware_handlers[$path][] = $handler;
 
+        krsort($this->middleware_handlers);
+
         return $this;
     }
 
