@@ -22,6 +22,17 @@ class Response extends \Owl\Http\Response {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
-        $response->end((string)$this->body);
+        $body = $this->body;
+
+        if ($body instanceof \Closure) {
+            ob_start(function($buffer, 8192) use ($response) {
+                $response->write($buffer);
+            });
+            call_user_func($body);
+            $response->write(ob_get_clean());
+            $response->end();
+        } else {
+            $response->end((string)$body);
+        }
     }
 }
