@@ -22,6 +22,6 @@ class Response extends \Owl\Http\Response {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
-        $response->end($this->body);
+        $response->end((string)$this->body);
     }
 }
