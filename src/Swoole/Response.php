@@ -25,9 +25,9 @@ class Response extends \Owl\Http\Response {
         $body = $this->body;
 
         if ($body instanceof \Closure) {
-            ob_start(function($buffer, 8192) use ($response) {
+            ob_start(function($buffer) use ($response) {
                 $response->write($buffer);
-            });
+            }, 8192);
             call_user_func($body);
             $response->write(ob_get_clean());
             $response->end();
