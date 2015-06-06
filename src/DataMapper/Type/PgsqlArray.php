@@ -4,12 +4,6 @@ namespace Owl\DataMapper\Type;
 use \Owl\Service\DB\Expr;
 
 class PgsqlArray extends \Owl\DataMapper\Type\Mixed {
-    public function normalizeAttribute(array $attribute) {
-        return array_merge([
-            'strict' => true,
-        ], $attribute);
-    }
-
     public function normalize($value, array $attribute) {
         if ($value === null) {
             return array();
