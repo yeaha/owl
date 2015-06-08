@@ -2,12 +2,6 @@
 namespace Owl\DataMapper\Type;
 
 class Json extends \Owl\DataMapper\Type\Mixed {
-    public function normalizeAttribute(array $attribute) {
-        return array_merge([
-            'strict' => true,
-        ], $attribute);
-    }
-
     public function normalize($value, array $attribute) {
         if (is_array($value)) {
             return $value;
