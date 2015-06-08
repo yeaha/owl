@@ -77,7 +77,7 @@ class Session implements \ArrayAccess {
             return false;
         }
 
-        session_start();
+        @session_start();
         $this->data = $_SESSION;
         $this->snapshot = $_SESSION;
 
