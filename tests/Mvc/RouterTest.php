@@ -78,14 +78,22 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
             'namespace' => '\Controller',
         ]);
 
-        $router->middleware('/foobar', function($request, $response) {
-            $response->setBody('foobar');
+        $test = [];
+
+        $router->middleware('/foo/bar', function($request, $response) use (&$test) {
+            $test[] = 1;
+
+            yield true;
+        });
+
+        $router->middleware('/foo', function($request, $response) use (&$test) {
+            $test[] = 2;
 
             yield false;
         });
 
-        $response = $router->testExecute('/foobar/baz');
-        $this->assertEquals('foobar', $response->getBody());
+        $response = $router->testExecute('/foo/bar/baz');
+        $this->assertSame([1, 2], $test);
     }
 
     public function testExceptionHandler() {
