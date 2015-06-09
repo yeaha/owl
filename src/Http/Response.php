@@ -93,6 +93,10 @@ class Response {
             $this->cookie = [];
         }
 
+        if ($_SESSION instanceof \Owl\Session) {
+            $_SESSION->commit();
+        }
+
         $body = $this->body;
         if (in_array($this->getStatus(), [204, 304])) {
             $body = '';
