@@ -73,6 +73,16 @@ class Container extends \Owl\Container {
         $this->router = [];
     }
 
+    public function refresh() {
+        foreach ($this->values as $service) {
+            if (($service instanceof \Owl\Service) || method_exists($service, 'disconnect')) {
+                $service->disconnect();
+            }
+        }
+
+        parent::refresh();
+    }
+
     protected function setService($id, array $options) {
         $this->set($id, function() use ($options) {
             if (!isset($options['class'])) {
