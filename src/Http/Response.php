@@ -93,7 +93,7 @@ class Response {
             $this->cookie = [];
         }
 
-        if ($_SESSION instanceof \Owl\Session) {
+        if (isset($_SESSION) && $_SESSION instanceof \Owl\Session) {
             $_SESSION->commit();
         }
 
