@@ -186,7 +186,7 @@ class Router {
             throw \Owl\Http\Exception::factory(404);
         }
 
-        $controller = new $class;
+        $controller = new $class($request, $response);
         $controller->request = $request;
         $controller->response = $response;
 
