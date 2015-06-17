@@ -75,9 +75,7 @@ class Container extends \Owl\Container {
 
     public function refresh() {
         foreach ($this->values as $service) {
-            if (($service instanceof \Owl\Service) || method_exists($service, 'disconnect')) {
-                $service->disconnect();
-            }
+            $service->disconnect();
         }
 
         parent::refresh();
