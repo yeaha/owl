@@ -7,6 +7,14 @@ require __DIR__.'/../../src/autoload.php';
 
 \Owl\Application::registerNamespace('\\', __DIR__);
 
+set_error_handler(function($errno, $error, $file = null, $line = null) {
+    if (error_reporting() & $errno) {
+        throw new \ErrorException($error, $errno, $errno, $file, $line);
+    }
+
+    return true;
+});
+
 function __ini_app(\Owl\Application $app) {
     $app->middleware(function($request, $response) {
         $start = microtime(true);
