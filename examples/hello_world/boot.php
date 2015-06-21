@@ -7,6 +7,14 @@ require __DIR__.'/../../src/autoload.php';
 
 \Owl\Application::registerNamespace('\\', __DIR__);
 
+set_error_handler(function($errno, $error, $file = null, $line = null) {
+    if (error_reporting() & $errno) {
+        throw new \ErrorException($error, $errno, $errno, $file, $line);
+    }
+
+    return true;
+});
+
 function __ini_app(\Owl\Application $app) {
     $app->middleware(function($request, $response) {
         $start = microtime(true);
@@ -47,18 +55,30 @@ function __get_fpm_app() {
     return __ini_app($app);
 }
 
-function __get_swoole_app() {
-    $config = parse_ini_file(ROOT_DIR.'/server.ini', true);
-
-    $public_listener = $config['public_listener'];
-    $app = new \Owl\Swoole\Application($public_listener['ip'], $public_listener['port']);
+function __get_swoole_app(array $config) {
+    $app = new \Owl\Swoole\Application($config['server']['ip'], $config['server']['port']);
 
     if (isset($config['swoole_setting']) && $config['swoole_setting']) {
         $app->getSwooleServer()->set($config['swoole_setting']);
     }
 
-    $app->getSwooleServer()->on('start', function() use ($public_listener) {
-        echo sprintf("Listening http://%s:%d/ ...\n", $public_listener['ip'], $public_listener['port']);
+    $server = $app->getSwooleServer();
+
+    $server->on('start', function() use ($config) {
+        $pid = posix_getpid();
+
+        if (isset($config['server']['pid_file'])) {
+            file_put_contents($config['server']['pid_file'], $pid);
+        }
+
+        echo sprintf("Server PID: %d\n", $pid);
+        echo sprintf("Listening http://%s:%d/ ...\n", $config['server']['ip'], $config['server']['port']);
+    });
+
+    $server->on('shutdown', function() use ($config) {
+        if (isset($config['server']['pid_file']) && file_exists($config['server']['pid_file'])) {
+            unlink($config['server']['pid_file']);
+        }
     });
 
     return __ini_app($app);

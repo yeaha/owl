@@ -105,4 +105,11 @@ class Container {
         $this->callbacks = [];
         $this->values = [];
     }
+
+    /**
+     * 刷新所有的执行结果
+     */
+    public function refresh() {
+        $this->values = [];
+    }
 }

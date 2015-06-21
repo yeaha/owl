@@ -125,8 +125,6 @@ class Router {
         $path = $this->normalizePath($path);
         $this->middleware_handlers[$path][] = $handler;
 
-        krsort($this->middleware_handlers);
-
         return $this;
     }
 
@@ -188,7 +186,7 @@ class Router {
             throw \Owl\Http\Exception::factory(404);
         }
 
-        $controller = new $class;
+        $controller = new $class($request, $response);
         $controller->request = $request;
         $controller->response = $response;
 
@@ -336,13 +334,14 @@ class Router {
 
         $request_path = $this->getRequestPath($request);
 
+        $result = [];
         foreach ($this->middleware_handlers as $path => $handlers) {
             if (strpos($request_path, $path) === 0) {
-                return $handlers;
+                $result = array_merge($result, $handlers);
             }
         }
 
-        return [];
+        return $result;
     }
 
     /**

@@ -22,6 +22,10 @@ class Response extends \Owl\Http\Response {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
+        if ($_SESSION instanceof \Owl\Session) {
+            $_SESSION->commit();
+        }
+
         $body = $this->body;
 
         if ($body instanceof \Closure) {

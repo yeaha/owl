@@ -44,5 +44,5 @@ server {
 require [swoole](https://github.com/swoole/swoole-src) extension
 
 ```
-php -q examples/hello_world/server.php
+php -q examples/hello_world/server.php start
 ```
