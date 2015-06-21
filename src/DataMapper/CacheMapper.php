@@ -1,11 +1,6 @@
 <?php
 namespace Owl\DataMapper;
 
-const CACHE_NONE = 0;           // disable cache functions
-const CACHE_FIND = 1;           // create cache after found, default enable
-const CACHE_INSERT = 2;         // create cache after insert
-const CACHE_UPDATE = 4;         // update cahce after update
-
 /**
  * @example
  * class MyMapper extends \Owl\DataMapper\DB\Mapper {
@@ -30,7 +25,10 @@ const CACHE_UPDATE = 4;         // update cahce after update
  *     static protected $mapper_options = [
  *         'service' => 'my.db',
  *         'collection' => 'tablename',
- *         'cache_policy' => \Owl\DataMapper\CACHE_INSERT | \Owl\DataMapper\CACHE_UPDATE, // require php-5.6
+ *         'cache_policy' => [
+ *             'insert' => false,       // create cache after insert, default disable
+ *             'update' => false,       // update cache after update, default disable
+ *         ],
  *     ];
  *
  *     static protected $attributes = [
@@ -41,7 +39,7 @@ const CACHE_UPDATE = 4;         // update cahce after update
 trait CacheMapper {
     /**
      * @param mixed $id
-     * @return array
+     * @return array|false
      */
     abstract protected function getCache($id);
 
@@ -65,16 +63,14 @@ trait CacheMapper {
      * @return void
      */
     protected function __afterInsert(\Owl\DataMapper\Data $data) {
-        if ($policy = $this->getCachePolicy()) {
-            $cache_insert = ($policy & \Owl\DataMapper\CACHE_INSERT) === \Owl\DataMapper\CACHE_INSERT;
+        $policy = $this->getCachePolicy();
 
-            if ($cache_insert) {
-                $id = $data->id();
-                $record = $this->unpack($data);
-                $record = $this->normalizeCacheRecord($record);
+        if ($policy['insert']) {
+            $id = $data->id();
+            $record = $this->unpack($data);
+            $record = $this->normalizeCacheRecord($record);
 
-                $this->saveCache($id, $record);
-            }
+            $this->saveCache($id, $record);
         }
 
         parent::__afterInsert($data);
@@ -87,18 +83,16 @@ trait CacheMapper {
      * @return void
      */
     protected function __afterUpdate(\Owl\DataMapper\Data $data) {
-        if ($policy = $this->getCachePolicy()) {
-            $cache_update = ($this->getCachePolicy() & \Owl\DataMapper\CACHE_UPDATE) === \Owl\DataMapper\CACHE_UPDATE;
+        $policy = $this->getCachePolicy();
 
-            if ($cache_update) {
-                $id = $data->id();
-                $record = $this->unpack($data);
-                $record = $this->normalizeCacheRecord($record);
+        if ($policy['update']) {
+            $id = $data->id();
+            $record = $this->unpack($data);
+            $record = $this->normalizeCacheRecord($record);
 
-                $this->saveCache($id, $record);
-            } else {
-                $this->deleteCache($data->id());
-            }
+            $this->saveCache($id, $record);
+        } else {
+            $this->deleteCache($data->id());
         }
 
         parent::__afterUpdate($data);
@@ -111,9 +105,7 @@ trait CacheMapper {
      * @return void
      */
     protected function __afterDelete(\Owl\DataMapper\Data $data) {
-        if ($this->getCachePolicy()) {
-            $this->deleteCache($data->id());
-        }
+        $this->deleteCache($data->id());
 
         parent::__afterDelete($data);
     }
@@ -125,9 +117,7 @@ trait CacheMapper {
      * @return \Owl\DataMapper\Data
      */
     public function refresh(\Owl\DataMapper\Data $data) {
-        if ($this->getCachePolicy()) {
-            $this->deleteCache($data->id());
-        }
+        $this->deleteCache($data->id());
 
         return parent::refresh($data);
     }
@@ -138,11 +128,27 @@ trait CacheMapper {
      * @return integer
      */
     protected function getCachePolicy() {
-        if ($this->hasOption('cache_policy')) {
-            return $this->getOption('cache_policy');
+        $defaults = [
+            'insert' => false,
+            'update' => false,
+        ];
+
+        if (!$this->hasOption('cache_policy')) {
+            return $defaults;
         }
 
-        return \Owl\DataMapper\CACHE_FIND;
+
+        $policy = $this->getOption('cache_policy');
+
+        if (is_array($policy)) {
+            return array_merge($defaults, $policy);
+        } else {
+            if (DEBUG) {
+                throw new \Exception('Invalid cache policy setting');
+            }
+
+            return $defaults;
+        }
     }
 
     /**
@@ -154,10 +160,6 @@ trait CacheMapper {
      * @return array
      */
     protected function doFind($id, \Owl\Service $service = null, $collection = null) {
-        if (!$this->getCachePolicy()) {
-            return parent::doFind($id, $service, $collection);
-        }
-
         if ($record = $this->getCache($id)) {
             return $record;
         }
