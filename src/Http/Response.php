@@ -7,6 +7,7 @@ class Response {
     protected $end = false;
     protected $headers = [];
     protected $status = 200;
+    protected $parameters = [];
 
     public function setStatus($status) {
         $this->status = (int)$status;
@@ -72,6 +73,33 @@ class Response {
         $this->end = false;
         $this->headers = [];
         $this->status = 200;
+        $this->parameters = [];
+    }
+
+    /**
+     * 设置自定义参数
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setParameter($key, $value) {
+        $this->parameters[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * 获取自定义参数
+     *
+     * @param string $key
+     * @return mixed|false
+     */
+    public function getParameter($key) {
+        return isset($this->parameters[$key]) ? $this->parameters[$key] : false;
+    }
+
+    public function getParameters() {
+        return $this->parameters;
     }
 
     protected function send() {
