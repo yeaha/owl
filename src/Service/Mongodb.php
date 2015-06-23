@@ -28,15 +28,13 @@ class Mongodb extends \Owl\Service {
     public function connect() {
         if (!$this->client) {
             $this->client = new \MongoClient($this->getConfig('dsn'), $this->getConfig('options') ?: []);
-        } else if (!$this->client->connected) {
-            $this->client->connect();
         }
 
         return $this->client;
     }
 
     public function isConnected() {
-        return $this->client && $this->client->connected;
+        return (bool)$this->client;
     }
 
     /**
