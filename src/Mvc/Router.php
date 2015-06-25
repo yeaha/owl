@@ -267,8 +267,8 @@ class Router {
         }
 
         $path = ($pathinfo['dirname'] === '/')
-              ? $pathinfo['dirname'] . $pathinfo['basename']
-              : $pathinfo['dirname'] .'/'. $pathinfo['basename'];
+              ? $pathinfo['dirname'] . $pathinfo['filename']
+              : $pathinfo['dirname'] .'/'. $pathinfo['filename'];
         $path = $this->normalizePath($path);
 
         if ($path === '/') {

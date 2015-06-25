@@ -12,6 +12,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar'));
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar/'));
         $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/FOO/BAR'));
+        $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar.json'));
+        $this->assertSame(['\Controller\Foo\Bar', []], $router->testDispatch('/foo/bar.html'));
     }
 
     public function testDisaptchByRewrite() {
