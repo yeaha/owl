@@ -365,23 +365,22 @@ abstract class Data {
     /**
      * 获得主键值，如果是多字段主键，以数组方式返回
      *
+     * @param boolean $as_array
      * @return string|integer|array
      */
-    public function id() {
+    public function id($as_array = false) {
         $keys = static::getMapper()->getPrimaryKey();
         $id = [];
 
         foreach ($keys as $key) {
-            $value = $this->get($key);
-
-            if (count($keys) === 1) {
-                return $value;
-            }
-
-            $id[$key] = $value;
+            $id[$key] = $this->get($key);
         }
 
-        return $id;
+        if ($as_array || count($id) > 1) {
+            return $id;
+        }
+
+        return current($id);
     }
 
     /**

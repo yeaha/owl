@@ -213,6 +213,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $data = new $class(array('foo' => 'foo'));
         $this->assertEquals($data->id(), 'foo');
+        $this->assertSame($data->id(true), ['foo' => 'foo']);
 
         $this->setAttributes(array(
             'foo' => array('type' => 'string', 'primary_key' => true),
