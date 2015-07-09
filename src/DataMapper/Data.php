@@ -439,11 +439,25 @@ abstract class Data {
     /**
      * 根据主键值查询生成Data实例
      *
-     * @param string|integer|array
+     * @param mixed $id
      * @return Data|false
      */
     static public function find($id) {
         return static::getMapper()->find($id);
+    }
+
+    /**
+     * 获取单条数据，数据不存在则抛出异常
+     *
+     * @param mixed $id
+     * @return Data
+     */
+    static public function findOrFail($id) {
+        if ($data = static::find($id)) {
+            return $data;
+        }
+
+        throw new \Owl\DataMapper\Exception\DataNotFoundException;
     }
 
     /**
