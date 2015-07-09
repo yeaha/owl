@@ -76,7 +76,7 @@ abstract class Adapter extends \Owl\Service {
     public function begin() {
         if ($this->in_transaction) {
             if (!$this->support_savepoint) {
-                throw new \Exception(get_class().' unsupport savepoint');
+                throw new \Exception(get_class($this).' unsupport savepoint');
             }
 
             $savepoint = $this->quoteIdentifier(uniqid('savepoint_'));

@@ -179,7 +179,7 @@ abstract class Data {
 
         if (!$attribute) {
             if ($options['strict']) {
-                throw new \UnexpectedValueException(get_class() .": Undefined property {$key}");
+                throw new \UnexpectedValueException(get_class($this) .": Undefined property {$key}");
             }
 
             return $this;
@@ -187,7 +187,7 @@ abstract class Data {
 
         if ($attribute['deprecated']) {
             if ($options['strict']) {
-                throw new \Exception(get_class() .": Property {$key} is deprecated");
+                throw new \Exception(get_class($this) .": Property {$key} is deprecated");
             }
 
             return $this;
@@ -199,7 +199,7 @@ abstract class Data {
 
         if (!$options['force'] && $attribute['refuse_update'] && !$this->isFresh()) {
             if ($options['strict']) {
-                throw new \Exception(get_class() .": Property {$key} refuse update");
+                throw new \Exception(get_class($this) .": Property {$key} refuse update");
             }
 
             return $this;
@@ -211,13 +211,13 @@ abstract class Data {
 
         if ($value === null) {
             if (!$attribute['allow_null']) {
-                throw new \UnexpectedValueException(get_class() .": Property {$key} not allow null");
+                throw new \UnexpectedValueException(get_class($this) .": Property {$key} not allow null");
             }
         } else {
             $value = $this->normalize($key, $value, $attribute);
 
             if ($attribute['pattern'] && !preg_match($attribute['pattern'], $value)) {
-                throw new \UnexpectedValueException(get_class() .": Property {$key} mismatching pattern {$attribute['pattern']}");
+                throw new \UnexpectedValueException(get_class($this) .": Property {$key} mismatching pattern {$attribute['pattern']}");
             }
         }
 
@@ -261,11 +261,11 @@ abstract class Data {
      */
     public function get($key) {
         if (!$attribute = static::getMapper()->getAttribute($key)) {
-            throw new \UnexpectedValueException(get_class() .": Undefined property {$key}");
+            throw new \UnexpectedValueException(get_class($this) .": Undefined property {$key}");
         }
 
         if ($attribute['deprecated']) {
-            throw new \RuntimeException(get_class() .": Property {$key} is deprecated");
+            throw new \RuntimeException(get_class($this) .": Property {$key} is deprecated");
         }
 
         if (!array_key_exists($key, $this->values)) {

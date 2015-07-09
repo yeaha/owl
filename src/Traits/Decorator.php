@@ -54,7 +54,7 @@ trait Decorator {
 
     protected function getReference() {
         if (!$this->reference) {
-            throw new \Exception(get_class().': undefined reference object.');
+            throw new \Exception(get_class($this).': undefined reference object.');
         }
 
         return $this->reference;
