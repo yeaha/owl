@@ -36,7 +36,7 @@ class Http extends \Owl\Curl {
      * @param array $headers
      * @return $this
      */
-    public fucntion setHeaders(array $headers) {
+    public function setHeaders(array $headers) {
         $this->headers = $headers;
         return $this;
     }
