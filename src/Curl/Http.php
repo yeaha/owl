@@ -4,6 +4,8 @@ namespace Owl\Curl;
 class Http extends \Owl\Curl {
     static public $method_emulate = true;
 
+    protected $headers = [];
+
     public function head($url, $params = []) {
         return $this->send($url, 'HEAD', $params);
     }
@@ -24,10 +26,27 @@ class Http extends \Owl\Curl {
         return $this->send($url, 'DELETE', $params);
     }
 
+    /**
+     * @example
+     * $curl->setHeaders([
+     *     'Content-Type: application/octet-stream',
+     *     'Content-Length: 1024',
+     * ]);
+     *
+     * @param array $headers
+     * @return $this
+     */
+    public fucntion setHeaders(array $headers) {
+        $this->headers = $headers;
+        return $this;
+    }
+
     protected function send($url, $method, $params) {
         $method = strtoupper($method);
         $params = $this->normalizeParameters($params);
         $options = [];
+
+        $options[CURLOPT_HTTPHEADER] = $this->headers;
 
         if ($method == 'GET' || $method == 'HEAD') {
             if ($params) {
