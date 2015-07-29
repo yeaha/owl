@@ -4,43 +4,29 @@ namespace Owl\Curl;
 class Http extends \Owl\Curl {
     static public $method_emulate = true;
 
-    public function head($url, array $params = []) {
+    public function head($url, $params = []) {
         return $this->send($url, 'HEAD', $params);
     }
 
-    public function get($url, array $params = []) {
+    public function get($url, $params = []) {
         return $this->send($url, 'GET', $params);
     }
 
-    public function post($url, array $params = []) {
+    public function post($url, $params = []) {
         return $this->send($url, 'POST', $params);
     }
 
-    public function put($url, array $params = []) {
+    public function put($url, $params = []) {
         return $this->send($url, 'PUT', $params);
     }
 
-    public function delete($url, array $params = []) {
+    public function delete($url, $params = []) {
         return $this->send($url, 'DELETE', $params);
     }
 
-    protected function send($url, $method, array $params) {
+    protected function send($url, $method, $params) {
         $method = strtoupper($method);
-
-        $is_upload = false;
-        foreach ($params as $key => $value) {
-            if ($value instanceof \CURLFile) {
-                $is_upload = true;
-                break;
-            }
-        }
-
-        // 数组必须用http_build_query转换为字符串
-        // 否则会使用multipart/form-data而不是application/x-www-form-urlencoded
-        if (!$is_upload) {
-            $params = http_build_query($params) ?: null;
-        }
-
+        $params = $this->normalizeParameters($params);
         $options = [];
 
         if ($method == 'GET' || $method == 'HEAD') {
@@ -85,5 +71,27 @@ class Http extends \Owl\Curl {
         $message['body'] = substr($result, $header_size);
 
         return $message;
+    }
+
+    protected function normalizeParameters($parameters) {
+        if (!is_array($parameters)) {
+            return $parameters;
+        }
+
+        $is_upload = false;
+        foreach ($parameters as $key => $value) {
+            if ($value instanceof \CURLFile) {
+                $is_upload = true;
+                break;
+            }
+        }
+
+        // 数组必须用http_build_query转换为字符串
+        // 否则会使用multipart/form-data而不是application/x-www-form-urlencoded
+        if (!$is_upload) {
+            $parameters = http_build_query($parameters) ?: null;
+        }
+
+        return $parameters;
     }
 }
