@@ -10,12 +10,12 @@ namespace Owl\Parameter;
  * $checker->execute($parameters, array(
  *     'foo' => [
  *         'type' => 'integer',                 // 数据格式类型
- *         'allow_empty' => true,               // 是否允许空字符串
  *         'required' => false,                 // 是否允许不传值
- *         'eq' => '0',                         // "=="检查
+ *         'allow_empty' => true,               // 是否允许空字符串
  *         'same' => 0,                         // "==="检查
- *         'enum_eq' => ['0', '1', '2'],        // 枚举值检查，使用"=="
+ *         'eq' => '0',                         // "=="检查
  *         'enum_same' => [0, 1, 2],            // 枚举值检查，使用"==="
+ *         'enum_eq' => ['0', '1', '2'],        // 枚举值检查，使用"=="
  *         'regexp' => '/^\d+$/',               // 自定义正则表达式检查
  *     ],
  *     'bar' => [],                             // 不指定任何配置就用默认配置
