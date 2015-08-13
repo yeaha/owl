@@ -312,6 +312,12 @@ class Checker {
             'regexp' => '',         // 正则检查
         ], $option);
 
+        // 老版本兼容
+        if (isset($option['enum']) && !isset($option['enum_eq'])) {
+            $option['enum_eq'] = $option['enum'];
+            unset($option['enum']);
+        }
+
         return $option;
     }
 
