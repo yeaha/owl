@@ -109,9 +109,7 @@ class Redis extends \Owl\Context {
     }
 
     protected function getService() {
-        $service = $this->getConfig('service');
-
-        if (!$service || !($service instanceof \Owl\Service\Redis)) {
+        if (!$service = $this->getConfig('service')) {
             throw new \Exception('Invalid redis service.');
         }
 
