@@ -102,8 +102,6 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
     public function testJSON() {
         $attribute = DataMapper\Type::normalizeAttribute(array('type' => 'json'));
 
-        $this->assertTrue($attribute['strict']);
-
         $type = $this->getType('json');
         $this->assertInstanceOf('\Owl\DataMapper\Type\JSON', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Mixed', $type);
