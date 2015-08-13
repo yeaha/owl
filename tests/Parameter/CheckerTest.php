@@ -27,8 +27,24 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         $checker->execute(array('foo' => 'bar'), array('foo' => array('eq' => 'bar')));
         $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'eq' => 'bar')));
 
+        $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'eq' => '1')));
+        $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'eq' => 1)));
+
         $this->setExpectedException('\Owl\Parameter\Exception');
         $checker->execute(array('foo' => 'bar'), array('foo' => array('eq' => 'baz')));
+    }
+
+    public function testSame() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $checker->execute(array('foo' => 1), array('foo' => array('type' => 'integer', 'same' => 1)));
+
+        try {
+            $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'same' => 1)));
+            $this->fail('compire same type, test failed');
+        } catch (\Owl\Parameter\Exception $ex) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testRegexp() {
@@ -41,14 +57,24 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         $checker->execute(array('foo' => 'baaaaab'), array('foo' => array('regexp' => '/^ba+$/')));
     }
 
-    public function testEnumValues() {
+    public function testEnumEqualValues() {
         $checker = new \Owl\Parameter\Checker;
 
-        $checker->execute(array('foo' => '0'), array('foo' => array('enum' => array('0', '1'))));
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'enum' => array('0', '1'))));
+        $checker->execute(array('foo' => '0'), array('foo' => array('enum_eq' => array(0, '1'))));
+        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'enum_eq' => array('0', '1'))));
 
         $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '2'), array('foo' => array('allow_empty' => true, 'enum' => array('0', '1'))));
+        $checker->execute(array('foo' => '2'), array('foo' => array('allow_empty' => true, 'enum_eq' => array('0', '1'))));
+    }
+
+    public function testEnumSameValues() {
+        $checker = new \Owl\Parameter\Checker;
+
+        $checker->execute(array('foo' => 0), array('foo' => array('enum_same' => array(0, 1))));
+        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'enum_same' => array(0, 1))));
+
+        $this->setExpectedException('\Owl\Parameter\Exception');
+        $checker->execute(array('foo' => '1'), array('foo' => array('allow_empty' => true, 'enum_same' => array(0, 1))));
     }
 
     public function testIntegerType() {
@@ -56,8 +82,19 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
 
         $checker->execute(array('foo' => '123'), array('foo' => array('type' => 'integer')));
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '12a'), array('foo' => array('type' => 'integer')));
+        try {
+            $checker->execute(array('foo' => '12a'), array('foo' => array('type' => 'integer')));
+            $this->fail('integer type test failed');
+        } catch (\Owl\Parameter\Exception $ex) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            $checker->execute(array('foo' => -1), array('foo' => array('type' => 'integer', 'allow_negative' => false)));
+            $this->fail('integer type, negative test failed');
+        } catch (\Owl\Parameter\Exception $ex) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testNumericType() {
@@ -65,8 +102,19 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
 
         $checker->execute(array('foo' => '12.3'), array('foo' => array('type' => 'numeric')));
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '12.'), array('foo' => array('type' => 'numeric')));
+        try {
+            $checker->execute(array('foo' => '12.'), array('foo' => array('type' => 'numeric')));
+            $this->fail('numeric type, test failed');
+        } catch (\Owl\Parameter\Exception $ex) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            $checker->execute(array('foo' => -1.2), array('foo' => array('type' => 'numeric', 'allow_negative' => false)));
+            $this->fail('numeric type, negative test failed');
+        } catch (\Owl\Parameter\Exception $ex) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testBoolType() {

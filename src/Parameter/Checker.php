@@ -12,8 +12,10 @@ namespace Owl\Parameter;
  *         'type' => 'integer',                 // 数据格式类型
  *         'allow_empty' => true,               // 是否允许空字符串
  *         'required' => false,                 // 是否允许不传值
- *         'eq' => '0',                         // "==="检查
- *         'enum' => ['0', '1', '2'],           // 枚举值检查
+ *         'eq' => '0',                         // "=="检查
+ *         'same' => 0,                         // "==="检查
+ *         'enum_eq' => ['0', '1', '2'],        // 枚举值检查，使用"=="
+ *         'enum_same' => [0, 1, 2],            // 枚举值检查，使用"==="
  *         'regexp' => '/^\d+$/',               // 自定义正则表达式检查
  *     ],
  *     'bar' => [],                             // 不指定任何配置就用默认配置
@@ -58,10 +60,12 @@ class Checker {
      */
     protected $type_options = [
         'integer' => [
-            'regexp' => '/^\d+$/',
+            'regexp' => '/^\-?\d+$/',
+            'allow_negative' => true,
         ],
         'numeric' => [
-            'regexp' => '/^\d+(?:\.\d+)?$/',
+            'regexp' => '/^\-?\d+(?:\.\d+)?$/',
+            'allow_negative' => true,
         ],
         'url' => [
             'regexp' => '#^[a-z]+://[0-9a-z\-\.]+\.[0-9a-z]{1,4}(?:\d+)?(?:/[^\?]*)?(?:\?[^\#]*)?(?:\#[0-9a-z\-\_\/]*)?$#',
@@ -148,17 +152,31 @@ class Checker {
             }
         }
 
-        if (isset($option['eq'])) {
-            if ($value !== $option['eq']) {
+        if (isset($option['same'])) {
+            if ($value !== $option['same']) {
+                throw $this->exception($key, sprintf('value must strict equal [%s], current value is [%s]', $option['same'], $value));
+            }
+        } elseif (isset($option['eq'])) {
+            if ($value != $option['eq']) {
                 throw $this->exception($key, sprintf('value must equal "%s", current value is "%s"', $option['eq'], $value));
             }
-        } elseif ($option['enum']) {
-            if (!in_array($value, $option['enum'], true)) {
-                throw $this->exception($key, sprintf('value must be one of [%s], current value is "%s"', implode(', ', $option['enum']), $value));
+        } elseif (isset($option['enum_same'])) {
+            if (!in_array($value, $option['enum_same'], true)) {
+                throw $this->exception($key, sprintf('value must be one of [%s], current value is "%s"', implode(', ', $option['enum_same']), $value));
+            }
+        } elseif (isset($option['enum_eq'])) {
+            if (!in_array($value, $option['enum_eq'])) {
+                throw $this->exception($key, sprintf('value must be one of [%s], current value is "%s"', implode(', ', $option['enum_eq']), $value));
             }
         } elseif ($option['regexp']) {
             if (!preg_match($option['regexp'], $value)) {
                 throw $this->exception($key, sprintf('value mismatch regexp %s, current value is "%s"', $option['regexp'], $value));
+            }
+        }
+
+        if ($option['type'] === 'integer' || $option['type'] === 'numeric') {
+            if ($value < 0 && !$option['allow_negative']) {
+                throw $this->exception($key, sprintf('not allow negative numeric, current value is "%s"', $value));
             }
         }
     }
@@ -292,16 +310,7 @@ class Checker {
             'required' => true,     // 是否允许不传
             'allow_empty' => false, // 允许空字符串
             'regexp' => '',         // 正则检查
-            'enum' => [],           // 枚举内容检查
         ], $option);
-
-        if ($option['enum']) {
-            $enum = array();
-            foreach ($option['enum'] as $value) {
-                $enum[] = (string)$value;
-            }
-            $option['enum'] = $enum;
-        }
 
         return $option;
     }
