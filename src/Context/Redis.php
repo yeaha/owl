@@ -69,7 +69,7 @@ class Redis extends \Owl\Context {
         $redis = $this->getService();
         $token = $this->getToken();
 
-        return $redis->setTimeout($token, $ttl);
+        return $redis->expire($token, $ttl);
     }
 
     public function save() {
@@ -90,19 +90,21 @@ class Redis extends \Owl\Context {
 
         $removed_keys = array_diff($this->saved_keys, array_keys($data));
 
-        $redis->multi(\Redis::PIPELINE);
+        $tx = $redis->multi();
 
-        foreach ($removed_keys as $key) {
-            $redis->hDel($token, $key);
+        if ($removed_keys) {
+            // 兼容phpredis和predis两种传值方式
+            $hdel_args = $removed_keys;
+            array_unshift($hdel_args, $token);
+            call_user_func_array([$tx, 'hdel'], $hdel_args);
         }
-
-        $redis->hMSet($token, $data);
+        $tx->hMSet($token, $data);
 
         if ($ttl = (int)$this->getConfig('ttl')) {
-            $redis->setTimeout($token, $ttl);
+            $tx->expire($token, $ttl);
         }
 
-        $redis->exec();
+        $tx->exec();
 
         $this->saved_keys = array_keys($data);
         return true;
