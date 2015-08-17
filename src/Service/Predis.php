@@ -63,4 +63,19 @@ class Predis extends \Owl\Service {
     public function multi() {
         return $this->connect()->transaction();
     }
+
+    public function hMGet($key, array $fields) {
+        $redis = $this->connect();
+
+        $values = $redis->hmget($key, $fields);
+
+        $result = [];
+        foreach ($values as $i => $value) {
+            $key = $fields[$i];
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
 }
