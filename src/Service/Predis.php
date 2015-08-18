@@ -57,7 +57,7 @@ class Predis extends \Owl\Service {
         if ($this->client) {
             $parameters = $this->getConfig('parameters');
 
-            if (!isset($parameters['persistent']) || !$parameters['persistent']) {
+            if (isset($parameters['persistent']) && $parameters['persistent']) {
                 $this->client->disconnect();
             }
 
