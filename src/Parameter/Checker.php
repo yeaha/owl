@@ -182,7 +182,7 @@ class Checker {
 
         $allow_tags = isset($option['allow_tags']) ? (boolean)$option['allow_tags'] : false;
         if (!$allow_tags && is_string($value)) {
-            if (preg_match('/<\\?[a-z]+>/i', $value) !== false) {
+            if (preg_match('/<\/?[a-z]+>/i', $value)) {
                 throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
             }
         }
