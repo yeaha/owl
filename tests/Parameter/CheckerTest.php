@@ -80,6 +80,8 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
     public function testAllowTags() {
         $checker = new \Owl\Parameter\Checker;
 
+        $checker->execute(['foo' => 'normal string'], ['foo' => ['type' => 'string']]);
+
         try {
             $checker->execute(['foo' => '<script></script>'], ['foo' => ['type' => 'string']]);
             $this->fail('test string "allow_tags" failed');
