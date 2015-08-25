@@ -77,6 +77,19 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
         $checker->execute(array('foo' => '1'), array('foo' => array('allow_empty' => true, 'enum_same' => array(0, 1))));
     }
 
+    public function testAllowTags() {
+        $checker = new \Owl\Parameter\Checker;
+
+        try {
+            $checker->execute(['foo' => '<script></script>'], ['foo' => ['type' => 'string']]);
+            $this->fail('test string "allow_tags" failed');
+        } catch (\Owl\Parameter\Exception $exception) {
+            $this->assertTrue(true);
+        }
+
+        $checker->execute(['foo' => '<script></script>'], ['foo' => ['type' => 'string', 'allow_tags' => true]]);
+    }
+
     public function testIntegerType() {
         $checker = new \Owl\Parameter\Checker;
 

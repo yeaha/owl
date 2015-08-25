@@ -179,6 +179,13 @@ class Checker {
                 throw $this->exception($key, sprintf('not allow negative numeric, current value is "%s"', $value));
             }
         }
+
+        $allow_tags = isset($option['allow_tags']) ? (boolean)$option['allow_tags'] : false;
+        if (!$allow_tags && is_string($value)) {
+            if (preg_match('/<\\?[a-z]+>/i', $value) !== false) {
+                throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
+            }
+        }
     }
 
     /**
