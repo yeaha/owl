@@ -50,7 +50,7 @@ class Router {
         (new \Owl\Parameter\Checker)->execute($config, [
             'namespace' => ['type' => 'string'],
             'base_path' => ['type' => 'string', 'required' => false, 'regexp' => '#^/.+#'],
-            'rewrite' => ['type' => 'hash', 'required' => false, 'allow_empty' => true],
+            'rewrite' => ['type' => 'hash', 'required' => false, 'allow_empty' => true, 'keys' => []],
         ]);
 
         if (substr($config['namespace'], -1, 1) !== '\\') {
