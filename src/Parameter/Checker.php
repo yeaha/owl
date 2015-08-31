@@ -242,10 +242,6 @@ class Checker {
             throw $this->exception($key, 'json_decode() failed, '. $error);
         }
 
-        if (!isset($option['keys']) && !isset($option['element'])) {
-            $option['keys'] = [];
-        }
-
         return $this->checkArray($key, $value, $option);
     }
 
