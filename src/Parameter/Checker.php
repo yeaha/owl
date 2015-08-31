@@ -23,21 +23,20 @@ namespace Owl\Parameter;
  *
  *     'foo' => [                               // 整数类型
  *         'type' => 'integer',
- *         'filter_options' => [
- *             'min_range' => (integer),
- *             'max_range' => (integer),
- *         ],
+ *         'allow_negative' => (boolean),       // default true
  *     ],
  *
  *     'foo' => [                               // 浮点数类型
  *         'type' => 'float',
- *         'filter_options' => [
- *             'decimal' => (integer),
- *         ],
+ *         'allow_negative' => (boolean),       // default true
  *     ],
  *
  *     'foo' => [
- *         'type' => 'ip',
+ *         'type' => 'ipv4',
+ *     ],
+ *
+ *     'foo' => [
+ *         'type' => 'uri',
  *     ],
  *
  *     'foo' => [
@@ -50,14 +49,14 @@ namespace Owl\Parameter;
  *     ],
  *
  *     'foo' => [
- *         'type' => 'array',
+ *         'type' => 'array',                   // 普通数组
  *         'element' => [
  *             // ...
  *         ],
  *     ],
  *
  *     'foo' => [
- *         'type' => 'array',
+ *         'type' => 'array',                   // hash数组
  *         'keys' => [
  *             // ...
  *         ],
