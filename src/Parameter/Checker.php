@@ -212,6 +212,10 @@ class Checker {
             throw $this->exception($key, 'is not array type');
         }
 
+        if (!isset($option['keys']) && !isset($option['element'])) {
+            throw $this->exception($key, 'rule missing "keys" or "element"');
+        }
+
         if (isset($option['keys']) && $option['keys']) {
             $this->path[] = $key;
 
@@ -226,8 +230,6 @@ class Checker {
             }
 
             array_pop($this->path);
-        } else {
-            throw $this->exception($key, 'rule missing "keys" or "element"');
         }
 
         return true;
