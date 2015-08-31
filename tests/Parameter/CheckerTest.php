@@ -2,310 +2,422 @@
 namespace Tests\Parameter;
 
 class CheckerTest extends \PHPUnit_Framework_TestCase {
+    private $checker;
+
     public function testRequired() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(['foo' => 'bar'], ['foo' => ['type' => 'string']]);
+        $this->execute([], ['foo' => ['type' => 'string', 'required' => false]]);
 
-        $checker->execute(array('foo' => 'bar'), array('foo' => array('required' => true)));
-        $checker->execute(array(), array('foo' => array('required' => false)));
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array(), array('foo' => array('required' => true)));
+        $this->tryExecute(
+            [],
+            ['foo' => ['type' => 'string']],
+            'test "required" rule failed'
+        );
     }
 
     public function testAllowEmpty() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(['foo' => ''], ['foo' => ['allow_empty' => true]]);
+        $this->execute(['foo' => ''], ['foo' => ['type' => 'array', 'allow_empty' => true]]);
 
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true)));
+        $this->tryExecute(
+            ['foo' => ''],
+            ['foo' => ['allow_empty' => false]],
+            'test "allow_empty" rule failed'
+        );
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => false)));
+        $this->tryExecute(
+            ['foo' => []],
+            ['foo' => ['type' => 'array', 'allow_empty' => false]],
+            'test "allow_empty" rule failed'
+        );
     }
 
     public function testEquals() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(['foo' => 1], ['foo' => ['eq' => '1']]);
+        $this->execute(['foo' => 1], ['foo' => ['eq' => 1]]);
 
-        $checker->execute(array('foo' => 'bar'), array('foo' => array('eq' => 'bar')));
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'eq' => 'bar')));
+        $this->execute(['foo' => ''], ['foo' => ['eq' => '1', 'allow_empty' => true]]);
 
-        $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'eq' => '1')));
-        $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'eq' => 1)));
+        $this->tryExecute(
+            ['foo' => 'baz'],
+            ['foo' => ['eq' => 'bar']],
+            'test "eq" rule failed'
+        );
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => 'bar'), array('foo' => array('eq' => 'baz')));
+        $this->execute(['foo' => 1], ['foo' => ['enum_eq' => ['0', '1']]]);
+
+        $this->tryExecute(
+            ['foo' => 2],
+            ['foo' => ['enum_eq' => ['0', '1']]],
+            'test "enum_eq" rule failed'
+        );
     }
 
     public function testSame() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(['foo' => '1'], ['foo' => ['same' => '1']]);
+        $this->execute(['foo' => 1], ['foo' => ['same' => 1]]);
 
-        $checker->execute(array('foo' => 1), array('foo' => array('type' => 'integer', 'same' => 1)));
+        $this->execute(['foo' => ''], ['foo' => ['same' => '1', 'allow_empty' => true]]);
 
-        try {
-            $checker->execute(array('foo' => '1'), array('foo' => array('type' => 'integer', 'same' => 1)));
-            $this->fail('compire same type, test failed');
-        } catch (\Owl\Parameter\Exception $ex) {
-            $this->assertTrue(true);
-        }
+        $this->tryExecute(
+            ['foo' => '1'],
+            ['foo' => ['same' => 1]],
+            'test "same" rule failed'
+        );
+
+        $this->execute(['foo' => 1], ['foo' => ['enum_same' => [0, 1]]]);
+
+        $this->tryExecute(
+            ['foo' => 1],
+            ['foo' => ['enum_same' => ['0', '1']]],
+            'test "enum_same" rule failed'
+        );
     }
 
     public function testRegexp() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(['foo' => 'aab'], ['foo' => ['regexp' => '/^a+b$/']]);
 
-        $checker->execute(array('foo' => 'baaaaaa'), array('foo' => array('regexp' => '/^ba+$/')));
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'regexp' => '/^ba+$/')));
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => 'baaaaab'), array('foo' => array('regexp' => '/^ba+$/')));
+        $this->tryExecute(
+            ['foo' => 'abb'],
+            ['foo' => ['regexp' => '/^a+b$/']],
+            'test "regexp" rule fails'
+        );
     }
 
-    public function testEnumEqualValues() {
-        $checker = new \Owl\Parameter\Checker;
+    public function testInteger() {
+        $this->execute(['foo' => 1], ['foo' => ['type' => 'integer']]);
+        $this->execute(['foo' => '1'], ['foo' => ['type' => 'integer']]);
+        $this->execute(['foo' => -1], ['foo' => ['type' => 'integer']]);
+        $this->execute(['foo' => '-1'], ['foo' => ['type' => 'integer']]);
 
-        $checker->execute(array('foo' => '0'), array('foo' => array('enum_eq' => array(0, '1'))));
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'enum_eq' => array('0', '1'))));
+        $this->tryExecute(
+            ['foo' => 'bar'],
+            ['foo' => ['type' => 'integer']],
+            'test "integer" type failed'
+        );
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '2'), array('foo' => array('allow_empty' => true, 'enum_eq' => array('0', '1'))));
+        $this->tryExecute(
+            ['foo' => 1.1],
+            ['foo' => ['type' => 'integer']],
+            'test "integer" type failed'
+        );
+
+        $this->tryExecute(
+            ['foo' => -1],
+            ['foo' => ['type' => 'integer', 'allow_negative' => false]],
+            'test "allow_negative" rule failed'
+        );
     }
 
-    public function testEnumSameValues() {
-        $checker = new \Owl\Parameter\Checker;
+    public function testNumeric() {
+        $this->execute(['foo' => 1.1], ['foo' => ['type' => 'numeric']]);
+        $this->execute(['foo' => '1.1'], ['foo' => ['type' => 'numeric']]);
+        $this->execute(['foo' => -1.1], ['foo' => ['type' => 'numeric']]);
+        $this->execute(['foo' => '-1.1'], ['foo' => ['type' => 'numeric']]);
 
-        $checker->execute(array('foo' => 0), array('foo' => array('enum_same' => array(0, 1))));
-        $checker->execute(array('foo' => ''), array('foo' => array('allow_empty' => true, 'enum_same' => array(0, 1))));
+        $this->tryExecute(
+            ['foo' => 'bar'],
+            ['foo' => ['type' => 'numeric']],
+            'test "numeric" type failed'
+        );
 
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '1'), array('foo' => array('allow_empty' => true, 'enum_same' => array(0, 1))));
+        $this->tryExecute(
+            ['foo' => -1.1],
+            ['foo' => ['type' => 'numeric', 'allow_negative' => false]],
+            'test "allow_negative" rule failed'
+        );
+    }
+
+    public function testBoolean() {
+        $this->execute(['foo' => true], ['foo' => ['type' => 'boolean']]);
+        $this->execute(['foo' => false], ['foo' => ['type' => 'boolean']]);
+
+        $this->tryExecute(
+            ['foo' => 'bar'],
+            ['foo' => ['type' => 'boolean']],
+            'test "boolean" type failed'
+        );
+    }
+
+    public function testArray() {
+        $this->execute(
+            [
+                'a' => [
+                    'b' => 1,
+                    'c' => [
+                        'd' => 'foo@bar.com',
+                    ],
+                    'd' => [
+                        [
+                            'e' => 1,
+                        ],
+                        [
+                            'e' => 2,
+                        ]
+                    ],
+                ]
+            ],
+            [
+                'a' => [
+                    'type' => 'array',
+                    'keys' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => [
+                            'type' => 'array',
+                            'keys' => [
+                                'd' => ['type' => 'email'],
+                            ]
+                        ],
+                        'd' => [
+                            'type' => 'array',
+                            'element' => [
+                                'e' => ['type' => 'integer'],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->tryExecute(
+            [
+                'a' => [
+                    'b' => 1,
+                ],
+            ],
+            [
+                'a' => [
+                    'type' => 'array',
+                    'keys' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => ['type' => 'integer'],
+                    ]
+                ]
+            ],
+            'array "keys" rule fails'
+        );
+
+        $this->tryExecute(
+            [
+                'a' => [
+                    [
+                        'b' => 1,
+                    ]
+                ],
+            ],
+            [
+                'a' => [
+                    'type' => 'array',
+                    'element' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => ['type' => 'integer'],
+                    ]
+                ]
+            ],
+            'array "element" rule fails'
+        );
+
+        $this->tryExecute(
+            [
+                'a' => 1,
+            ],
+            [
+                'a' => [
+                    'type' => 'json',
+                ]
+            ],
+            'test "json" fails'
+        );
+    }
+
+    public function testJson() {
+        $this->execute(
+            [
+                'a' => json_encode([
+                    'b' => 1,
+                    'c' => [
+                        'd' => 'foo@bar.com',
+                    ],
+                    'd' => [
+                        [
+                            'e' => 1,
+                        ],
+                        [
+                            'e' => 2,
+                        ]
+                    ],
+                ])
+            ],
+            [
+                'a' => [
+                    'type' => 'json',
+                    'keys' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => [
+                            'type' => 'array',
+                            'keys' => [
+                                'd' => ['type' => 'email'],
+                            ]
+                        ],
+                        'd' => [
+                            'type' => 'array',
+                            'element' => [
+                                'e' => ['type' => 'integer'],
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->tryExecute(
+            [
+                'a' => json_encode([
+                    'b' => 1,
+                ]),
+            ],
+            [
+                'a' => [
+                    'type' => 'json',
+                    'keys' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => ['type' => 'integer'],
+                    ]
+                ]
+            ],
+            'json "keys" rule fails'
+        );
+
+        $this->tryExecute(
+            [
+                'a' => json_encode([
+                    [
+                        'b' => 1,
+                    ]
+                ]),
+            ],
+            [
+                'a' => [
+                    'type' => 'json',
+                    'element' => [
+                        'b' => ['type' => 'integer'],
+                        'c' => ['type' => 'integer'],
+                    ]
+                ]
+            ],
+            'json "element" rule fails'
+        );
+    }
+
+    public function testObject() {
+        $this->execute(
+            [
+                'a' => new \stdClass,
+            ],
+            [
+                'a' => [
+                    'type' => 'object',
+                    'instanceof' => '\stdClass',
+                ]
+            ]
+        );
+
+        $this->tryExecute(
+            [
+                'a' => 1,
+            ],
+            [
+                'a' => [
+                    'type' => 'object',
+                    'instanceof' => '\stdClass',
+                ]
+            ],
+            'test "object" fails'
+        );
+    }
+
+    public function testURL() {
+        $options = ['foo' => ['type' => 'url']];
+
+        $test = [
+            'http://192.168.1.1/',
+            'http://192.168.1.1/#',
+            'http://192.168.1.1/foo/bar',
+            'http://192.168.1.1/foo/bar?',
+            'http://192.168.1.1/foo/bar?a=b',
+            'http://192.168.1.1/foo/bar?a=b#',
+            'http://192.168.1.1/foo/bar?a=b#c/d',
+        ];
+
+        foreach ($test as $value) {
+            $this->execute(['foo' => $value], $options);
+        }
+    }
+
+    public function testURI() {
+        $options = ['foo' => ['type' => 'uri']];
+
+        $test = [
+            '/',
+            '/?',
+            '/foo/bar',
+            '/foo/bar?a=b',
+            '/foo/bar?a=b#',
+            '/foo/bar?a=b#c/d',
+        ];
+
+        foreach ($test as $value) {
+            $this->execute(['foo' => $value], $options);
+        }
     }
 
     public function testAllowTags() {
-        $checker = new \Owl\Parameter\Checker;
+        $this->execute(
+            [
+                'a' => 'foo bar',
+            ],
+            [
+                'a' => ['type' => 'string'],
+            ]
+        );
 
-        $checker->execute(['foo' => 'normal string'], ['foo' => ['type' => 'string']]);
+        $this->execute(
+            [
+                'a' => '<p>test</p>',
+            ],
+            [
+                'a' => ['type' => 'string', 'allow_tags' => true],
+            ]
+        );
 
-        try {
-            $checker->execute(['foo' => '<script></script>'], ['foo' => ['type' => 'string']]);
-            $this->fail('test string "allow_tags" failed');
-        } catch (\Owl\Parameter\Exception $exception) {
-            $this->assertTrue(true);
-        }
-
-        $checker->execute(['foo' => '<script></script>'], ['foo' => ['type' => 'string', 'allow_tags' => true]]);
+        $this->tryExecute(
+            [
+                'a' => '<p>test</p>',
+            ],
+            [
+                'a' => ['type' => 'string'],
+            ],
+            'test "allow_tags" fails'
+        );
     }
 
-    public function testIntegerType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $checker->execute(array('foo' => '123'), array('foo' => array('type' => 'integer')));
-
-        try {
-            $checker->execute(array('foo' => '12a'), array('foo' => array('type' => 'integer')));
-            $this->fail('integer type test failed');
-        } catch (\Owl\Parameter\Exception $ex) {
-            $this->assertTrue(true);
-        }
-
-        try {
-            $checker->execute(array('foo' => -1), array('foo' => array('type' => 'integer', 'allow_negative' => false)));
-            $this->fail('integer type, negative test failed');
-        } catch (\Owl\Parameter\Exception $ex) {
-            $this->assertTrue(true);
-        }
+    protected function setUp() {
+        $this->checker = new \Owl\Parameter\Checker;
     }
 
-    public function testNumericType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $checker->execute(array('foo' => '12.3'), array('foo' => array('type' => 'numeric')));
-
+    private function tryExecute($values, array $options, $message) {
         try {
-            $checker->execute(array('foo' => '12.'), array('foo' => array('type' => 'numeric')));
-            $this->fail('numeric type, test failed');
-        } catch (\Owl\Parameter\Exception $ex) {
-            $this->assertTrue(true);
-        }
+            $this->checker->execute($values, $options);
 
-        try {
-            $checker->execute(array('foo' => -1.2), array('foo' => array('type' => 'numeric', 'allow_negative' => false)));
-            $this->fail('numeric type, negative test failed');
+            $this->fail($message);
         } catch (\Owl\Parameter\Exception $ex) {
             $this->assertTrue(true);
         }
     }
 
-    public function testBoolType() {
-        $checker = new \Owl\Parameter\Checker;
+    private function execute(array $values, array $options) {
+        $result = $this->checker->execute($values, $options);
 
-        $checker->execute(array('foo' => true), array('foo' => array('type' => 'bool')));
-        $checker->execute(array('foo' => false), array('foo' => array('type' => 'bool')));
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => 0), array('foo' => array('type' => 'bool')));
-    }
-
-    public function testHashType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $options = array(
-            'foo' => array(
-                'type' => 'hash',
-                'keys' => array(
-                    'bar' => array(
-                        'type' => 'integer',
-                    )
-                )
-            ),
-        );
-
-        $checker->execute(
-            array('foo' => array('bar' => '1')),
-            $options
-        );
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => array('bar' => 'a')), $options);
-    }
-
-    public function testHashTypeException() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $options = array(
-            'foo' => array(
-                'type' => 'hash',
-            ),
-        );
-
-        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/is not hash type/');
-        $checker->execute(
-            array('foo' => array(1, 2, 3)),
-            $options
-        );
-    }
-
-    public function testEmptyHashException() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $checker->execute(
-            array('foo' => array()),
-            array(
-                'foo' => array(
-                    'type' => 'hash',
-                    'allow_empty' => true,
-                ),
-            )
-        );
-
-        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/not allow empty hash/');
-        $checker->execute(
-            array('foo' => array()),
-            array(
-                'foo' => array(
-                    'type' => 'hash',
-                ),
-            )
-        );
-    }
-
-    public function testArrayType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $options = array(
-            'foo' => array(
-                'type' => 'array',
-                'allow_empty' => true,
-                'element' => array(
-                    'bar' => array(
-                        'type' => 'integer',
-                    )
-                )
-            ),
-        );
-
-        $checker->execute(array(
-            'foo' => array(
-                array(
-                    'bar' => '1',
-                )
-            )
-        ), $options);
-
-        $checker->execute(array(
-            'foo' => array(
-            )
-        ), $options);
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array(
-            'foo' => array(
-                array(
-                    'bar' => 'a',
-                )
-            )
-        ), $options);
-    }
-
-    public function testEmptyArrayException() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $checker->execute(
-            array('foo' => array()),
-            array(
-                'foo' => array(
-                    'type' => 'array',
-                    'allow_empty' => true,
-                ),
-            )
-        );
-
-        $this->setExpectedExceptionRegExp('\Owl\Parameter\Exception', '/not allow empty array/');
-        $checker->execute(
-            array('foo' => array()),
-            array(
-                'foo' => array(
-                    'type' => 'array',
-                ),
-            )
-        );
-    }
-
-    public function testURLType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $options = array(
-            'foo' => array(
-                'type' => 'url',
-            ),
-        );
-
-        $checker->execute(array('foo' => 'http://192.168.1.1/'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/#'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/foo/bar'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/foo/bar?'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/foo/bar?a=b'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/foo/bar?a=b#'), $options);
-        $checker->execute(array('foo' => 'http://192.168.1.1/foo/bar?a=b#c/d'), $options);
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => '/foo/bar?a=b#c/d'), $options);
-    }
-
-    public function testURIType() {
-        $checker = new \Owl\Parameter\Checker;
-
-        $options = array(
-            'foo' => array(
-                'type' => 'uri',
-            ),
-        );
-
-        $checker->execute(array('foo' => '/'), $options);
-        $checker->execute(array('foo' => '/?'), $options);
-        $checker->execute(array('foo' => '/foo/bar'), $options);
-        $checker->execute(array('foo' => '/foo/bar?'), $options);
-        $checker->execute(array('foo' => '/foo/bar?a=b'), $options);
-        $checker->execute(array('foo' => '/foo/bar?a=b#'), $options);
-        $checker->execute(array('foo' => '/foo/bar?a=b#c/d'), $options);
-
-        $this->setExpectedException('\Owl\Parameter\Exception');
-        $checker->execute(array('foo' => 'foo/bar'), $options);
+        $this->assertTrue($result);
     }
 }
