@@ -11,7 +11,7 @@ namespace Owl;
  * $middleware->insert(function($a, $b, $c) {
  *     echo "before 1\n";
  *
- *     yield true;      // continue execute next middleware
+ *     yield;           // continue execute next middleware
  *
  *     echo "after 1\n";
  * });
@@ -27,7 +27,7 @@ namespace Owl;
  * $middleware->insert(function($a, $b, $c) {
  *     echo "before 3\n";
  *
- *     yield true;
+ *     yield;
  *
  *     echo "after 3\n";
  * });
@@ -74,14 +74,12 @@ class Middleware {
         foreach ($handlers as $handler) {
             $generator = call_user_func_array($handler, $arguments);
 
-            if (!$generator || !($generator instanceof \Generator)) {
-                throw new \Exception('Middleware handler need "yield"!');
-            }
+            if ($generator && $generator instanceof \Generator) {
+                $stack[] = $generator;
 
-            $stack[] = $generator;
-
-            if (!$generator->current()) {
-                break;
+                if ($generator->current() === false) {
+                    break;
+                }
             }
         }
 

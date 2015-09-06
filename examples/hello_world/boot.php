@@ -19,7 +19,7 @@ function __ini_app(\Owl\Application $app) {
     $app->middleware(function($request, $response) {
         $start = microtime(true);
 
-        yield true;
+        yield;
 
         $use_time = (microtime(true) - $start) * 1000;
         $response->setHeader('use-time', (int)$use_time.'ms');
@@ -30,8 +30,6 @@ function __ini_app(\Owl\Application $app) {
     ]);
     $app->middleware(function($request, $response) use ($router) {
         $router->execute($request, $response);
-
-        yield true;
     });
 
     $app->setExceptionHandler(function($exception, $request, $response) {

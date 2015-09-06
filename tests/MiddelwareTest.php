@@ -33,14 +33,6 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase {
         $middleware->execute();
     }
 
-    public function testHandleGenerator() {
-        $middleware = new \Owl\Middleware;
-        $middleware->insert(function() {});
-
-        $this->setExpectedExceptionRegExp('\Exception', '/yield/');
-        $middleware->execute();
-    }
-
     public function testInvalidHandler() {
         $middleware = new \Owl\Middleware;
 
