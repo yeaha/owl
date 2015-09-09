@@ -197,7 +197,7 @@ class Request {
     }
 
     public function isGet() {
-        return $this->getMethod() === 'GET';
+        return $this->getMethod() === 'GET' || $this->getMethod() === 'HEAD';
     }
 
     public function isPost() {
