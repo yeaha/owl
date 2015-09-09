@@ -182,8 +182,6 @@ class Checker {
             if (!is_bool($value)) {
                 throw $this->exception($key, sprintf('must be TRUE or FALSE, current value is "%s"', $value));
             }
-
-            return true;
         }
 
         if ($option['type'] === 'integer' || $option['type'] === 'numeric') {
@@ -193,7 +191,7 @@ class Checker {
         }
 
         if (!$option['allow_tags'] && is_string($value)) {
-            if (strip_tags($value) !== (string)$value) {
+            if (strip_tags($value) !== $value) {
                 throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
             }
         }
