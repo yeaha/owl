@@ -28,6 +28,7 @@ namespace Owl\DataMapper;
  *         'cache_policy' => [
  *             'insert' => false,       // create cache after insert, default disable
  *             'update' => false,       // update cache after update, default disable
+ *             'not_found' => false,    // create "not found" cache, default disable, set true or false or integer
  *         ],
  *     ];
  *
@@ -52,9 +53,10 @@ trait CacheMapper {
     /**
      * @param mixed $id
      * @param array $record
+     * @param integer $ttl
      * @return boolean
      */
-    abstract protected function saveCache($id, array $record);
+    abstract protected function saveCache($id, array $record, $ttl = null);
 
     /**
      * create cache after save new data, if cache policy set
@@ -71,6 +73,8 @@ trait CacheMapper {
             $record = $this->normalizeCacheRecord($record);
 
             $this->saveCache($id, $record);
+        } elseif ($policy['not_found']) {
+            $this->deleteCache($id);
         }
 
         parent::__afterInsert($data);
@@ -131,6 +135,7 @@ trait CacheMapper {
         $defaults = [
             'insert' => false,
             'update' => false,
+            'not_found' => false,
         ];
 
         if (!$this->hasOption('cache_policy')) {
@@ -161,15 +166,20 @@ trait CacheMapper {
      */
     protected function doFind($id, \Owl\Service $service = null, $collection = null) {
         if ($record = $this->getCache($id)) {
-            return $record;
+            return isset($record['__IS_NOT_FOUND__']) ? false : $record;
         }
 
-        if (!$record = parent::doFind($id, $service, $collection)) {
-            return $record;
-        }
+        if ($record = parent::doFind($id, $service, $collection)) {
+            $record = $this->normalizeCacheRecord($record);
+            $this->saveCache($id, $record);
+        } else {
+            $policy = $this->getCachePolicy();
 
-        $record = $this->normalizeCacheRecord($record);
-        $this->saveCache($id, $record);
+            if ($ttl = $policy['not_found']) {
+                $ttl = is_numeric($ttl) ? (int)$ttl : null;
+                $this->saveCache($id, ['__IS_NOT_FOUND__' => 1], $ttl);
+            }
+        }
 
         return $record;
     }
