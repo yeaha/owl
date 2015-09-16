@@ -107,6 +107,10 @@ class Application {
         if (!TEST) {
             $response->end();
         }
+
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
     }
 
     /**
