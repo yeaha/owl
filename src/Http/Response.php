@@ -112,13 +112,11 @@ class Response {
             foreach ($this->headers as $key => $value) {
                 header(sprintf('%s: %s', $key, $value));
             }
-            $this->headers = [];
 
             foreach ($this->cookies as $config) {
                 list($name, $value, $expire, $path, $domain, $secure, $httponly) = $config;
                 setCookie($name, $value, $expire, $path, $domain, $secure, $httponly);
             }
-            $this->cookie = [];
         }
 
         if (isset($_SESSION) && $_SESSION instanceof \Owl\Session) {
