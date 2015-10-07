@@ -12,12 +12,12 @@ $app->middleware(function($request, $response) {
     yield true;
 
     $use_time = (microtime(true) - $start) * 1000;
-    $response->setHeader('use-time', (int)$use_time.'ms');
+    $response->withHeader('use-time', (int)$use_time.'ms');
 });
 
 $app->middleware(function($request, $response) {
     if ($request->getRequestPath() === '/') {
-        $response->setBody('hello world!');
+        $response->write('hello world!');
     } else {
         throw \Owl\Http\Exception::factory(404);
     }
@@ -34,7 +34,7 @@ $app->setExceptionHandler(function($exception, $request, $response) {
         $message = \Owl\Http::getStatusMessage(500);
     }
 
-    $response->setStatus($status);
+    $response->withStatus($status);
     $response->setBody($message);
 });
 

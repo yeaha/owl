@@ -97,7 +97,7 @@ class Cookie extends \Owl\Context {
         }
 
         do {
-            if (!$data = $this->getConfig('request')->getCookie($this->getToken())) {
+            if (!$data = $this->getConfig('request')->getCookieParam($this->getToken())) {
                 break;
             }
 
@@ -273,7 +273,7 @@ class Cookie extends \Owl\Context {
         }
 
         if ($this->getConfig('bind_ip')) {
-            $ip = $this->getConfig('request')->getIP();
+            $ip = $this->getConfig('request')->getClientIP();
             $salt .= long2ip(ip2long($ip) & ip2long('255.255.255.0'));     // 192.168.1.123 -> 192.168.1.0
         }
 

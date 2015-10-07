@@ -67,7 +67,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['\Admin\Controller\Baz', []], $router->testDispatch('/foo/bar/admin/baz'));
 
         $admin_router->middleware(function($request, $response) {
-            $response->setBody('admin router');
+            $response->write('admin router');
             yield false;
         });
 
@@ -104,7 +104,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         ]);
 
         $router->setExceptionHandler(function($exception, $request, $response) {
-            $response->setBody('page not found');
+            $response->write('page not found');
         });
 
         $admin_router = new \Tests\Mock\Mvc\Router([
@@ -113,7 +113,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
         $router->delegate('/admin', $admin_router);
 
         $admin_router->setExceptionHandler(function($exception, $request, $response) {
-            $response->setBody('admin page not found');
+            $response->write('admin page not found');
         });
 
         $response = $router->testExecute('/foobar/baz');

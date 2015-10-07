@@ -43,8 +43,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             ],
         ]);
 
-        $this->assertEquals('1', $request->getCookie('foo'));
-        $this->assertSame('', $request->getCookie('bar'));
+        $this->assertEquals('1', $request->getCookieParam('foo'));
+        $this->assertSame('', $request->getCookieParam('bar'));
         $this->assertSame(['foo' => '1', 'bar' => ''], $request->getCookies());
     }
 
@@ -83,8 +83,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             'uri' => $uri,
         ]);
 
-        $this->assertEquals($uri, $request->getRequestURI());
-        $this->assertEquals('/foobar.json', $request->getRequestPath());
-        $this->assertEquals('json', $request->getExtension());
+        $this->assertEquals($uri, $request->getRequestTarget());
+        $this->assertEquals('/foobar.json', $request->getUri()->getPath());
+        $this->assertEquals('json', $request->getUri()->getExtension());
     }
 }

@@ -12,14 +12,14 @@ namespace Owl;
  *     yield true;
  *
  *     $use_time = (microtime(true) - $start) * 1000;
- *     $response->setHeader('use-time', (int)$use_time.'ms');
+ *     $response->withHeader('use-time', (int)$use_time.'ms');
  * });
  *
  * $app->middelware(function($request, $response) {
  *     yield true;
  *
  *     $logger = new \Monolog\Logger;
- *     $logger->debug(sprintf('Request %s, status: %d'), $request->getRequestURI(), $response->getStatus());
+ *     $logger->debug(sprintf('Request %s, status: %d'), $request->getRequestTarget(), $response->getStatusCode());
  * });
  *
  * $router = new \Owl\Mvc\Router([
@@ -32,8 +32,8 @@ namespace Owl;
  * });
  *
  * $app->setExceptionHandler(function($exception, $request, $response) {
- *     $response->setStatus(500);
- *     $response->setBody($exception->getMessage());
+ *     $response->withStatus(500);
+ *     $response->write($exception->getMessage());
  * });
  *
  * $app->start();
@@ -97,8 +97,8 @@ class Application {
             $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
             $handler = $this->exception_handler ?: function($exception, $request, $response) {
-                $response->setStatus(500);
-                $response->setBody('');
+                $response->withStatus(500);
+                $response->write('');
             };
 
             call_user_func($handler, $exception, $request, $response);

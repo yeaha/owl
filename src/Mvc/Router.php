@@ -193,7 +193,7 @@ class Router {
         // 如果__beforeExecute()返回了内容就直接返回内容
         if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $parameters))) {
             if (!($data instanceof \Owl\Http\Response)) {
-                $response->setBody($data);
+                $response->write($data);
             }
 
             return $response;
@@ -214,7 +214,7 @@ class Router {
 
         $data = call_user_func_array([$controller, $method], $parameters);
         if (!($data instanceof \Owl\Http\Response)) {
-            $response->setBody($data);
+            $response->write($data);
         }
 
         if (method_exists($controller, '__afterExecute')) {
@@ -373,7 +373,7 @@ class Router {
      * @return string
      */
     protected function getRequestPath(\Owl\Http\Request $request) {
-        $path = $this->normalizePath($request->getRequestPath());
+        $path = $this->normalizePath($request->getUri()->getPath());
         return $this->trimBasePath($path);
     }
 }

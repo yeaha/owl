@@ -3,6 +3,7 @@ defined('DEBUG') or define('DEBUG', true);
 defined('TEST') or define('TEST', false);
 define('ROOT_DIR', __DIR__);
 
+require __DIR__.'/../../vendor/autoload.php';
 require __DIR__.'/../../src/autoload.php';
 
 \Owl\Application::registerNamespace('\\', __DIR__);
@@ -22,7 +23,7 @@ function __ini_app(\Owl\Application $app) {
         yield;
 
         $use_time = (microtime(true) - $start) * 1000;
-        $response->setHeader('use-time', (int)$use_time.'ms');
+        $response->withHeader('use-time', (int)$use_time.'ms');
     });
 
     $router = new \Owl\Mvc\Router([
@@ -38,10 +39,10 @@ function __ini_app(\Owl\Application $app) {
             $status = $exception->getCode();
         }
 
-        $response->setStatus($status);
+        $response->withStatus($status);
 
         $view = new \Owl\Mvc\View(ROOT_DIR.'/View');
-        $response->setBody($view->render('_error', ['exception' => $exception]));
+        $response->write($view->render('_error', ['exception' => $exception]));
     });
 
     return $app;

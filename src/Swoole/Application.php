@@ -32,7 +32,7 @@ namespace Owl\Swoole;
  * });
  *
  * $app->setExceptionHandler(function($exception, $request, $response) {
- *     $response->setStatus(500);
+ *     $response->withStatus(500);
  *     $response->setBody($exception->getMessage());
  * });
  *
