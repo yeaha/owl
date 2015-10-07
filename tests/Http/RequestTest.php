@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Mvc;
+namespace Tests\Http;
 
 class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testGet() {
@@ -51,18 +51,18 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     public function testHeaders() {
         $request = \Owl\Http\Request::factory([
             'headers' => [
-                'Accept-Encoding' => 'gzip, deflate',
+                'Accept-Encoding' => 'gzip,deflate',
                 'Accept-Language' => 'en-us,en;q=0.8,zh-cn;q=0.5,zh;q=0.3',
                 'Connection' => 'keepalive',
             ],
         ]);
 
-        $this->assertEquals('gzip, deflate', $request->getHeader('accept-encoding'));
+        $this->assertEquals(['gzip', 'deflate'], $request->getHeader('accept-encoding'));
         $this->assertEquals($request->getHeader('accept-encoding'), $request->getHeader('ACCEPT-ENCODING'));
         $this->assertSame([
-            'accept-encoding' => 'gzip, deflate',
-            'accept-language' => 'en-us,en;q=0.8,zh-cn;q=0.5,zh;q=0.3',
-            'connection' => 'keepalive',
+            'accept-encoding' => ['gzip', 'deflate'],
+            'accept-language' => ['en-us', 'en;q=0.8', 'zh-cn;q=0.5', 'zh;q=0.3'],
+            'connection' => ['keepalive'],
         ], $request->getHeaders());
     }
 

@@ -13,14 +13,14 @@ class Uri implements UriInterface {
         'https' => 443,
     ];
 
-    public $scheme;
-    public $host;
-    public $port;
-    public $user;
-    public $password;
-    public $path;
-    public $query;
-    public $fragment;
+    protected $scheme;
+    protected $host;
+    protected $port;
+    protected $user;
+    protected $password;
+    protected $path;
+    protected $query;
+    protected $fragment;
 
     public function __construct($uri = '') {
         $parsed = [];
@@ -89,6 +89,10 @@ class Uri implements UriInterface {
 
     public function getPath() {
         return $this->path;
+    }
+
+    public function getExtension() {
+        return pathinfo($this->path, PATHINFO_EXTENSION);
     }
 
     public function getQuery() {

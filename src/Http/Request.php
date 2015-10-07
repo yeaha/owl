@@ -1,27 +1,34 @@
 <?php
 namespace Owl\Http;
 
-class Request {
+use \Owl\Http\Stream;
+use \Owl\Http\Uri;
+use \Psr\Http\Message\ServerRequestInterface;
+use \Psr\Http\Message\UriInterface;
+
+class Request implements ServerRequestInterface {
+    use \Owl\Http\MessageTrait;
+
     protected $get;
     protected $post;
     protected $cookies;
-    protected $headers;
-    protected $server;
-    protected $parameters;
+    protected $files;
     protected $method;
+    protected $uri;
 
-    public function __construct() {
-        $this->reset();
+    public function __construct($get = null, $post = null, $server = null, $cookies = null, $files = null) {
+        $this->get = $get === null ? $_GET : $get;
+        $this->post = $post === null ? $_POST : $post;
+        $this->server = $server === null ? $_SERVER : $server;
+        $this->cookies = $cookies === null ? $_COOKIE : $cookies;
+        $this->files = $files === null ? $_FILES : $files;
+
+        $this->initialize();
     }
 
-    public function reset() {
-        $this->get = $_GET;
-        $this->post = $_POST;
-        $this->cookies = $_COOKIE;
-        $this->server = $_SERVER;
-        $this->headers = null;
-        $this->parameters = [];
+    public function __clone() {
         $this->method = null;
+        $this->uri = null;
     }
 
     public function get($key = null) {
@@ -48,89 +55,140 @@ class Request {
         return array_key_exists($key, $this->post);
     }
 
-    /**
-     * 设置自定义参数
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return $this
-     */
-    public function setParameter($key, $value) {
-        $this->parameters[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * 获取自定义参数
-     *
-     * @param string $key
-     * @return mixed|false
-     */
-    public function getParameter($key) {
-        return isset($this->parameters[$key]) ? $this->parameters[$key] : false;
-    }
-
-    public function getParameters() {
-        return $this->parameters;
-    }
-
-    public function getServer($key = null) {
-        if ($key === null) {
-            return $this->server;
-        }
-
-        $key = strtoupper($key);
-        return isset($this->server[$key]) ? $this->server[$key] : false;
-    }
-
-    public function getHeader($key) {
-        $key = strtolower($key);
-        $headers = $this->getHeaders();
-        return isset($headers[$key]) ? $headers[$key] : false;
-    }
-
-    public function getHeaders() {
-        if ($this->headers !== null) {
-            return $this->headers;
-        }
-
-        $headers = [];
-        foreach ($this->server as $key => $value) {
-            $pos = strpos($key, 'HTTP_');
-
-            if ($pos !== false) {
-                $key = strtolower(str_replace('_', '-', substr($key, 5)));
-                $headers[$key] = $value;
-            }
-        }
-
-        return $this->headers = $headers;
-    }
-
-    public function getCookie($key) {
-        return isset($this->cookies[$key]) ? $this->cookies[$key] : false;
-    }
-
-    public function getCookies() {
-        return $this->cookies;
-    }
-
-    public function getRequestURI() {
+    public function getRequestTarget() {
         return isset($this->server['REQUEST_URI']) ? $this->server['REQUEST_URI'] : '/';
     }
 
-    public function getRequestPath() {
-        return parse_url($this->getRequestURI(), PHP_URL_PATH);
+    public function withRequestTarget($requestTarget) {
+        $result = clone $this;
+
+        $result->server['REQUEST_URI'] = $requestTarget;
+
+        return $result;
     }
 
-    public function getExtension() {
-        return pathinfo($this->getRequestPath(), PATHINFO_EXTENSION) ?: 'html';
+    public function getMethod() {
+        if ($this->method !== null) {
+            return $this->method;
+        }
+
+        $method = isset($this->server['REQUEST_METHOD']) ? strtoupper($this->server['REQUEST_METHOD']) : 'GET';
+        if ($method !== 'POST') {
+            return $this->method = $method;
+        }
+
+        $override = $this->getHeader('x-http-method-override') ?: $this->post('_method');
+        if ($override) {
+            if (is_array($override)) {
+                $override = array_unshift($override);
+            }
+
+            $method = $override;
+        }
+
+        return $this->method = strtoupper($method);
     }
 
-    public function getIP($proxy = null) {
+    public function withMethod($method) {
+        $result = clone $this;
+        $result->method = strtoupper($method);
+
+        return $result;
+    }
+
+    public function getUri() {
+        if ($this->uri) {
+            return $this->uri;
+        }
+
+        $scheme = $this->getServerParam('HTTPS') ? 'https' : 'http';
+        $user = $this->getServerParam('PHP_AUTH_USER');
+        $password = $this->getServerParam('PHP_AUTH_PW');
+        $host = $this->getServerParam('SERVER_NAME') ?: $this->getServerParam('SERVER_ADDR') ?: '127.0.0.1';
+        $port = $this->getServerParam('SERVER_PORT');
+
+        return $this->uri = (new Uri($this->getRequestTarget()))
+                            ->withScheme($scheme)
+                            ->withUserInfo($user, $password)
+                            ->withHost($host)
+                            ->withPort($port);
+    }
+
+    public function withUri(UriInterface $uri, $preserveHost = false) {
+        throw new \Exception('Request::withUri() not implemented');
+    }
+
+    public function getServerParams() {
+        return $this->server;
+    }
+
+    public function getServerParam($name) {
+        $name = strtoupper($name);
+
+        return isset($this->server[$name]) ? $this->server[$name] : false;
+    }
+
+    public function getCookieParams() {
+        return $this->cookies;
+    }
+
+    public function getCookieParam($name) {
+        return isset($this->cookies[$name]) ? $this->cookies[$name] : false;
+    }
+
+    public function withCookieParams(array $cookies) {
+        $result = clone $this;
+
+        $result->cookies = $cookies;
+
+        return $result;
+    }
+
+    public function getQueryParams() {
+        return $this->get;
+    }
+
+    public function withQueryParams(array $query) {
+        $result = clone $this;
+
+        $result->get = $query;
+
+        return $result;
+    }
+
+    public function getUploadedFiles() {
+        throw new \Exception('Request::getUploadedFiles() not implemented');
+    }
+
+    public function withUploadedFiles(array $uploadFiles) {
+        throw new \Exception('Request::withUploadedFiles() not implemented');
+    }
+
+    public function getParsedBody() {
+        throw new \Exception('Request::getParsedBody() not implemented');
+    }
+
+    public function withParsedBody($data) {
+        throw new \Exception('Request::withParsedBody() not implemented');
+    }
+
+    protected function initialize() {
+        $this->body = new Stream(fopen('php://input', 'r'));
+
+        $headers = [];
+        foreach ($this->server as $key => $value) {
+            if (strpos($key, 'HTTP_') === 0) {
+                $key = strtolower(str_replace('_', '-', substr($key, 5)));
+                $headers[$key] = explode(',', $value);
+            }
+        }
+        $this->headers = $headers;
+    }
+
+    public function getClientIP($proxy = null) {
         $ip = $proxy
-            ? $this->getServer('http_x_forwarded_for') ?: $this->getServer('remote_addr')
-            : $this->getServer('remote_addr');
+            ? $this->getServerParam('http_x_forwarded_for') ?: $this->getServerParam('remote_addr')
+            : $this->getServerParam('remote_addr');
 
         if (strpos($ip, ',') === false) {
             return $ip;
@@ -175,27 +233,6 @@ class Request {
         return array_shift($ip_set) ?: '0.0.0.0';
     }
 
-    public function getMethod() {
-        if ($this->method) {
-            return $this->method;
-        }
-
-        $method = strtoupper($this->getServer('REQUEST_METHOD'));
-
-        if ($method !== 'POST') {
-            return $method;
-        }
-
-        if ($override = $this->getHeader('x-http-method-override')) {
-            $method = $override;
-        } elseif ($_method = $this->post('_method')) {
-            unset($this->post['_method']);
-            $method = $_method;
-        }
-
-        return $this->method = strtoupper($method);
-    }
-
     public function isGet() {
         return $this->getMethod() === 'GET' || $this->getMethod() === 'HEAD';
     }
@@ -214,7 +251,7 @@ class Request {
 
     public function isAjax() {
         $val = $this->getHeader('x-requested-with');
-        return $val && (strtolower($val) === 'xmlhttprequest');
+        return $val && (strtolower($val[0]) === 'xmlhttprequest');
     }
 
     /**
@@ -253,13 +290,12 @@ class Request {
             'ip' => '',
         ], $options);
 
-        self::resetServer();
-
-        $_SERVER['REQUEST_METHOD'] = strtoupper($options['method']);
-        $_SERVER['REQUEST_URI'] = $options['uri'];
+        $server = [];
+        $server['REQUEST_METHOD'] = strtoupper($options['method']);
+        $server['REQUEST_URI'] = $options['uri'];
 
         if ($options['ip']) {
-            $_SERVER['REMOTE_ADDR'] = $options['ip'];
+            $server['REMOTE_ADDR'] = $options['ip'];
         }
 
         if ($query = parse_url($options['uri'], PHP_URL_QUERY)) {
@@ -267,29 +303,93 @@ class Request {
             $options['get'] = array_merge($get, $options['get']);
         }
 
-        $_COOKIE = $options['cookies'];
-        $_GET = $options['get'];
-        $_POST = $options['post'];
-        $_REQUEST = array_merge($_GET, $_POST);
+        $cookies = $options['cookies'];
+        $get = $options['get'];
+        $post = $options['post'];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $_POST = [];
+        if ($server['REQUEST_METHOD'] === 'GET') {
+            $post = [];
         }
 
         foreach ($options['headers'] as $key => $value) {
             $key = 'HTTP_'. strtoupper(str_replace('-', '_', $key));
-            $_SERVER[$key] = $value;
+            $server[$key] = $value;
         }
 
-        return new Request;
+        return new Request($get, $post, $server, $cookies);
     }
 
-    static private function resetServer() {
-        foreach ($_SERVER as $key => $value) {
-            if (strpos($key, 'HTTP_') === 0) {
-                unset($_SERVER[$key]);
-            }
+    /**
+     * @deprecated
+     */
+    public function getRequestURI() {
+        return $this->getRequestTarget();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getRequestPath() {
+        return $this->getUri()->getPath();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getExtension() {
+        return $this->getUri()->getExtension();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setParameter($key, $value) {
+        return $this->withAttribute($key, $value);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getParameter($key) {
+        return $this->getAttribute($key);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getParameters() {
+        return $this->getAttributes();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getServer($key = null) {
+        if ($key === null) {
+            return $this->getServerParams();
         }
-        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+        return $this->getServerParam($key);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getCookie($key) {
+        return $this->getCookieParam($key);
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getCookies() {
+        return $this->getCookieParams();
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getIP($proxy = null) {
+        return $this->getClientIP($proxy);
     }
 }
