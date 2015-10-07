@@ -165,7 +165,7 @@ class Response implements \Psr\Http\Message\ResponseInterface {
             }
 
             foreach ($this->headers as $key => $value) {
-                $key = ucfirst(strtolower($key), '-');
+                $key = ucwords(strtolower($key), '-');
                 if (is_array($value)) {
                     $value = implode(',', $value);
                 }
@@ -215,7 +215,7 @@ class Response implements \Psr\Http\Message\ResponseInterface {
      * @deprecated
      */
     public function setBody($body) {
-        return $this->write($bod);
+        return $this->write($body);
     }
 
     /**
