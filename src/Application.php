@@ -97,8 +97,8 @@ class Application {
             $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
             $handler = $this->exception_handler ?: function($exception, $request, $response) {
-                $response->withStatus(500);
-                $response->write('');
+                $response->withStatus(500)
+                         ->withBody(new \Owl\Http\StringStream('')); // reset response stream
             };
 
             call_user_func($handler, $exception, $request, $response);
