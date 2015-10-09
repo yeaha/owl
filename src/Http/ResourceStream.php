@@ -17,11 +17,6 @@ class ResourceStream extends \Owl\Http\Stream {
         ]
     ];
 
-    protected $stream;
-    protected $seekable;
-    protected $readable;
-    protected $writable;
-
     public function __construct($stream, $options = []) {
         if (!is_resource($stream)) {
             throw new \Exception('Stream must be a resource');
