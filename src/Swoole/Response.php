@@ -2,19 +2,27 @@
 namespace Owl\Swoole;
 
 class Response extends \Owl\Http\Response {
-    public function __construct($response) {
-        $this->response = $response;
+    protected $swoole_response;
+
+    public function __construct($swoole_response) {
+        $this->swoole_response = $swoole_response;
+
+        parent::__construct();
     }
 
     protected function send() {
-        $response = $this->response;
+        $response = $this->swoole_response;
 
-        $status = $this->getStatus();
+        $status = $this->getStatusCode();
         if ($status && $status !== 200) {
             $response->status($status);
         }
 
         foreach ($this->headers as $key => $value) {
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
+
             $response->header($key, $value);
         }
 
@@ -22,21 +30,6 @@ class Response extends \Owl\Http\Response {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
-        if ($_SESSION instanceof \Owl\Session) {
-            $_SESSION->commit();
-        }
-
-        $body = $this->body;
-
-        if ($body instanceof \Closure) {
-            ob_start(function($buffer) use ($response) {
-                $response->write($buffer);
-            }, 8192);
-            call_user_func($body);
-            $response->write(ob_get_clean());
-            $response->end();
-        } else {
-            $response->end((string)$body);
-        }
+        $response->end((string)$this->getBody());
     }
 }

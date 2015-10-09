@@ -2,27 +2,29 @@
 namespace Owl\Swoole;
 
 class Request extends \Owl\Http\Request {
-    protected $request;
+    protected $swoole_request;
 
-    public function __construct($request) {
-        $this->request = $request;
-        parent::__construct();
-    }
+    public function __construct($swoole_request) {
+        $this->swoole_request = $swoole_request;
 
-    public function reset() {
-        parent::reset();
+        $get = isset($request->get) ? $request->get : [];
+        $post = isset($request->post) ? $request->post : [];
+        $cookies = isset($request->cookie) ? $request->cookie : [];
+        $server = isset($request->server) ? array_change_key_case($request->server, CASE_UPPER) : [];
+        $headers = isset($request->header) ? array_change_key_case($request->header, CASE_LOWER) : [];
+        $files = isset($request->files) ? $request->files : [];
 
-        $request = $this->request;
+        foreach ($headers as $key => $value) {
+            $key = 'HTTP_'.strtoupper(str_replace('-', '_', $key));
+            $server[$key] = $value;
+        }
 
-        $this->get = isset($request->get) ? $request->get : [];
-        $this->post = isset($request->post) ? $request->post : [];
-        $this->cookies = isset($request->cookie) ? $request->cookie : [];
-        $this->server = isset($request->server) ? array_change_key_case($request->server, CASE_UPPER) : [];
-        $this->headers = isset($request->header) ? $request->header : [];
+        $_GET = $get;
+        $_POST = $post;
+        $_COOKIE = $cookies;
+        $_SERVER = $server;
+        $_FILES = $files;
 
-        $_GET = $this->get;
-        $_POST = $this->post;
-        $_COOKIE = $this->cookies;
-        $_SERVER = $this->server;
+        parent::__construct($get, $post, $server, $cookies, $files);
     }
 }
