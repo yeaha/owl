@@ -172,19 +172,6 @@ class Request implements ServerRequestInterface {
         throw new \Exception('Request::withParsedBody() not implemented');
     }
 
-    protected function initialize() {
-        $this->body = new Stream(fopen('php://input', 'r'));
-
-        $headers = [];
-        foreach ($this->server as $key => $value) {
-            if (strpos($key, 'HTTP_') === 0) {
-                $key = strtolower(str_replace('_', '-', substr($key, 5)));
-                $headers[$key] = explode(',', $value);
-            }
-        }
-        $this->headers = $headers;
-    }
-
     public function getClientIP($proxy = null) {
         $ip = $proxy
             ? $this->getServerParam('http_x_forwarded_for') ?: $this->getServerParam('remote_addr')
@@ -252,6 +239,19 @@ class Request implements ServerRequestInterface {
     public function isAjax() {
         $val = $this->getHeader('x-requested-with');
         return $val && (strtolower($val[0]) === 'xmlhttprequest');
+    }
+
+    protected function initialize() {
+        $this->body = new Stream(fopen('php://input', 'r'));
+
+        $headers = [];
+        foreach ($this->server as $key => $value) {
+            if (strpos($key, 'HTTP_') === 0) {
+                $key = strtolower(str_replace('_', '-', substr($key, 5)));
+                $headers[$key] = explode(',', $value);
+            }
+        }
+        $this->headers = $headers;
     }
 
     /**
