@@ -28,9 +28,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         // body
         $response->write('foo');
-        $this->assertSame('foo', $response->getBody()->getContents());
+        $this->assertSame('foo', (string)$response->getBody());
 
         $response->write('bar');
-        $this->assertSame('foobar', $response->getBody()->getContents());
+        $this->assertSame('foobar', (string)$response->getBody());
     }
 }
