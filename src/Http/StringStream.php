@@ -1,55 +1,23 @@
 <?php
 namespace Owl\Http;
 
-class StringStream implements \Psr\Http\Message\StreamInterface {
-    protected $contents = '';
+class StringStream extends \Owl\Http\Stream {
     protected $position = 0;
-    protected $closed = false;
     protected $seekable = true;
     protected $readable = true;
     protected $writable = true;
 
-    public function __construct($contents = '') {
-        $this->contents = $contents;
-        $this->position = strlen($contents);
-    }
-
-    public function __destruct() {
-        $this->close();
+    public function __construct($string = '') {
+        $this->stream = $string;
+        $this->position = strlen($string);
     }
 
     public function __toString() {
-        return $this->getContents();
-    }
-
-    public function isSeekable() {
-        return $this->seekable;
-    }
-
-    public function isReadable() {
-        return $this->readable;
-    }
-
-    public function isWritable() {
-        return $this->writable;
-    }
-
-    public function close() {
-        $this->closed = true;
-        $this->detach();
-    }
-
-    public function detach() {
-        $this->closed = true;
-
-        $result = $this->contents;
-        $this->contents = '';
-
-        return $result;
+        return $this->stream;
     }
 
     public function getSize() {
-        return strlen($this->contents);
+        return strlen($this->stream);
     }
 
     public function tell() {
@@ -57,7 +25,7 @@ class StringStream implements \Psr\Http\Message\StreamInterface {
     }
 
     public function eof() {
-        return $this->position === strlen($this->contents);
+        return $this->position === strlen($this->stream);
     }
 
     public function seek($offset, $whence = SEEK_SET) {
@@ -69,14 +37,14 @@ class StringStream implements \Psr\Http\Message\StreamInterface {
     }
 
     public function write($string) {
-        $this->contents .= $string;
+        $this->stream .= $string;
         $this->position = $this->getSize();
 
         return strlen($string);
     }
 
     public function read($length) {
-        $result = substr($this->contents, $this->position, $length);
+        $result = substr($this->stream, $this->position, $length);
 
         $this->position = min($this->position+$length, $this->getSize());
 
@@ -84,9 +52,6 @@ class StringStream implements \Psr\Http\Message\StreamInterface {
     }
 
     public function getContents() {
-        return $this->contents;
-    }
-
-    public function getMetadata($key = null) {
+        return substr($this->stream, $this->position);
     }
 }

@@ -12,6 +12,7 @@ class Response extends \Owl\Http\Response {
 
     protected function send() {
         $response = $this->swoole_response;
+        var_dump($response);
 
         $status = $this->getStatusCode();
         if ($status && $status !== 200) {
@@ -30,6 +31,15 @@ class Response extends \Owl\Http\Response {
             $response->cookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
 
-        $response->end((string)$this->getBody());
+        $body = $this->getBody();
+        if ($body instanceof \Owl\Http\IteratorStream) {
+            foreach ($body->iterator() as $string) {
+                $response->write($string);
+            }
+
+            $response->end('');
+        } else {
+            $response->end((string)$body);
+        }
     }
 }

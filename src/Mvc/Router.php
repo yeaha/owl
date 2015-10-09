@@ -213,12 +213,12 @@ class Router {
         }
 
         $data = call_user_func_array([$controller, $method], $parameters);
-        if (!($data instanceof \Owl\Http\Response) && is_string($data)) {
+        if (!($data instanceof \Owl\Http\Response)) {
             $response->write($data);
         }
 
         if (method_exists($controller, '__afterExecute')) {
-            $controller->__afterExecute($request, $response, $data);
+            $controller->__afterExecute($request, $response);
         }
 
         return $response;

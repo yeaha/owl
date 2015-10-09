@@ -180,7 +180,13 @@ class Response implements \Psr\Http\Message\ResponseInterface {
         }
 
         $body = $this->getBody();
-        echo $body->getContents();
+        if ($body instanceof \Owl\Http\IteratorStream) {
+            foreach ($body->iterator() as $string) {
+                echo $string;
+            }
+        } else {
+            echo (string)$body;
+        }
     }
 
     /**

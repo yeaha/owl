@@ -1,7 +1,7 @@
 <?php
 namespace Owl\Http;
 
-use \Owl\Http\Stream;
+use \Owl\Http\ResourceStream;
 use \Owl\Http\Uri;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\UriInterface;
@@ -242,7 +242,7 @@ class Request implements ServerRequestInterface {
     }
 
     protected function initialize() {
-        $this->body = new Stream(fopen('php://input', 'r'));
+        $this->body = new ResourceStream(fopen('php://input', 'r'));
 
         $headers = [];
         foreach ($this->server as $key => $value) {
