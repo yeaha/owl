@@ -15,6 +15,7 @@ class Request implements ServerRequestInterface {
     protected $files;
     protected $method;
     protected $uri;
+    protected $allow_client_proxy_ip = false;
 
     public function __construct($get = null, $post = null, $server = null, $cookies = null, $files = null) {
         $this->get = $get === null ? $_GET : $get;
@@ -172,8 +173,16 @@ class Request implements ServerRequestInterface {
         throw new \Exception('Request::withParsedBody() not implemented');
     }
 
-    public function getClientIP($proxy = null) {
-        $ip = $proxy
+    public function allowClientProxyIP() {
+        $this->allow_client_proxy_ip = true;
+    }
+
+    public function disAllowClientProxyIP() {
+        $this->allow_client_proxy_ip = false;
+    }
+
+    public function getClientIP() {
+        $ip = $this->allow_client_proxy_ip
             ? $this->getServerParam('http_x_forwarded_for') ?: $this->getServerParam('remote_addr')
             : $this->getServerParam('remote_addr');
 
@@ -389,7 +398,7 @@ class Request implements ServerRequestInterface {
     /**
      * @deprecated
      */
-    public function getIP($proxy = null) {
-        return $this->getClientIP($proxy);
+    public function getIP() {
+        return $this->getClientIP();
     }
 }
