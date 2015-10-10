@@ -213,7 +213,9 @@ class Router {
         }
 
         $data = call_user_func_array([$controller, $method], $parameters);
-        if (!($data instanceof \Owl\Http\Response)) {
+        if ($data instanceof \Psr\Http\Message\StreamInterface) {
+            $response->withBody($data);
+        } elseif ($data !== null && !($data instanceof \Owl\Http\Response)) {
             $response->write($data);
         }
 
