@@ -177,7 +177,7 @@ class Request implements ServerRequestInterface {
         $this->allow_client_proxy_ip = true;
     }
 
-    public function disAllowClientProxyIP() {
+    public function disallowClientProxyIP() {
         $this->allow_client_proxy_ip = false;
     }
 
