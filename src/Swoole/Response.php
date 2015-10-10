@@ -12,7 +12,6 @@ class Response extends \Owl\Http\Response {
 
     protected function send() {
         $response = $this->swoole_response;
-        var_dump($response);
 
         $status = $this->getStatusCode();
         if ($status && $status !== 200) {
