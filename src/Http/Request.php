@@ -158,7 +158,13 @@ class Request implements ServerRequestInterface {
     }
 
     public function getUploadedFiles() {
-        throw new \Exception('Request::getUploadedFiles() not implemented');
+        $files = [];
+
+        foreach ($this->files as $key => $file) {
+            $files[$key] = new \Owl\Http\UploadFile($file);
+        }
+
+        return $files;
     }
 
     public function withUploadedFiles(array $uploadFiles) {
