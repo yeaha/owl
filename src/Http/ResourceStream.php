@@ -36,7 +36,10 @@ class ResourceStream extends \Owl\Http\Stream {
 
     public function __toString() {
         try {
-            $this->rewind();
+            if ($this->isSeekable()) {
+                $this->rewind();
+            }
+
             return $this->getContents();
         } catch (\Exception $ex) {
             return '';

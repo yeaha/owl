@@ -158,7 +158,13 @@ class Request implements ServerRequestInterface {
     }
 
     public function getUploadedFiles() {
-        throw new \Exception('Request::getUploadedFiles() not implemented');
+        $files = [];
+
+        foreach ($this->files as $key => $file) {
+            $files[$key] = new \Owl\Http\UploadFile($file);
+        }
+
+        return $files;
     }
 
     public function withUploadedFiles(array $uploadFiles) {
@@ -166,7 +172,24 @@ class Request implements ServerRequestInterface {
     }
 
     public function getParsedBody() {
-        throw new \Exception('Request::getParsedBody() not implemented');
+        $content_type = $this->getHeaderLine('content-type');
+        $method = $this->getServerParam('REQUEST_METHOD');
+
+        if ($method === 'POST' && ($content_type === 'application/x-www-form-urlencoded' || $content_type === 'multipart/form-data')) {
+            return $this->post;
+        }
+
+        $body = (string)$this->body;
+
+        if ($body === '') {
+            return null;
+        }
+
+        if ($content_type === 'application/json') {
+            return json_decode($body, true);
+        }
+
+        return $body;
     }
 
     public function withParsedBody($data) {
@@ -177,7 +200,7 @@ class Request implements ServerRequestInterface {
         $this->allow_client_proxy_ip = true;
     }
 
-    public function disAllowClientProxyIP() {
+    public function disallowClientProxyIP() {
         $this->allow_client_proxy_ip = false;
     }
 
