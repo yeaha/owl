@@ -20,8 +20,8 @@ class IteratorStream extends \Owl\Http\Stream {
     protected $writable = false;
 
     public function __construct($iterator) {
-        if (!($iterator instanceof \Traversable)) {
-            throw new \Exception('Stream must be a traversable object');
+        if (!($iterator instanceof \Iterator)) {
+            throw new \Exception('Stream must be a Iterator object');
         }
 
         $this->stream = $iterator;
