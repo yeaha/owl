@@ -3,8 +3,7 @@ defined('DEBUG') or define('DEBUG', true);
 defined('TEST') or define('TEST', false);
 define('ROOT_DIR', __DIR__);
 
-require __DIR__.'/../../vendor/autoload.php';
-require __DIR__.'/../../src/autoload.php';
+require __DIR__.'/vendor/autoload.php';
 
 \Owl\Application::registerNamespace('\\', __DIR__);
 
