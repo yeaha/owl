@@ -22,6 +22,7 @@
         "exclude": ["/examples", "/tests"]
     },
     "autoload": {
-        "psr-4": {"Owl\\": "src"}
+        "psr-4": {"Owl\\": "src"},
+        "files": ["src/constant.php"]
     }
 }
