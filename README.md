@@ -5,7 +5,7 @@
 ```json
 {
     "require": {
-        "yeaha/owl": "0.1.*"
+        "yeaha/owl": "0.2.*"
     }
 }
 ```
@@ -17,6 +17,12 @@ require 'src/autoload.php';
 ```
 
 # [Hello world](https://github.com/yeaha/owl/tree/master/examples/hello_world)
+
+## install
+```
+cd examples/hello_world
+composer install
+```
 
 ## php-fpm + nginx
 
