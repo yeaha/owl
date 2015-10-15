@@ -192,7 +192,9 @@ class Router {
 
         // 如果__beforeExecute()返回了内容就直接返回内容
         if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $parameters))) {
-            if (!($data instanceof \Owl\Http\Response)) {
+            if ($data instanceof \Psr\Http\Message\StreamInterface) {
+                $response->withBody($data);
+            } elseif (!($data instanceof \Owl\Http\Response)) {
                 $response->write($data);
             }
 
