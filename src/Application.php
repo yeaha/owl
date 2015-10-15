@@ -104,9 +104,7 @@ class Application {
             call_user_func($handler, $exception, $request, $response);
         }
 
-        $is_test = (bool)constant('TEST');
-
-        if (!$is_test) {
+        if (!TEST) {
             $response->end();
         }
 
