@@ -205,6 +205,16 @@ class View {
     }
 
     /**
+     * 把内容中的html特殊字符转码后输出
+     *
+     * @param string
+     * @return void
+     */
+    protected function eprint($string) {
+        echo htmlspecialchars($string);
+    }
+
+    /**
      * 显示已经生成好的块
      *
      * @param string $name
