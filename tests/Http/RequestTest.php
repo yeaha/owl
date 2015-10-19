@@ -75,6 +75,25 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(strtoupper($method), $request->getMethod());
             $this->assertTrue(call_user_func([$request, 'is'.$method]));
         }
+
+        $request = \Owl\Http\Request::factory([
+            'method' => 'POST',
+            'post' => [
+                '_method' => 'PUT',
+            ],
+        ]);
+        $this->assertEquals('PUT', $request->getMethod());
+
+        $request = \Owl\Http\Request::factory([
+            'method' => 'POST',
+            'headers' => [
+                'x-http-method-override' => 'DELETE',
+            ],
+            'post' => [
+                'foo' => 'bar',
+            ],
+        ]);
+        $this->assertEquals('DELETE', $request->getMethod());
     }
 
     public function testRequestURI() {
