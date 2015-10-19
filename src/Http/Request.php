@@ -81,7 +81,7 @@ class Request implements ServerRequestInterface {
         $override = $this->getHeader('x-http-method-override') ?: $this->post('_method');
         if ($override) {
             if (is_array($override)) {
-                $override = array_unshift($override);
+                $override = array_shift($override);
             }
 
             $method = $override;
