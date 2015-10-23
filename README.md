@@ -10,12 +10,6 @@
 }
 ```
 
-## Manual
-
-```php
-require 'src/autoload.php';
-```
-
 # [Hello world](https://github.com/yeaha/owl/tree/master/examples/hello_world)
 
 ## install
