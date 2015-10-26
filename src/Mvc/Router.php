@@ -1,6 +1,8 @@
 <?php
 namespace Owl\Mvc;
 
+use Owl\Application as App;
+
 /**
  * @example
  *
@@ -179,8 +181,18 @@ class Router {
      * @throws \Owl\Http\Exception 501
      */
     protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+        App::log('debug', 'router respond', [
+            'url' => (string)$request->getUri(),
+            'method' => $request->getMethod(),
+        ]);
+
         $path = $this->getRequestPath($request);
         list($class, $parameters) = $this->byRewrite($path) ?: $this->byPath($path);
+
+        App::log('debug', 'router dispatch', [
+            'class' => $class,
+            'parameters' => $parameters,
+        ]);
 
         if (!class_exists($class)) {
             throw \Owl\Http\Exception::factory(404);

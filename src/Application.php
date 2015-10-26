@@ -158,4 +158,20 @@ class Application {
             return $loader($classname, true);
         }
     }
+
+    static protected $logger;
+
+    static public function setLogger(\Psr\Log\LoggerInterface $logger) {
+        self::$logger = $logger;
+    }
+
+    static public function unsetLogger() {
+        self::$logger = null;
+    }
+
+    static public function log($level, $message, array $context = []) {
+        if ($logger = self::$logger) {
+            $logger->log($level, $message, $context);
+        }
+    }
 }

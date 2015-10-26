@@ -1,6 +1,8 @@
 <?php
 namespace Owl\Service;
 
+use Owl\Application as App;
+
 // https://github.com/nrk/predis
 if (!class_exists('\Predis\Client')) {
     throw new \Exception('Require Predis library');
@@ -39,6 +41,11 @@ class Predis extends \Owl\Service {
             $method = $this->command_alias[$command];
         }
 
+        App::log('debug', 'redis execute', [
+            'command' => $command,
+            'arguments' => $args,
+        ]);
+
         return $args ? call_user_func_array([$client, $method], $args) : $client->$method();
     }
 
@@ -47,7 +54,20 @@ class Predis extends \Owl\Service {
             $parameters = $this->getConfig('parameters');
             $options = $this->getConfig('options') ?: [];
 
-            $this->client = new \Predis\Client($parameters, $options);
+            try {
+                $this->client = new \Predis\Client($parameters, $options);
+
+                App::log('debug', 'redis connected', [
+                    'parameters' => $parameters,
+                    'options' => $options,
+                ]);
+            } catch (\Exception $exception) {
+                App::log('error', 'redis connect failed', [
+                    'error' => $exception->getMessage(),
+                    'parameters' => $parameters,
+                    'options' => $options,
+                ]);
+            }
         }
 
         return $this->client;
@@ -63,6 +83,10 @@ class Predis extends \Owl\Service {
             }
 
             $this->client = null;
+
+            App::log('debug', 'redis disconnected', [
+                'parameters' => $parameters,
+            ]);
         }
     }
 
