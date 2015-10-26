@@ -36,12 +36,6 @@ class Redis extends \Owl\Service {
         }
     }
 
-    public function __destruct() {
-        if (!$this->isPersistent()) {
-            $this->disconnect();
-        }
-    }
-
     public function __call($fn, array $args) {
         return $args
              ? call_user_func_array(array($this->connect(), $fn), $args)

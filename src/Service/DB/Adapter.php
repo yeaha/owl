@@ -21,10 +21,6 @@ abstract class Adapter extends \Owl\Service {
         parent::__construct($config);
     }
 
-    public function __destruct() {
-        $this->disconnect();
-    }
-
     public function __sleep() {
         $this->disconnect();
     }
