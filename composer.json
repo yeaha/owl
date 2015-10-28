@@ -20,7 +20,7 @@
         "phpunit/phpunit": "~4.5.0"
     },
     "suggest": {
-        "monolog/monolog"
+        "monolog/monolog": "Allows more advanced logging of the application flow"
     },
     "archive": {
         "exclude": ["/examples", "/tests"]
