@@ -205,9 +205,9 @@ class Request implements ServerRequestInterface {
     }
 
     public function getClientIP() {
-        $ip = $this->allow_client_proxy_ip
-            ? $this->getServerParam('http_x_forwarded_for') ?: $this->getServerParam('remote_addr')
-            : $this->getServerParam('remote_addr');
+        if (!$this->allow_client_proxy_ip || !($ip = $this->getServerParam('http_x_forwarded_for'))) {
+            return $this->getServerParam('remote_addr');
+        }
 
         if (strpos($ip, ',') === false) {
             return $ip;

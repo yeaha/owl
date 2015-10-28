@@ -106,4 +106,29 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('/foobar.json', $request->getUri()->getPath());
         $this->assertEquals('json', $request->getUri()->getExtension());
     }
+
+    public function testGetIP() {
+        $server = [
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_X_FORWARDED_FOR' => '192.168.1.2,3.3.3.3',
+        ];
+
+        $request = new \Owl\Http\Request([], [], $server);
+
+        $this->assertEquals('127.0.0.1', $request->getClientIP());
+
+        $request->allowClientProxyIP();
+        $this->assertEquals('3.3.3.3', $request->getClientIP());
+
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        $server = [
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_X_FORWARDED_FOR' => '192.168.1.2,192.168.1.3',
+        ];
+
+        $request = new \Owl\Http\Request([], [], $server);
+
+        $request->allowClientProxyIP();
+        $this->assertEquals('192.168.1.2', $request->getClientIP());
+    }
 }
