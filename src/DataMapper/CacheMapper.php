@@ -67,8 +67,9 @@ trait CacheMapper {
     protected function __afterInsert(\Owl\DataMapper\Data $data) {
         $policy = $this->getCachePolicy();
 
+        $id = $data->id();
+
         if ($policy['insert']) {
-            $id = $data->id();
             $record = $this->unpack($data);
             $record = $this->normalizeCacheRecord($record);
 
