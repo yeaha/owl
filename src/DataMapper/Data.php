@@ -256,6 +256,54 @@ abstract class Data {
     }
 
     /**
+     * @param string $key
+     * @param array|string $path
+     * @param mixed $value
+     * @return $this
+     */
+    public function setIn($key, $path, $value) {
+        $attribute = $this->prepareSet($key);
+        $path = (array)$path;
+
+        $hash = array_key_exists($key, $this->values)
+              ? $this->values[$key]
+              : Type::factory($attribute['type'])->getDefaultValue($attribute);
+
+        if (!is_array($hash)) {
+            throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
+        }
+
+        self::arraySetter($hash, $path, $value);
+        $this->change($key, $hash);
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array|string $path
+     * @return mixed|false
+     */
+    public function getIn($key, $path) {
+        $attribute = $this->prepareGet($key);
+        $path = (array)$path;
+
+        $value = array_key_exists($key, $this->values)
+               ? $this->values[$key]
+               : Type::factory($attribute['type'])->getDefaultValue($attribute);
+
+        foreach ($path as $key) {
+            if (!isset($value[$key])) {
+                return false;
+            }
+
+            $value = &$value[$key];
+        }
+
+        return $value;
+    }
+
+    /**
      * 获得所有的或指定的属性值，以数组格式返回
      * 自动忽略无效的属性值以及尚未赋值的属性
      *
@@ -511,5 +559,19 @@ abstract class Data {
         $options = array_merge($parent_options, $options);
 
         return $options;
+    }
+
+    static private function arraySetter(array &$target, array $path, $value) {
+        $last_key = array_pop($path);
+
+        foreach ($path as $key) {
+            if (!array_key_exists($key, $target) || !is_array($target[$key])) {
+                $target[$key] = [];
+            }
+
+            $target = &$target[$key];
+        }
+
+        $target[$last_key] = $value;
     }
 }

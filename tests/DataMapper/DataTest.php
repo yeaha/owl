@@ -266,6 +266,50 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data = new $class;
         $bar = $data->bar;
     }
+
+    public function testSetIn() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true],
+            'doc' => ['type' => 'json'],
+            'msg' => ['type' => 'string'],
+        ]);
+
+        $class = $this->class;
+        $data = new $class(['id' => 1], ['fresh' => false]);
+
+        $this->assertFalse($data->isDirty('doc'));
+
+        $data->setIn('doc', 'foo', 1);
+        $this->assertSame(['foo' => 1], $data->get('doc'));
+        $this->assertTrue($data->isDirty('doc'));
+
+        $data->setIn('doc', 'bar', 2);
+        $this->assertSame(['foo' => 1, 'bar' => 2], $data->get('doc'));
+
+        $data->setIn('doc', ['foo', 'baz'], 3);
+        $this->assertSame(['foo' => ['baz' => 3], 'bar' => 2], $data->get('doc'));
+
+        try {
+            $data->setIn('msg', 'foo', 1);
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        return $data;
+    }
+
+    /**
+     * @depends testSetIn
+     */
+    public function testGetIn($data) {
+        $this->assertSame(['baz' => 3], $data->getIn('doc', 'foo'));
+        $this->assertSame(3, $data->getIn('doc', ['foo', 'baz']));
+        $this->assertSame(2, $data->getIn('doc', 'bar'));
+
+        $this->assertFalse($data->getIn('doc', 'foobar'));
+        $this->assertFalse($data->getIn('doc', ['foo', 'bar']));
+
+        $this->assertFalse($data->getIn('msg', 'foo'));
+    }
 }
 
 namespace Tests\Mock\DataMapper;
