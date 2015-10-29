@@ -1,6 +1,7 @@
 <?php
 namespace Owl\DataMapper;
 
+use Owl\DataMapper\Exception;
 use Owl\DataMapper\Type;
 
 abstract class Data {
@@ -165,29 +166,21 @@ abstract class Data {
      * @param boolean [$options:strict=true] 严格模式，出现错误会抛出异常，属性如果被标记为"strict"，就只能在严格模式下才能修改
      * @return $this
      *
-     * @throws \UnexpectedValueException 如果属性未定义
-     * @throws \UnexpectedValueException 把null赋值给一个不允许为null的属性
-     * @throws \UnexpectedValueException 值没有通过设定的正则表达式检查
-     * @throws \Exception 属性被标记为“废弃”
-     * @throws \Exception 属性不允许更新修改
+     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException 如果属性未定义
+     * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException 把null赋值给一个不允许为null的属性
+     * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException 值没有通过设定的正则表达式检查
+     * @throws \Owl\DataMapper\Exception\DeprecatedPropertyException 属性被标记为“废弃”
+     * @throws \Owl\DataMapper\Exception\RefuseUpdatePropertyException 属性不允许更新修改
      */
     public function set($key, $value, array $options = null) {
         $defaults = ['force' => false, 'strict' => true];
         $options = $options ? array_merge($defaults, $options) : $defaults;
 
-        $attribute = static::getMapper()->getAttribute($key);
-
-        if (!$attribute) {
+        try {
+            $attribute = $this->prepareSet($key, $options['force']);
+        } catch (Exception\PropertyException $ex) {
             if ($options['strict']) {
-                throw new \UnexpectedValueException(get_class($this) .": Undefined property {$key}");
-            }
-
-            return $this;
-        }
-
-        if ($attribute['deprecated']) {
-            if ($options['strict']) {
-                throw new \Exception(get_class($this) .": Property {$key} is deprecated");
+                throw $ex;
             }
 
             return $this;
@@ -197,27 +190,19 @@ abstract class Data {
             return $this;
         }
 
-        if (!$options['force'] && $attribute['refuse_update'] && !$this->isFresh()) {
-            if ($options['strict']) {
-                throw new \Exception(get_class($this) .": Property {$key} refuse update");
-            }
-
-            return $this;
-        }
-
         if ($value === '') {
             $value = null;
         }
 
         if ($value === null) {
             if (!$attribute['allow_null']) {
-                throw new \UnexpectedValueException(get_class($this) .": Property {$key} not allow null");
+                throw new Exception\UnexpectedPropertyValueException(get_class($this) .": Property {$key} not allow null");
             }
         } else {
             $value = $this->normalize($key, $value, $attribute);
 
             if ($attribute['pattern'] && !preg_match($attribute['pattern'], $value)) {
-                throw new \UnexpectedValueException(get_class($this) .": Property {$key} mismatching pattern {$attribute['pattern']}");
+                throw new Exception\UnexpectedPropertyValueException(get_class($this) .": Property {$key} mismatching pattern {$attribute['pattern']}");
             }
         }
 
@@ -256,17 +241,11 @@ abstract class Data {
      *
      * @param string $key 属性名
      * @return mixed
-     * @throws \UnexpectedValueException 当获取不存在的字段
-     * @throws \RuntimeException 当字段已经被标记为“废弃”
+     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException 如果属性未定义
+     * @throws \Owl\DataMapper\Exception\DeprecatedPropertyException 属性被标记为“废弃”
      */
     public function get($key) {
-        if (!$attribute = static::getMapper()->getAttribute($key)) {
-            throw new \UnexpectedValueException(get_class($this) .": Undefined property {$key}");
-        }
-
-        if ($attribute['deprecated']) {
-            throw new \RuntimeException(get_class($this) .": Property {$key} is deprecated");
-        }
+        $attribute = $this->prepareGet($key);
 
         if (!array_key_exists($key, $this->values)) {
             return Type::factory($attribute['type'])->getDefaultValue($attribute);
@@ -422,6 +401,40 @@ abstract class Data {
      */
     protected function normalize($key, $value, array $attribute) {
         return Type::factory($attribute['type'])->normalize($value, $attribute);
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    protected function prepareSet($key, $force = false) {
+        if (!$attribute = static::getMapper()->getAttribute($key)) {
+            throw new Exception\UndefinedPropertyException(get_class($this).": Undefined property {$key}");
+        }
+
+        if ($attribute['deprecated']) {
+            throw new Exception\DeprecatedPropertyException(get_class($this) .": Property {$key} is deprecated");
+        } elseif (!$force && $attribute['refuse_update'] && !$this->isFresh()) {
+            throw new Exception\RefuseUpdatePropertyException(get_class($this) .": Property {$key} refuse update");
+        }
+
+        return $attribute;
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    protected function prepareGet($key) {
+        if (!$attribute = static::getMapper()->getAttribute($key)) {
+            throw new Exception\UndefinedPropertyException(get_class($this).": Undefined property {$key}");
+        }
+
+        if ($attribute['deprecated']) {
+            throw new Exception\DeprecatedPropertyException(get_class($this) .": Property {$key} is deprecated");
+        }
+
+        return $attribute;
     }
 
     /**

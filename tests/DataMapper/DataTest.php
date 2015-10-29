@@ -103,7 +103,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $data->foo = null;
 
-        $this->setExpectedExceptionRegExp('\UnexpectedValueException', '/not allow null/');
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UnexpectedPropertyValueException');
         $data->bar = null;
     }
 
@@ -138,7 +138,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->foo = '';
         $this->assertNull($data->foo);
 
-        $this->setExpectedExceptionRegExp('\UnexpectedValueException', '/not allow null/');
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UnexpectedPropertyValueException');
         $data->bar = '';
     }
 
@@ -152,7 +152,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->set('bar', 'bar', array('strict' => false));
         $data->merge(array('bar' => 'bar'));
 
-        $this->setExpectedExceptionRegExp('\UnexpectedValueException', '/undefined property/i');
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UndefinedPropertyException');
         $data->bar = 'bar';
     }
 
@@ -163,7 +163,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $data = new $this->class;
 
-        $this->setExpectedExceptionRegExp('\UnexpectedValueException', '/undefined property/i');
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UndefinedPropertyException');
         $data->foo;
     }
 
@@ -262,7 +262,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertFalse($mapper->hasAttribute('bar'));
 
-        $this->setExpectedExceptionRegExp('\RuntimeException', '/deprecated/');
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\DeprecatedPropertyException');
         $data = new $class;
         $bar = $data->bar;
     }
