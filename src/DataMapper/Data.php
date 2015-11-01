@@ -262,19 +262,34 @@ abstract class Data {
      * @return $this
      */
     public function setIn($key, $path, $value) {
-        $attribute = $this->prepareSet($key);
+        $target = $this->get($key);
         $path = (array)$path;
 
-        $hash = array_key_exists($key, $this->values)
-              ? $this->values[$key]
-              : Type::factory($attribute['type'])->getDefaultValue($attribute);
-
-        if (!is_array($hash)) {
+        if (!is_array($target)) {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        self::arraySetter($hash, $path, $value);
-        $this->change($key, $hash);
+        Type\Complex::setIn($target, $path, $value);
+        $this->change($key, $target);
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array|string $path
+     * @return $this
+     */
+    public function unsetIn($key, $path) {
+        $target = $this->get($key);
+        $path = (array)$path;
+
+        if (!is_array($target)) {
+            throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
+        }
+
+        Type\Complex::unsetIn($target, $path);
+        $this->change($key, $target);
 
         return $this;
     }
@@ -285,22 +300,14 @@ abstract class Data {
      * @return mixed|false
      */
     public function getIn($key, $path) {
-        $attribute = $this->prepareGet($key);
+        $target = $this->get($key);
         $path = (array)$path;
 
-        $value = array_key_exists($key, $this->values)
-               ? $this->values[$key]
-               : Type::factory($attribute['type'])->getDefaultValue($attribute);
-
-        foreach ($path as $key) {
-            if (!isset($value[$key])) {
-                return false;
-            }
-
-            $value = &$value[$key];
+        if (!is_array($target)) {
+            throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        return $value;
+        return Type\Complex::getIn($target, $path);
     }
 
     /**

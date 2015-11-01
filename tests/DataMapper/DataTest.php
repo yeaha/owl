@@ -308,7 +308,10 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($data->getIn('doc', 'foobar'));
         $this->assertFalse($data->getIn('doc', ['foo', 'bar']));
 
-        $this->assertFalse($data->getIn('msg', 'foo'));
+        try {
+            $data->getIn('msg', 'foo');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
     }
 }
 
