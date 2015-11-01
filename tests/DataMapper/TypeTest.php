@@ -104,7 +104,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
 
         $type = $this->getType('json');
         $this->assertInstanceOf('\Owl\DataMapper\Type\JSON', $type);
-        $this->assertInstanceOf('\Owl\DataMapper\Type\Mixed', $type);
+        $this->assertInstanceOf('\Owl\DataMapper\Type\Complex', $type);
 
         $json = array('foo' => 'bar');
         $this->assertEquals($json, $type->normalize($json, array()));

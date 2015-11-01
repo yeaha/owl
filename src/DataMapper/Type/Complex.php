@@ -8,6 +8,12 @@ abstract class Complex extends Mixed {
         ], $attribute);
     }
 
+    public function getDefaultValue(array $attribute) {
+        return isset($attribute['default'])
+             ? $attribute['default']
+             : [];
+    }
+
     static public function setIn(array &$target, array $path, $value) {
         $last_key = array_pop($path);
 

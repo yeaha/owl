@@ -3,7 +3,7 @@ namespace Owl\DataMapper\Type;
 
 use \Owl\Service\DB\Expr;
 
-class PgsqlArray extends \Owl\DataMapper\Type\Mixed {
+class PgsqlArray extends Complex {
     public function normalize($value, array $attribute) {
         if ($value === null) {
             return array();
@@ -30,10 +30,6 @@ class PgsqlArray extends \Owl\DataMapper\Type\Mixed {
         }
 
         return self::decode($value);
-    }
-
-    public function getDefaultValue(array $attribute) {
-        return $attribute['default'] ?: array();
     }
 
     static public function encode(array $array) {

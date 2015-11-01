@@ -1,7 +1,7 @@
 <?php
 namespace Owl\DataMapper\Type;
 
-class Json extends \Owl\DataMapper\Type\Mixed {
+class Json extends Complex {
     public function normalize($value, array $attribute) {
         if (is_array($value)) {
             return $value;
@@ -34,9 +34,5 @@ class Json extends \Owl\DataMapper\Type\Mixed {
         }
 
         return $this->normalize($value, $attribute);
-    }
-
-    public function getDefaultValue(array $attribute) {
-        return $attribute['default'] ?: [];
     }
 }
