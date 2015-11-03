@@ -11,29 +11,33 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $class::getMapper()->setAttributes($attributes);
     }
 
-    public function testConstruct() {
+    protected function newData(array $values = [], array $options = []) {
         $class = $this->class;
 
+        return new $class($values, $options);
+    }
+
+    public function testConstruct() {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'default' => 'foo'),
             'bar' => array('type' => 'string', 'default' => 'bar', 'allow_null' => true),
         ));
 
-        $data = new $class;
+        $data = $this->newData();
 
         $this->assertTrue($data->isFresh());
         $this->assertTrue($data->isDirty());
         $this->assertEquals($data->foo, 'foo');
         $this->assertNull($data->bar);
 
-        $data = new $class(array(
+        $data = $this->newData(array(
             'bar' => 'bar'
         ));
 
         $this->assertEquals($data->bar, 'bar');
 
-        $data = new $class(array(), array('fresh' => false));
+        $data = $this->newData(array(), array('fresh' => false));
 
         $this->assertFalse($data->isFresh());
         $this->assertFalse($data->isDirty());
@@ -54,7 +58,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'foo' => array('type' => 'string', 'strict' => true),
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
 
         $data->merge(array('foo' => 'foo'));
         $this->assertFalse($data->isDirty('foo'));
@@ -75,14 +79,12 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'foo' => array('type' => 'string', 'refuse_update' => true),
         ));
 
-        $class = $this->class;
-
-        $data = new $class;
+        $data = $this->newData();
         $data->foo = 'foo';
 
         $this->assertEquals($data->foo, 'foo');
 
-        $data = new $class(array('foo' => 'foo'), array('fresh' => false));
+        $data = $this->newData(array('foo' => 'foo'), array('fresh' => false));
 
         // test force set
         $data->set('foo', 'bar', array('force' => true));
@@ -99,7 +101,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'bar' => array('type' => 'string'),
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
 
         $data->foo = null;
 
@@ -114,8 +116,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'bar' => array('type' => 'string'),
         ));
 
-        $class = $this->class;
-        $data = new $class(array('bar' => 'bar'), array('fresh' => false));
+        $data = $this->newData(array('bar' => 'bar'), array('fresh' => false));
 
         $this->assertFalse($data->isDirty());
 
@@ -133,7 +134,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'bar' => array('type' => 'integer'),
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
 
         $data->foo = '';
         $this->assertNull($data->foo);
@@ -147,7 +148,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
 
         $data->set('bar', 'bar', array('strict' => false));
         $data->merge(array('bar' => 'bar'));
@@ -161,7 +162,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
 
         $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UndefinedPropertyException');
         $data->foo;
@@ -173,7 +174,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'time' => array('type' => 'datetime', 'default' => 'now')
         ));
 
-        $data = new $this->class;
+        $data = $this->newData();
         $this->assertNotSame($data->time, $data->time);
     }
 
@@ -184,9 +185,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'bar' => array('type' => 'string'),
         ));
 
-        $class = $this->class;
-
-        $data = new $class(array(
+        $data = $this->newData(array(
             'foo' => 'foo',
             'bar' => 'bar',
         ), array('fresh' => false));
@@ -205,13 +204,11 @@ class DataTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetID() {
-        $class = $this->class;
-
         $this->setAttributes(array(
             'foo' => array('type' => 'string', 'primary_key' => true),
         ));
 
-        $data = new $class(array('foo' => 'foo'));
+        $data = $this->newData(array('foo' => 'foo'));
         $this->assertEquals($data->id(), 'foo');
         $this->assertSame($data->id(true), ['foo' => 'foo']);
 
@@ -220,7 +217,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'bar' => array('type' => 'string', 'primary_key' => true),
         ));
 
-        $data = new $class(array('foo' => 'foo', 'bar' => 'bar'));
+        $data = $this->newData(array('foo' => 'foo', 'bar' => 'bar'));
         $this->assertSame($data->id(), array('foo' => 'foo', 'bar' => 'bar'));
     }
 
@@ -263,7 +260,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($mapper->hasAttribute('bar'));
 
         $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\DeprecatedPropertyException');
-        $data = new $class;
+        $data = $this->newData();
         $bar = $data->bar;
     }
 
@@ -274,8 +271,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
             'msg' => ['type' => 'string'],
         ]);
 
-        $class = $this->class;
-        $data = new $class(['id' => 1], ['fresh' => false]);
+        $data = $this->newData(['id' => 1], ['fresh' => false]);
 
         $this->assertFalse($data->isDirty('doc'));
 
