@@ -607,18 +607,4 @@ abstract class Data {
 
         return $options;
     }
-
-    static private function arraySetter(array &$target, array $path, $value) {
-        $last_key = array_pop($path);
-
-        foreach ($path as $key) {
-            if (!array_key_exists($key, $target) || !is_array($target[$key])) {
-                $target[$key] = [];
-            }
-
-            $target = &$target[$key];
-        }
-
-        $target[$last_key] = $value;
-    }
 }
