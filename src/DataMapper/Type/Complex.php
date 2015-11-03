@@ -1,10 +1,38 @@
 <?php
 namespace Owl\DataMapper\Type;
 
+/**
+ * @example
+ * class Book extends \Owl\DataMapper\Data {
+ *     static protected $attributes = [
+ *         'id' => ['type' => 'uuid', 'primary_key' => true],
+ *         'doc' => [
+ *             'type' => 'json',
+ *             'schema' => [
+ *                 'title' => ['type' => 'string'],
+ *                 'description' => ['type' => 'string', 'required' => false, 'allow_empty' => true],
+ *                 'author' => [
+ *                     'type' => 'array',
+ *                     'element' => [
+ *                         'first_name' => ['type' => 'string'],
+ *                         'last_name' => ['type' => 'string'],
+ *                     ],
+ *                 ],
+ *             ],
+ *         ]
+ *     ];
+ * }
+ *
+ * $book = new Book;
+ * $book->setIn('doc', 'title', 'book title');
+ * $book->setIn('doc', 'author', [{'first_name' => 'foo', 'last_name' => 'bar'}]);
+ *
+ * @see \Owl\Parameter\Checker
+ */
 abstract class Complex extends Mixed {
     public function normalizeAttribute(array $attribute) {
         return array_merge([
-            'rules' => [],
+            'schema' => [],
         ], $attribute);
     }
 
@@ -12,6 +40,16 @@ abstract class Complex extends Mixed {
         return isset($attribute['default'])
              ? $attribute['default']
              : [];
+    }
+
+    public function isNull($value) {
+        return $value === null || $value === '' || $value === [];
+    }
+
+    public function validateValue($value, array $attribute) {
+        if (!$this->isNull($value) && $attribute['schema']) {
+            (new \Owl\Parameter\Checker)->execute($value, $attribute['schema']);
+        }
     }
 
     static public function setIn(array &$target, array $path, $value) {

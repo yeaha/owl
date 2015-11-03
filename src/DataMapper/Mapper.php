@@ -380,7 +380,7 @@ abstract class Mapper {
      */
     protected function insert(Data $data) {
         $this->__before('insert', $data);
-        $this->validateData($data);
+        $data->validate();
 
         if (!is_array($id = $this->doInsert($data))) {
             return false;
@@ -400,7 +400,7 @@ abstract class Mapper {
      */
     protected function update(Data $data) {
         $this->__before('update', $data);
-        $this->validateData($data);
+        $data->validate();
 
         if (!$this->doUpdate($data)) {
             return false;
@@ -408,48 +408,6 @@ abstract class Mapper {
 
         $this->pack([], $data);
         $this->__after('update', $data);
-
-        return true;
-    }
-
-    /**
-     * Data属性值有效性检查
-     *
-     * @param Data $data
-     * @return boolean
-     * @throws \UnexpectedValueException 不允许为空的属性没有被赋值
-     */
-    protected function validateData(Data $data) {
-        $is_fresh = $data->isFresh();
-        $attributes = $this->getAttributes();
-
-        if ($is_fresh) {
-            $record = $this->unpack($data);
-            $keys = array_keys($attributes);
-        } else {
-            $record = $this->unpack($data, ['dirty' => true]);
-            $keys = array_keys($record);
-        }
-
-        foreach ($keys as $key) {
-            $attribute = $attributes[$key];
-
-            do {
-                if ($attribute['allow_null']) {
-                    break;
-                }
-
-                if ($attribute['auto_generate'] && $is_fresh) {
-                    break;
-                }
-
-                if (isset($record[$key])) {
-                    break;
-                }
-
-                throw new \UnexpectedValueException($this->class.' property '.$key.' not allow null');
-            } while (false);
-        }
 
         return true;
     }

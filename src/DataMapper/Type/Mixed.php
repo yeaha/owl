@@ -70,4 +70,12 @@ class Mixed {
     public function toJSON($value, array $attribute) {
         return $value;
     }
+
+    public function isNull($value) {
+        return $value === null;
+    }
+
+    public function validateValue($value, array $attribute) {
+        return true;
+    }
 }

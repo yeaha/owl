@@ -446,6 +446,46 @@ abstract class Data {
     }
 
     /**
+     * 检查所有赋值的有效性
+     *
+     * "fresh"对象会检查所有值
+     * 非"fresh"对象只检查修改过的值
+     *
+     * @return true
+     * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException
+     */
+    public function validate() {
+        $attributes = static::getMapper()->getAttributes();
+        $keys = $this->isFresh() ? array_keys($attributes) : array_keys($this->dirty);
+
+        foreach ($keys as $key) {
+            $attribute = $attributes[$key];
+
+            if ($attribute['auto_generate'] && $this->isFresh()) {
+                continue;
+            }
+
+            $value = $this->get($key);
+            $type = Type::factory($attribute['type']);
+
+            if ($type->isNull($value)) {
+                if (!$attribute['allow_null']) {
+                    throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", not allow null', get_class($this), $key));
+                }
+            } else {
+                try {
+                    $type->validateValue($value, $attribute);
+                } catch (\Owl\Parameter\Exception $ex) {
+                    $message = sprintf('%s: Property "%s", %s', get_class($this), $key, $message->getMessage());
+                    throw new Exception\UnexpectedPropertyValueException($message);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * 格式化属性值
      * 可以通过重载此方法实现自定义格式化逻辑
      *
