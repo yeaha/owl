@@ -136,4 +136,18 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             ],
         ], $target);
     }
+
+    public function testSetInException() {
+        $target = ['a' => ['b' => 1]];
+
+        $this->setExpectedException('\RuntimeException');
+        Complex::setIn($target, ['a', 'b', 'c'], 2);
+    }
+
+    public function testPushInException() {
+        $target = ['a' => ['b' => 1]];
+
+        $this->setExpectedException('\RuntimeException');
+        Complex::pushIn($target, ['a', 'b'], 2);
+    }
 }

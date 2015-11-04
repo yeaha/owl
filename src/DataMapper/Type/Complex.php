@@ -56,16 +56,22 @@ abstract class Complex extends Mixed {
         $last_key = array_pop($path);
 
         foreach ($path as $key) {
-            if (!array_key_exists($key, $target) || !is_array($target[$key])) {
+            if (!array_key_exists($key, $target)) {
                 $target[$key] = [];
             }
 
             $target = &$target[$key];
+
+            if (!is_array($target)) {
+                throw new \RuntimeException('Cannot use a scalar value as an array');
+            }
         }
 
         if ($push) {
-            if (!isset($target[$last_key]) || !is_array($target[$last_key])) {
+            if (!array_key_exists($last_key, $target)) {
                 $target[$last_key] = [];
+            } elseif (!is_array($target[$last_key])) {
+                throw new \RuntimeException('Cannot use a scalar value as an array');
             }
 
             array_push($target[$last_key], $value);
