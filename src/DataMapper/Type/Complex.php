@@ -25,7 +25,8 @@ namespace Owl\DataMapper\Type;
  *
  * $book = new Book;
  * $book->setIn('doc', 'title', 'book title');
- * $book->setIn('doc', 'author', [{'first_name' => 'foo', 'last_name' => 'bar'}]);
+ * $book->pushIn('doc', 'author', ['first_name' => 'F1', 'last_name' => 'L1']);
+ * $book->pushIn('doc', 'author', ['first_name' => 'F2', 'last_name' => 'L2']);
  *
  * @see \Owl\Parameter\Checker
  */
