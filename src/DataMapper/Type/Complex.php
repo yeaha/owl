@@ -52,7 +52,7 @@ abstract class Complex extends Mixed {
         }
     }
 
-    static public function setIn(array &$target, array $path, $value) {
+    static public function setIn(array &$target, array $path, $value, $push = false) {
         $last_key = array_pop($path);
 
         foreach ($path as $key) {
@@ -63,7 +63,26 @@ abstract class Complex extends Mixed {
             $target = &$target[$key];
         }
 
-        $target[$last_key] = $value;
+        if ($push) {
+            if (!isset($target[$last_key]) || !is_array($target[$last_key])) {
+                $target[$last_key] = [];
+            }
+
+            array_push($target[$last_key], $value);
+        } else {
+            $target[$last_key] = $value;
+        }
+    }
+
+    /**
+     * // set in
+     * $target[$path] = $value;
+     *
+     * // push in
+     * $target[$path][] = $value;
+     */
+    static public function pushIn(array &$target, array $path, $value) {
+        static::setIn($target, $path, $value, true);
     }
 
     static public function getIn(array $target, array $path) {

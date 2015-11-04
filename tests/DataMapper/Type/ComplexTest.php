@@ -46,6 +46,43 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
         return $target;
     }
 
+    public function testPushIn() {
+        $target = [];
+
+        Complex::pushIn($target, ['a'], 1);
+        $this->assertSame([
+            'a' => [1],
+        ], $target);
+
+        Complex::pushIn($target, ['a'], 2);
+        $this->assertSame([
+            'a' => [1, 2],
+        ], $target);
+
+        Complex::pushIn($target, ['a', 'b'], 3);
+        $this->assertSame([
+            'a' => [
+                1,
+                2,
+                'b' => [3],
+            ],
+        ], $target);
+
+        Complex::pushIn($target, ['b', 'c', 'd'], 'e');
+        $this->assertSame([
+            'a' => [
+                1,
+                2,
+                'b' => [3],
+            ],
+            'b' => [
+                'c' => [
+                    'd' => ['e']
+                ]
+            ],
+        ], $target);
+    }
+
     /**
      * @depends testSetIn
      */

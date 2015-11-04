@@ -259,9 +259,10 @@ abstract class Data {
      * @param string $key
      * @param array|string $path
      * @param mixed $value
+     * @param boolean $push
      * @return $this
      */
-    public function setIn($key, $path, $value) {
+    public function setIn($key, $path, $value, $push = false) {
         $target = $this->get($key);
         $path = (array)$path;
 
@@ -269,10 +270,20 @@ abstract class Data {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        Type\Complex::setIn($target, $path, $value);
+        Type\Complex::setIn($target, $path, $value, $push);
         $this->change($key, $target);
 
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param array|string $path
+     * @param mixed $value
+     * @return $this
+     */
+    public function pushIn($key, $path, $value) {
+        return $this->setIn($key, $path, $value, true);
     }
 
     /**
