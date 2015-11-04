@@ -487,7 +487,7 @@ abstract class Data {
                 try {
                     $type->validateValue($value, $attribute);
                 } catch (\Owl\Parameter\Exception $ex) {
-                    $message = sprintf('%s: Property "%s", %s', get_class($this), $key, $message->getMessage());
+                    $message = sprintf('%s: Property "%s", %s', get_class($this), $key, $ex->getMessage());
                     throw new Exception\UnexpectedPropertyValueException($message);
                 }
             }

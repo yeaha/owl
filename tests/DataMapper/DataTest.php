@@ -328,6 +328,68 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->pushIn('doc', ['a', 'b'], 2);
         $this->assertSame(['a' => ['b' => [1, 2]]], $data->doc);
     }
+
+    public function testValidate() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'foo' => ['type' => 'string'],
+            'bar' => ['type' => 'string', 'allow_null' => true],
+        ]);
+
+        $data = $this->newData();
+
+        try {
+            $data->validate();
+            $this->fail('validate "allow_null" falied');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        $data->foo = 'foo';
+        $this->assertTrue($data->validate());
+
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'doc' => [
+                'type' => 'json',
+                'allow_null' => true,
+                'schema' => [
+                    'a' => ['type' => 'integer'],
+                    'b' => ['type' => 'integer', 'required' => false],
+                    'c' => [
+                        'type' => 'array',
+                        'keys' => [
+                            'd' => ['type' => 'string', 'enum_eq' => ['foo', 'bar']],
+                            'e' => ['type' => 'string', 'regexp' => '/^a.+z$/'],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $data = $this->newData();
+        $this->assertTrue($data->validate());
+
+        $data->setIn('doc', 'b', 1);
+        try {
+            $data->validate();
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        $data->setIn('doc', 'a', 1);
+        $data->setIn('doc', ['c', 'd'], 'foo');
+        $data->setIn('doc', ['c', 'e'], 'aaaaaaz');
+        $this->assertTrue($data->validate());
+
+        $data->setIn('doc', ['c', 'd'], 'baz');
+        try {
+            $data->validate();
+            $this->fail('validate complex type failed');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        $data->setIn('doc', ['c', 'd'], 'bar');
+        $this->assertTrue($data->validate());
+    }
 }
 
 namespace Tests\Mock\DataMapper;
