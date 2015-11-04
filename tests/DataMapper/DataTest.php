@@ -282,9 +282,6 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->setIn('doc', 'bar', 2);
         $this->assertSame(['foo' => 1, 'bar' => 2], $data->get('doc'));
 
-        $data->setIn('doc', ['foo', 'baz'], 3);
-        $this->assertSame(['foo' => ['baz' => 3], 'bar' => 2], $data->get('doc'));
-
         try {
             $data->setIn('msg', 'foo', 1);
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
@@ -297,8 +294,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
      * @depends testSetIn
      */
     public function testGetIn($data) {
-        $this->assertSame(['baz' => 3], $data->getIn('doc', 'foo'));
-        $this->assertSame(3, $data->getIn('doc', ['foo', 'baz']));
+        $this->assertSame(1, $data->getIn('doc', 'foo'));
         $this->assertSame(2, $data->getIn('doc', 'bar'));
 
         $this->assertFalse($data->getIn('doc', 'foobar'));
