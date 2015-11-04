@@ -7,7 +7,7 @@ class Json extends Complex {
             return $value;
         }
 
-        if ($value === null) {
+        if ($this->isNull($value)) {
             return [];
         }
 
@@ -21,7 +21,7 @@ class Json extends Complex {
     }
 
     public function store($value, array $attribute) {
-        if ($value === []) {
+        if ($this->isNull($value)) {
             return null;
         }
 
@@ -29,7 +29,7 @@ class Json extends Complex {
     }
 
     public function restore($value, array $attribute) {
-        if ($value === null) {
+        if ($this->isNull($value)) {
             return [];
         }
 

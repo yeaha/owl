@@ -5,7 +5,7 @@ use \Owl\Service\DB\Expr;
 
 class PgsqlHstore extends Complex {
     public function normalize($value, array $attribute) {
-        if ($value === null) {
+        if ($this->isNull($value)) {
             return [];
         }
 
@@ -17,7 +17,7 @@ class PgsqlHstore extends Complex {
     }
 
     public function store($value, array $attribute) {
-        if ($value === []) {
+        if ($this->isNull($value)) {
             return null;
         }
 
@@ -25,7 +25,7 @@ class PgsqlHstore extends Complex {
     }
 
     public function restore($value, array $attribute) {
-        if ($value === null) {
+        if ($this->isNull($value)) {
             return [];
         }
 

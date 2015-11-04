@@ -5,8 +5,8 @@ use \Owl\Service\DB\Expr;
 
 class PgsqlArray extends Complex {
     public function normalize($value, array $attribute) {
-        if ($value === null) {
-            return array();
+        if ($this->isNull($value)) {
+            return [];
         }
 
         if (!is_array($value)) {
@@ -17,7 +17,7 @@ class PgsqlArray extends Complex {
     }
 
     public function store($value, array $attribute) {
-        if ($value === array()) {
+        if ($this->isNull($value)) {
             return null;
         }
 
@@ -25,7 +25,7 @@ class PgsqlArray extends Complex {
     }
 
     public function restore($value, array $attribute) {
-        if ($value === null) {
+        if ($this->isNull($value)) {
             return [];
         }
 
