@@ -305,6 +305,29 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
         }
     }
+
+    public function testPushIn() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true],
+            'doc' => ['type' => 'json'],
+        ]);
+
+        $data = $this->newData();
+
+        $data->pushIn('doc', 'a', 1);
+        $this->assertSame(['a' => [1]], $data->doc);
+
+        $data->pushIn('doc', 'a', 2);
+        $this->assertSame(['a' => [1, 2]], $data->doc);
+
+        $data->unsetIn('doc', 'a');
+
+        $data->pushIn('doc', ['a', 'b'], 1);
+        $this->assertSame(['a' => ['b' => [1]]], $data->doc);
+
+        $data->pushIn('doc', ['a', 'b'], 2);
+        $this->assertSame(['a' => ['b' => [1, 2]]], $data->doc);
+    }
 }
 
 namespace Tests\Mock\DataMapper;
