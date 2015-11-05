@@ -390,6 +390,37 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->setIn('doc', ['c', 'd'], 'bar');
         $this->assertTrue($data->validate());
     }
+
+    public function testGetterSetter() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'foo' => ['type' => 'string'],
+            'foo_bar' => ['type' => 'string'],
+        ]);
+
+        $data = $this->newData();
+
+        $data->setFoo('bar');
+        $this->assertTrue($data->isDirty('foo'));
+        $this->assertEquals('bar', $data->foo);
+        $this->assertEquals('bar', $data->getFoo());
+
+        $data->setFoobar('baz');
+        $this->assertTrue($data->isDirty('foo_bar'));
+        $this->assertEquals('baz', $data->getFoobar());
+
+        try {
+            $data->setBar(1);
+            $this->fail('set undefined property using setter');
+        } catch (\Owl\DataMapper\Exception\UndefinedPropertyException $ex) {
+        }
+
+        try {
+            $data->getBar();
+            $this->fail('get undefined property using setter');
+        } catch (\Owl\DataMapper\Exception\UndefinedPropertyException $ex) {
+        }
+    }
 }
 
 namespace Tests\Mock\DataMapper;

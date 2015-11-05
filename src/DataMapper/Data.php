@@ -129,6 +129,52 @@ abstract class Data {
     }
 
     /**
+     * @example
+     * // $data->foo = 'bar';
+     * $data->setFoo('bar');
+     *
+     * // $val = $data->foo;
+     * $val = $data->getFoo();
+     *
+     * // $data->set('foo_bar', 'baz');
+     * $data->setFoobar('baz');
+     *
+     * // $val = $data->get('foo_bar');
+     * $data->getFoobar();
+     *
+     * @magic
+     * @param string $method
+     * @param array $args
+     */
+    public function __call($method, array $args) {
+        $prefix = strtolower(substr($method, 0, 3));
+
+        if ($prefix != 'set' && $prefix != 'get') {
+            throw new \BadMethodCallException(sprintf('Call undefined method %s:%s()', get_class($this), $method));
+        }
+
+        $key = strtolower(substr($method, 3));
+        if (!$this->has($key)) {
+            $found = false;
+            foreach (array_keys(static::getMapper()->getAttributes()) as $akey) {
+                if ($key == str_replace('_', '', $akey)) {
+                    $key = $akey;
+                    $found = true;
+
+                    break;
+                }
+            }
+
+            if (!$found) {
+                throw new Exception\UndefinedPropertyException(get_class($this).": Undefined property {$key}");
+            }
+        }
+
+        array_unshift($args, $key);
+        return call_user_func_array([$this, $prefix], $args);
+    }
+
+    /**
      * 把数据打包到Data实例内
      * 这个方法不应该被直接调用，只提供给Mapper调用
      *
