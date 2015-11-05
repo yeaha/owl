@@ -32,7 +32,7 @@ class Mixed {
      * @return mixed
      */
     public function store($value, array $attribute) {
-        return $value;
+        return $this->isNull($value) ? null : $value;
     }
 
     /**
@@ -43,11 +43,9 @@ class Mixed {
      * @return mixed
      */
     public function restore($value, array $attribute) {
-        if ($value === null) {
-            return null;
-        }
-
-        return $this->normalize($value, $attribute);
+        return $this->isNull($value)
+             ? null
+             : $this->normalize($value, $attribute);
     }
 
     /**
@@ -71,11 +69,22 @@ class Mixed {
         return $value;
     }
 
+    /**
+     * 判断值是否空值
+     *
+     * @param mixed $value
+     * @return boolean
+     */
     public function isNull($value) {
-        return $value === null;
+        return $value === null || $value === '';
     }
 
+    /**
+     * 自定义检查逻辑
+     *
+     * @param mixed $value
+     * @param array $attribute
+     */
     public function validateValue($value, array $attribute) {
-        return true;
     }
 }
