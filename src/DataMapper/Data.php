@@ -287,6 +287,8 @@ abstract class Data {
      * @return $this
      */
     public function setIn($key, $path, $value, $push = false) {
+        $this->prepareSet($key);
+
         $target = $this->get($key);
         $path = (array)$path;
 
@@ -316,6 +318,8 @@ abstract class Data {
      * @return $this
      */
     public function unsetIn($key, $path) {
+        $this->prepareSet($key);
+
         $target = $this->get($key);
         $path = (array)$path;
 
