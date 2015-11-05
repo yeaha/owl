@@ -86,7 +86,7 @@ abstract class Data {
 
                 $default = Type::factory($attribute['type'])->getDefaultValue($attribute);
                 if ($default !== null) {
-                    $this->change($key, $default);
+                    $this->change($key, $default, $attribute);
                 }
             }
         } else {
@@ -241,13 +241,7 @@ abstract class Data {
             $value = $this->normalize($key, $value, $attribute);
         }
 
-        if (array_key_exists($key, $this->values) && $this->values[$key] === $value) {
-            return $this;
-        } elseif ($type->isNull($value) && $attribute['allow_null']) {
-            return $this;
-        }
-
-        $this->change($key, $value);
+        $this->change($key, $value, $attribute);
         return $this;
     }
 
@@ -582,9 +576,23 @@ abstract class Data {
      *
      * @param string $key
      * @param mixed $value
+     * @param array $attribute
      * @return void
      */
-    final protected function change($key, $value) {
+    final protected function change($key, $value, array $attribute = null) {
+        $attribute = $attribute ?: static::getMapper()->getAttribute($key);
+        $type = Type::factory($attribute['type']);
+
+        if (array_key_exists($key, $this->values)) {
+            if ($value === $this->values[$key]) {
+                return;
+            } elseif ($type->isNull($value) && $type->isNull($this->values[$key])) {
+                return;
+            }
+        } elseif ($type->isNull($value) && $attribute['allow_null']) {
+            return;
+        }
+
         $this->values[$key] = $value;
         $this->dirty[$key] = true;
     }
