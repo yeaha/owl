@@ -94,21 +94,6 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->foo = 'foo';
     }
 
-    public function testSetNull() {
-        $this->setAttributes(array(
-            'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
-            'foo' => array('type' => 'string', 'allow_null' => true),
-            'bar' => array('type' => 'string'),
-        ));
-
-        $data = $this->newData();
-
-        $data->foo = null;
-
-        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UnexpectedPropertyValueException');
-        $data->bar = null;
-    }
-
     public function testSetSame() {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
@@ -125,22 +110,6 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $data->bar = 'bar';
         $this->assertFalse($data->isDirty('bar'));
-    }
-
-    public function testSetEmptyString() {
-        $this->setAttributes(array(
-            'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
-            'foo' => array('type' => 'string', 'allow_null' => true),
-            'bar' => array('type' => 'integer'),
-        ));
-
-        $data = $this->newData();
-
-        $data->foo = '';
-        $this->assertNull($data->foo);
-
-        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UnexpectedPropertyValueException');
-        $data->bar = '';
     }
 
     public function testSetUndefined() {
@@ -329,7 +298,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['a' => ['b' => [1, 2]]], $data->doc);
     }
 
-    public function testValidate() {
+    public function testValidateAttributeAllowNull() {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'foo' => ['type' => 'string'],
@@ -344,9 +313,57 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
         }
 
+        $data->foo = '';
+        try {
+            $data->validate();
+            $this->fail('validate "allow_null" falied');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        $data->foo = null;
+        try {
+            $data->validate();
+            $this->fail('validate "allow_null" falied');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
         $data->foo = 'foo';
         $this->assertTrue($data->validate());
 
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'doc' => ['type' => 'json'],
+        ]);
+
+        $data = $this->newData();
+
+        try {
+            $data->validate();
+            $this->fail('validate "allow_null" falied');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+    }
+
+    public function testValidateAttributePattern() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'foo' => ['type' => 'string', 'pattern' => '/^a.+z$/'],
+        ]);
+
+        $data = $this->newData();
+        $data->foo = 'abc';
+
+        try {
+            $data->validate();
+            $this->fail('validate "pattern" failed');
+        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
+        }
+
+        $data->foo = 'abz';
+        $this->assertTrue($data->validate());
+    }
+
+    public function testValidateComplexTypeProperty() {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'doc' => [

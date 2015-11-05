@@ -236,34 +236,18 @@ abstract class Data {
             return $this;
         }
 
-        if ($value === '') {
-            $value = null;
-        }
-
-        if ($value === null) {
-            if (!$attribute['allow_null']) {
-                throw new Exception\UnexpectedPropertyValueException(get_class($this) .": Property {$key} not allow null");
-            }
-        } else {
+        $type = Type::factory($attribute['type']);
+        if (!$type->isNull($value)) {
             $value = $this->normalize($key, $value, $attribute);
-
-            if ($attribute['pattern'] && !preg_match($attribute['pattern'], $value)) {
-                throw new Exception\UnexpectedPropertyValueException(get_class($this) .": Property {$key} mismatching pattern {$attribute['pattern']}");
-            }
         }
 
-        if (array_key_exists($key, $this->values)) {
-            if ($this->values[$key] === $value) {
-                return $this;
-            }
-        } else {
-            if ($value === null && $attribute['allow_null']) {
-                return $this;
-            }
+        if (array_key_exists($key, $this->values) && $this->values[$key] === $value) {
+            return $this;
+        } elseif ($type->isNull($value) && $attribute['allow_null']) {
+            return $this;
         }
 
         $this->change($key, $value);
-
         return $this;
     }
 
@@ -530,11 +514,15 @@ abstract class Data {
                     throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", not allow null', get_class($this), $key));
                 }
             } else {
+                if ($attribute['pattern'] && !preg_match($attribute['pattern'], $value)) {
+                    throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", mismatching pattern %s', get_class($this), $key, $attribute['pattern']));
+                }
+
                 try {
                     $type->validateValue($value, $attribute);
-                } catch (\Owl\Parameter\Exception $ex) {
+                } catch (\Exception $ex) {
                     $message = sprintf('%s: Property "%s", %s', get_class($this), $key, $ex->getMessage());
-                    throw new Exception\UnexpectedPropertyValueException($message);
+                    throw new Exception\UnexpectedPropertyValueException($message, 0, $ex);
                 }
             }
         }
