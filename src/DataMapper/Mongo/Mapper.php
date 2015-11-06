@@ -24,6 +24,12 @@ class Mapper extends \Owl\DataMapper\Mapper {
         $record = $this->unpack($data);
         $record['_id'] = $this->normalizeID($data->id());
 
+        foreach ($record as $key => $value) {
+            if ($value === null) {
+                unset($record[$key]);
+            }
+        }
+
         $service->insert($collection, $record);
 
         return [
@@ -36,7 +42,24 @@ class Mapper extends \Owl\DataMapper\Mapper {
         $collection = $collection ?: $this->getCollection();
         $record = $this->unpack($data, ['dirty' => true]);
 
-        return $service->update($collection, ['_id' => $this->normalizeID($data)], ['$set' => $record]);
+        $new = ['$set' => [], '$unset' => []];
+        foreach ($record as $key => $value) {
+            if ($value === null) {
+                $new['$unset'][$key] = '';
+            } else {
+                $new['$set'][$key] = $value;
+            }
+        }
+
+        if (!$new['$set']) {
+            unset($new['$set']);
+        }
+
+        if (!$new['$unset']) {
+            unset($new['$unset']);
+        }
+
+        return $service->update($collection, ['_id' => $this->normalizeID($data)], $new);
     }
 
     protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {

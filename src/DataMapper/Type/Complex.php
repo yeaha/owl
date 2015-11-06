@@ -37,6 +37,14 @@ class Complex extends Mixed {
         ], $attribute);
     }
 
+    public function store($value, array $attribute) {
+        return $this->isNull($value) ? null : $value;
+    }
+
+    public function restore($value, array $attribute) {
+        return $this->isNull($value) ? [] : $value;
+    }
+
     public function getDefaultValue(array $attribute) {
         return isset($attribute['default'])
              ? $attribute['default']
