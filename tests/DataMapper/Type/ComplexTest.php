@@ -150,4 +150,35 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
         $this->setExpectedException('\RuntimeException');
         Complex::pushIn($target, ['a', 'b'], 2);
     }
+
+    public function testTrim() {
+        $target = [
+            'a' => 1,
+            'b' => null,
+            'c' => [
+                'd' => 1,
+                'e' => [],
+                'f' => [
+                    'g' => null,
+                ],
+                'h' => [
+                    'i' => '',
+                ],
+                'j' => [
+                    'k' => [],
+                    'l' => 1,
+                ],
+            ],
+        ];
+
+        $this->assertSame([
+            'a' => 1,
+            'c' => [
+                'd' => 1,
+                'j' => [
+                    'l' => 1,
+                ],
+            ],
+        ], Complex::trim($target));
+    }
 }

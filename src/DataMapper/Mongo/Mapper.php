@@ -1,6 +1,8 @@
 <?php
 namespace Owl\DataMapper\Mongo;
 
+use \Owl\DataMapper\Type;
+
 class Mapper extends \Owl\DataMapper\Mapper {
     public function pack(array $record, \Owl\DataMapper\Data $data = null) {
         if (isset($record['_id'])) {
@@ -8,6 +10,22 @@ class Mapper extends \Owl\DataMapper\Mapper {
         }
 
         return parent::pack($record, $data);
+    }
+
+    public function unpack(\Owl\DataMapper\Data $data, array $options = null) {
+        $record = parent::unpack($data, $options);
+
+        if ($data->isFresh()) {
+            $record = Type\Complex::trim($record);
+        } else {
+            foreach ($record as $key => $value) {
+                if (is_array($value)) {
+                    $record[$key] = Type\Complex::trim($value) ?: null;
+                }
+            }
+        }
+
+        return $record;
     }
 
     protected function doFind($id, \Owl\Service $service = null, $collection = null) {
@@ -23,12 +41,6 @@ class Mapper extends \Owl\DataMapper\Mapper {
 
         $record = $this->unpack($data);
         $record['_id'] = $this->normalizeID($data->id());
-
-        foreach ($record as $key => $value) {
-            if ($value === null) {
-                unset($record[$key]);
-            }
-        }
 
         $service->insert($collection, $record);
 

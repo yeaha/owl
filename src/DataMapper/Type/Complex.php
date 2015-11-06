@@ -129,4 +129,44 @@ class Complex extends Mixed {
 
         unset($target[$last_key]);
     }
+
+    /**
+     * @example
+     * $value = [
+     *     'a' => [
+     *         'b' => [],
+     *     ],
+     *     'c' => [
+     *         'd' => [
+     *             'e' => 1,
+     *         ],
+     *     ],
+     * ];
+     *
+     * // [
+     * //     'c' => [
+     * //         'd' => [
+     * //             'e' => 1,
+     * //         ],
+     * //     ],
+     * // ];
+     * $value = Complex::trim($value);
+     */
+    static public function trim(array $target) {
+        $result = [];
+
+        foreach ($target as $key => $value) {
+            if (is_array($value) && $value) {
+                $value = self::trim($value);
+            }
+
+            if ($value === null || $value === '' || $value === []) {
+                continue;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
+    }
 }
