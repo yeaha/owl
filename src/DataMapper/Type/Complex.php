@@ -48,7 +48,7 @@ abstract class Complex extends Mixed {
     }
 
     public function validateValue($value, array $attribute) {
-        if (!$this->isNull($value) && $attribute['schema']) {
+        if ($attribute['schema']) {
             (new \Owl\Parameter\Checker)->execute($value, $attribute['schema']);
         }
     }

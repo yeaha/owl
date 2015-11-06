@@ -13,7 +13,7 @@ class String extends \Owl\DataMapper\Type\Mixed {
     }
 
     public function validateValue($value, array $attribute) {
-        if (!$this->isNull($value) && !$attribute['allow_tags'] && (strip_tags($value) != $value)) {
+        if (!$attribute['allow_tags'] && (strip_tags($value) != $value)) {
             throw new \UnexpectedValueException('cannot contain tags');
         }
     }
