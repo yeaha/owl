@@ -148,4 +148,5 @@ Type::getInstance()
     ->register('pg_array', '\Owl\DataMapper\Type\PgsqlArray')
     ->register('pg_hstore', '\Owl\DataMapper\Type\PgsqlHstore')
     ->register('string', '\Owl\DataMapper\Type\String')
-    ->register('uuid', '\Owl\DataMapper\Type\UUID');
+    ->register('uuid', '\Owl\DataMapper\Type\UUID')
+    ->register('complex', '\Owl\DataMapper\Type\Complex');
