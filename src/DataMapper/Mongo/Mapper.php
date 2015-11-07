@@ -4,6 +4,28 @@ namespace Owl\DataMapper\Mongo;
 use \Owl\DataMapper\Type;
 
 class Mapper extends \Owl\DataMapper\Mapper {
+    public function query($expr) {
+        $result = [];
+
+        foreach (static::iterator($expr) as $data) {
+            $result[$data->id()] = $data;
+        }
+
+        return $result;
+    }
+
+    public function iterator($expr = null) {
+        $cursor = $expr instanceof \MongoCursor
+                ? $expr
+                : $this->getService()->getCollection($this->getCollection())->find($expr ?: []);
+
+        foreach ($cursor as $record) {
+            $data = $this->pack($record);
+
+            yield $data;
+        }
+    }
+
     public function pack(array $record, \Owl\DataMapper\Data $data = null) {
         if (isset($record['_id'])) {
             $record['_id'] = (string)$record['_id'];
