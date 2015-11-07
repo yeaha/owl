@@ -17,11 +17,9 @@ class PgsqlArray extends Complex {
     }
 
     public function store($value, array $attribute) {
-        if ($this->isNull($value)) {
-            return null;
-        }
+        $value = parent::store($value, $attribute);
 
-        return self::encode($value);
+        return $value ? self::encode($value) : null;
     }
 
     public function restore($value, array $attribute) {

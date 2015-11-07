@@ -38,6 +38,10 @@ class Complex extends Mixed {
     }
 
     public function store($value, array $attribute) {
+        if ($value) {
+            $value = self::trim($value);
+        }
+
         return $this->isNull($value) ? null : $value;
     }
 
@@ -57,6 +61,8 @@ class Complex extends Mixed {
 
     public function validateValue($value, array $attribute) {
         if ($attribute['schema']) {
+            $value = self::trim($value);
+
             (new \Owl\Parameter\Checker)->execute($value, $attribute['schema']);
         }
     }

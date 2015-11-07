@@ -45,12 +45,6 @@ class Mapper extends \Owl\DataMapper\Mapper {
 
         if ($data->isFresh()) {
             $record = Type\Complex::trim($record);
-        } else {
-            foreach ($record as $key => $value) {
-                if (is_array($value)) {
-                    $record[$key] = Type\Complex::trim($value) ?: null;
-                }
-            }
         }
 
         return $record;

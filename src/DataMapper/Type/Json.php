@@ -21,11 +21,9 @@ class Json extends Complex {
     }
 
     public function store($value, array $attribute) {
-        if ($this->isNull($value)) {
-            return null;
-        }
+        $value = parent::store($value, $attribute);
 
-        return json_encode($value, JSON_UNESCAPED_UNICODE);
+        return $value ? json_encode($value, JSON_UNESCAPED_UNICODE) : null;
     }
 
     public function restore($value, array $attribute) {
