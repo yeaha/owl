@@ -1,0 +1,42 @@
+#!/usr/bin/env php
+<?php
+// 在crontab里面设置
+// * * * * * php -q bin/crontab
+
+if (!extension_loaded('swoole')) {
+    echo "Require \"swoole\" extension";
+
+    exit(1);
+}
+
+require __DIR__.'/../boot.php';
+
+$logger = new \Monolog\Logger('crontab');
+$logger->pushHandler(new \Monolog\Handler\StreamHandler('php://output'));
+
+\Model\Crontab::setLogger($logger);
+
+$jobs = [
+    // 把foobar任务赋予不同的名字，并行
+    // ['\Jobs\Foobar', 'foobar.1'],
+    // ['\Jobs\Foobar', 'foobar.2'],
+
+    '\Jobs\Foobar',
+];
+
+foreach ($jobs as $job) {
+    $process = new swoole_process(function($worker) use ($job) {
+        if (is_array($job)) {
+            list($class, $name) = $job;
+        } else {
+            list($class, $name) = [$job, null];
+        }
+
+        $job = new $class($name);
+        $result = $job->start();
+
+        $worker->exit($result ? 0 : 1);
+    });
+
+    $process->start();
+}

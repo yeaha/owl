@@ -1,4 +1,6 @@
 <?php
+define('SITE_MODE', true);
+
 require __DIR__.'/boot.php';
 
 $command = isset($argv[1]) ? $argv[1] : '';
