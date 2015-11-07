@@ -1,7 +1,7 @@
 {
     "name": "yeaha/owl",
     "description": "RESTFul Web Framework",
-    "keywords": ["framework", "mvc", "swoole", "restful"],
+    "keywords": ["framework", "mvc", "swoole", "restful", "orm", "datamapper"],
     "homepage": "https://github.com/yeaha/owl",
     "license": "MIT",
     "authors": [
