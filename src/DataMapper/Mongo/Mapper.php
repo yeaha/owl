@@ -15,9 +15,15 @@ class Mapper extends \Owl\DataMapper\Mapper {
     }
 
     public function iterator($expr = null) {
-        $cursor = $expr instanceof \MongoCursor
-                ? $expr
-                : $this->getService()->getCollection($this->getCollection())->find($expr ?: []);
+        if ($expr instanceof \MongoCursor) {
+            $cursor = $expr;
+        } elseif ($expr === null || is_array($expr)) {
+            $cursor = $this->getService()
+                           ->getCollection($this->getCollection())
+                           ->find($expr ?: []);
+        } else {
+            throw new \InvalidArgumentException('Invalid mongo query expressions');
+        }
 
         foreach ($cursor as $record) {
             $data = $this->pack($record);
