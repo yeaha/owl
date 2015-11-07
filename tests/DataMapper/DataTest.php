@@ -438,6 +438,26 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         } catch (\Owl\DataMapper\Exception\UndefinedPropertyException $ex) {
         }
     }
+
+    public function testAllowTags() {
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'foo' => ['type' => 'string', 'allow_tags' => true],
+        ]);
+
+        $data = $this->newData();
+        $data->foo = '<h1>test</h1>';
+        $this->assertTrue($data->validate());
+
+        $this->setAttributes([
+            'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
+            'foo' => ['type' => 'string'],
+        ]);
+
+        $data->foo = '<h1>test</h1>';
+        $this->setExpectedExceptionRegExp('\Owl\DataMapper\Exception\UnexpectedPropertyValueException', '/cannot contain tags$/');
+        $data->validate();
+    }
 }
 
 namespace Tests\Mock\DataMapper;

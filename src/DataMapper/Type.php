@@ -76,6 +76,10 @@ class Type {
             // 是否允许为空
             'allow_null' => false,
 
+            // 安全特性
+            // 是否允许内容包含html/xml tag
+            'allow_tags' => false,
+
             // 是否自动生成属性值，例如mysql里面的auto increase
             'auto_generate' => false,
 

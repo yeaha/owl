@@ -516,6 +516,10 @@ abstract class Data {
                     throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", mismatching pattern %s', get_class($this), $key, $attribute['pattern']));
                 }
 
+                if (!$attribute['allow_tags'] && is_string($value) && strip_tags($value) !== $value) {
+                    throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", cannot contain tags', get_class($this), $key));
+                }
+
                 try {
                     $type->validateValue($value, $attribute);
                 } catch (\Exception $ex) {
