@@ -180,5 +180,13 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
                 ],
             ],
         ], Complex::trim($target));
+
+        $target = [
+            'a' => [null, 1, '', 'a'],
+        ];
+
+        $this->assertSame([
+            'a' => [1, 'a'],
+        ], Complex::trim($target));
     }
 }

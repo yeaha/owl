@@ -153,6 +153,9 @@ class Complex extends Mixed {
      * $value = Complex::trim($value);
      */
     static public function trim(array $target) {
+        $keys = array_keys($target);
+        $is_array = ($keys === array_keys($keys));
+
         $result = [];
 
         foreach ($target as $key => $value) {
@@ -165,6 +168,10 @@ class Complex extends Mixed {
             }
 
             $result[$key] = $value;
+        }
+
+        if ($is_array && $result) {
+            $result = array_values($result);
         }
 
         return $result;
