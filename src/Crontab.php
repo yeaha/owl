@@ -78,7 +78,7 @@ abstract class Crontab {
                 return false;
             }
         } catch (\Exception $ex) {
-            $this->log('error', 'testTimer() error', [
+            $this->log('error', 'Job testTimer() error', [
                 'error' => $ex->getMessage(),
             ]);
 
@@ -98,7 +98,7 @@ abstract class Crontab {
                 return true;
             }
 
-            $this->log('warning', 'job kill error', [
+            $this->log('warning', 'Job kill error', [
                 'error' => posix_strerror($errno),
             ]);
 
