@@ -54,7 +54,7 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
 
     public function testString() {
         $type = $this->getType('string');
-        $this->assertInstanceOf('\Owl\DataMapper\Type\String', $type);
+        $this->assertInstanceOf('\Owl\DataMapper\Type\Text', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Mixed', $type);
 
         $this->assertSame('1.11', $type->normalize(1.11, array()));
