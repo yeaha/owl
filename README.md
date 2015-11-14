@@ -5,17 +5,16 @@
 ```json
 {
     "require": {
-        "yeaha/owl": "0.2.*"
+        "yeaha/owl": "0.3.*"
     }
 }
 ```
 
-# [Hello world](https://github.com/yeaha/owl/tree/master/examples/hello_world)
+# [Hello world](https://github.com/yeaha/owl-site)
 
 ## install
 ```
-cd examples/hello_world
-composer install
+composer create-project yeaha/owl-site ./mysite
 ```
 
 ## php-fpm + nginx
@@ -24,13 +23,13 @@ nginx.conf
 ```
 server {
     listen              127.0.0.1:12345;
-    root                /PATH/TO/examples/hello_world/public;
+    root                /PATH/TO/mysite/public;
     index               index.php;
 
     location @default {
         include        fastcgi_params;
         fastcgi_pass   127.0.0.1:9000;
-        fastcgi_param  SCRIPT_FILENAME    /PATH/TO/examples/hello_word/index.php;
+        fastcgi_param  SCRIPT_FILENAME    /PATH/TO/mysite/index.php;
     }
 
     location / {
@@ -44,5 +43,5 @@ server {
 require [swoole](https://github.com/swoole/swoole-src) extension
 
 ```
-php -q examples/hello_world/server.php start
+php -q /PATH/TO/mysite/server.php start
 ```
