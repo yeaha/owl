@@ -1,7 +1,0 @@
-{
-    "description": "owl framework example site",
-    "type": "project",
-    "require": {
-        "yeaha/owl": "0.2.*"
-    }
-}

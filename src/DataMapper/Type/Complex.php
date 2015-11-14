@@ -30,7 +30,7 @@ namespace Owl\DataMapper\Type;
  *
  * @see \Owl\Parameter\Checker
  */
-class Complex extends Mixed {
+class Complex extends Common {
     public function normalizeAttribute(array $attribute) {
         return array_merge([
             'schema' => [],

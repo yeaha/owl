@@ -1,7 +1,7 @@
 <?php
 namespace Owl\DataMapper\Type;
 
-class UUID extends \Owl\DataMapper\Type\Mixed {
+class UUID extends Common {
     public function normalizeAttribute(array $attribute) {
         $attribute = array_merge([
             'upper' => false,

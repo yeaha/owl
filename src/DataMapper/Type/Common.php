@@ -1,7 +1,7 @@
 <?php
 namespace Owl\DataMapper\Type;
 
-class Mixed {
+class Common {
     /**
      * 格式化属性定义
      *
