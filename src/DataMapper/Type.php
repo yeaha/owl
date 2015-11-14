@@ -29,6 +29,8 @@ class Type {
             $type = 'integer';
         } elseif ($type == 'text') {
             $type = 'string';
+        } elseif ($type == 'numeric') {
+            $type = 'number';
         }
 
         if (!isset($this->type_classes[$type]))
@@ -148,7 +150,7 @@ Type::getInstance()
     ->register('datetime', '\Owl\DataMapper\Type\Datetime')
     ->register('integer', '\Owl\DataMapper\Type\Integer')
     ->register('json', '\Owl\DataMapper\Type\Json')
-    ->register('numeric', '\Owl\DataMapper\Type\Numeric')
+    ->register('number', '\Owl\DataMapper\Type\Number')
     ->register('pg_array', '\Owl\DataMapper\Type\PgsqlArray')
     ->register('pg_hstore', '\Owl\DataMapper\Type\PgsqlHstore')
     ->register('string', '\Owl\DataMapper\Type\Text')

@@ -36,12 +36,14 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('foo', $type->getDefaultValue(array('default' => 'foo')));
     }
 
-    public function testNumeric() {
-        $type = $this->getType('numeric');
-        $this->assertInstanceOf('\Owl\DataMapper\Type\Numeric', $type);
+    public function testNumber() {
+        $type = $this->getType('number');
+        $this->assertInstanceOf('\Owl\DataMapper\Type\Number', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Mixed', $type);
 
         $this->assertSame(1.11, $type->normalize('1.11', array()));
+
+        $this->assertInstanceOf('\Owl\DataMapper\Type\Number', $this->getType('numeric'));
     }
 
     public function testInteger() {
