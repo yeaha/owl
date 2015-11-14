@@ -1,9 +1,0 @@
-{
-    "description": "owl framework example site",
-    "type": "project",
-    "require": {
-        "yeaha/owl": "0.2.*",
-        "monolog/monolog": "1.*.*",
-        "predis/predis": "1.0.*"
-    }
-}
