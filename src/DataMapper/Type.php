@@ -33,11 +33,13 @@ class Type {
             $type = 'number';
         }
 
-        if (!isset($this->type_classes[$type]))
-            $type = 'mixed';
+        if (!isset($this->type_classes[$type])) {
+            $type = 'common';
+        }
 
-        if (isset($this->types[$type]))
+        if (isset($this->types[$type])) {
             return $this->types[$type];
+        }
 
         $class = $this->type_classes[$type];
         return $this->types[$type] = new $class;
@@ -146,7 +148,7 @@ class Type {
 }
 
 Type::getInstance()
-    ->register('mixed', '\Owl\DataMapper\Type\Mixed')
+    ->register('common', '\Owl\DataMapper\Type\Common')
     ->register('datetime', '\Owl\DataMapper\Type\Datetime')
     ->register('integer', '\Owl\DataMapper\Type\Integer')
     ->register('json', '\Owl\DataMapper\Type\Json')

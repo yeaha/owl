@@ -1,7 +1,7 @@
 <?php
 namespace Owl\DataMapper\Type;
 
-class Datetime extends \Owl\DataMapper\Type\Mixed {
+class Datetime extends Common {
     public function normalize($value, array $attribute) {
         if ($value instanceof \DateTime) {
             return $value;
