@@ -6,6 +6,8 @@ namespace Owl\Parameter;
  *
  * @example
  * $checker = new \Owl\Parameter\Checker;
+ *
+ * // 检查数组形式的参数
  * $checker->execute($vars, [
  *     'foo' => [                               // 通用配置
  *         'required' => (boolean),             // default true
@@ -76,6 +78,9 @@ namespace Owl\Parameter;
  *         ],
  *     ],
  * ]);
+ *
+ * // 检查单独的参数
+ * $checker->check('$test', $test, ['type' => 'string', 'regexp' => '/^a.+z$/']);
  */
 class Checker {
     static public $types = [
@@ -121,7 +126,11 @@ class Checker {
         return true;
     }
 
-    protected function check($key, $value, array $option) {
+    public function check($key, $value, array $option) {
+        if (!isset($option['__normalized__'])) {
+            $option = $this->normalizeOption($option);
+        }
+
         if ($value === '') {
             if ($option['allow_empty']) {
                 return true;
@@ -139,11 +148,11 @@ class Checker {
             case 'object':
                 return $this->checkObject($key, $value, $option);
             default:
-                return $this->checkLiteral($key, $value, $option);
+                return $this->checkScalar($key, $value, $option);
         }
     }
 
-    protected function checkLiteral($key, $value, array $option) {
+    protected function checkScalar($key, $value, array $option) {
         if (isset($option['same'])) {
             if ($value === $option['same']) {
                 return true;
@@ -269,6 +278,7 @@ class Checker {
             'allow_tags' => false,
             'regexp' => null,
             'callback' => null,
+            '__normalized__' => true,
         ], $option);
 
         return $option;
