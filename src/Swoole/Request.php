@@ -7,12 +7,12 @@ class Request extends \Owl\Http\Request {
     public function __construct($swoole_request) {
         $this->swoole_request = $swoole_request;
 
-        $get = isset($request->get) ? $request->get : [];
-        $post = isset($request->post) ? $request->post : [];
-        $cookies = isset($request->cookie) ? $request->cookie : [];
-        $server = isset($request->server) ? array_change_key_case($request->server, CASE_UPPER) : [];
-        $headers = isset($request->header) ? array_change_key_case($request->header, CASE_LOWER) : [];
-        $files = isset($request->files) ? $request->files : [];
+        $get = isset($swoole_request->get) ? $swoole_request->get : [];
+        $post = isset($swoole_request->post) ? $swoole_request->post : [];
+        $cookies = isset($swoole_request->cookie) ? $swoole_request->cookie : [];
+        $server = isset($swoole_request->server) ? array_change_key_case($swoole_request->server, CASE_UPPER) : [];
+        $headers = isset($swoole_request->header) ? array_change_key_case($swoole_request->header, CASE_LOWER) : [];
+        $files = isset($swoole_request->files) ? $swoole_request->files : [];
 
         foreach ($headers as $key => $value) {
             $key = 'HTTP_'.strtoupper(str_replace('-', '_', $key));
