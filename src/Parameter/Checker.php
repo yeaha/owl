@@ -190,29 +190,8 @@ class Checker {
             }
         }
 
-        if (!$option['allow_tags'] && is_string($value) && strlen($value) > 2) {
-            // /?
-            // \w+                               tag name
-            // (?:                               attributes
-            //     (?:
-            //         \s+
-            //         [\w\-\.:]+                attribute key
-            //         (?:
-            //             \s*=\s*
-            //             ["\']?                quote symbol
-            //             (?:
-            //                 [^"\'>]+          attribute value
-            //             )?
-            //             ["\']?                quote symbol
-            //         )?
-            //     )?
-            // )+
-            // \s*
-            // /?
-            // \s*
-            if (preg_match('#</?\w+(?:(?:\s+[\w\-\.:]+(?:\s*=\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*>#', $value)) {
-                throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
-            }
+        if (!$option['allow_tags'] && is_string($value) && strlen($value) > 2 && preg_match(TAGS_REGEXP, $value)) {
+            throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
         }
 
         return true;
