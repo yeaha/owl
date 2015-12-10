@@ -7,13 +7,13 @@ namespace Owl;
  */
 function str_has_tags($string) {
     // /?
-    // \w+                               tag name
-    // (?:                               attributes
+    // \w+                              tag name
+    // (?:                              attributes
     //     (?:
     //         \s+
-    //         [\w\-\.:]+                attribute key
+    //         \S+                      attribute key
     //         (?:
-    //             \s*=\s*
+    //             \s*=+\s*
     //             ["']?                quote symbol
     //             (?:
     //                 [^"'>]+          attribute value
@@ -25,7 +25,7 @@ function str_has_tags($string) {
     // \s*
     // /?
     // \s*
-    $re = '#</?\w+(?:(?:\s+[\w\-\.:]+(?:\s*=\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*>#';
+    $re = '#</?\w+(?:(?:\s+\S+(?:\s*=+\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*>#';
 
     return is_string($string)
         && strlen($string) > 2

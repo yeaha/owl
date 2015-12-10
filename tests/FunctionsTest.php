@@ -7,21 +7,26 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
             '<' => false,
             '<div' => false,
             '<a>' => true,
+            '<a >' => true,
+            '< a >' => false,
             '<h1>' => true,
             '<H1>' => true,
-            '<a src>' => true,
-            '<a src=>' => true,
-            '<a src=/foo>' => true,
-            '<a src=\'/foo\'>' => true,
-            '<a src="/foo" target="_blank">' => true,
-            '<a 测试>' => false,
+            '<a href>' => true,
+            '<a href=>' => true,
+            '<a href=/foo>' => true,
+            '<a href=\'/foo\'>' => true,
+            '<a href="/foo" target="_blank">' => true,
             '<测试>' => false,
-            '<a data-foo="1" data-BAR=\'2\'>' => true,
-            '< a >' => false,
+            '<a测试>' => false,
+            '<a 测试>' => true,
+            '<script 测试 src="foo.js">' => true,
+            '<script 测试= src="foo.js">' => true,
+            '<script src="foo.js" 测试="">' => true,
+            '<script src="foo.js">' => true,
         ];
 
         foreach ($cases as $case => $expect) {
-            $this->assertSame($expect, \Owl\str_has_tags($case));
+            $this->assertSame($expect, \Owl\str_has_tags($case), $case);
         }
     }
 
