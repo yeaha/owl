@@ -23,6 +23,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
             '<script 测试= src="foo.js">' => true,
             '<script src="foo.js" 测试="">' => true,
             '<script src="foo.js">' => true,
+            "\x3cscript src=\"foo.js\"\x3e" => true,
         ];
 
         foreach ($cases as $case => $expect) {
