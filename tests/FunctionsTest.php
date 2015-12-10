@@ -24,6 +24,14 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
             '<script src="foo.js" 测试="">' => true,
             '<script src="foo.js">' => true,
             "\x3cscript src=\"foo.js\"\x3e" => true,
+            '<img src="test.jpg" """>' => true,
+            '<img src=# onmouseover="alert(\'xxs\')">' => true,
+            '<img src="jav	ascript:alert(\'xss\');">' => true,
+            '<body onload!#$%&()*~+-_.,:;?@[/|\]^`=alert("xss")>' => true,
+            '<script/src="http://ha.ckers.org/xss.js">' => true,
+            '<iframe src=http://ha.ckers.org/scriptlet.html <' => true,
+            '<script =">" src="http://ha.ckers.org/xss.js">' => true,
+            '<script "a=\'>\'" src="http://ha.ckers.org/xss.js">' => true,
         ];
 
         foreach ($cases as $case => $expect) {

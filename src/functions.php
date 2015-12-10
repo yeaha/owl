@@ -10,7 +10,7 @@ function str_has_tags($string) {
     // \w+                              tag name
     // (?:                              attributes
     //     (?:
-    //         \s+
+    //         [\s\/]+
     //         \S+                      attribute key
     //         (?:
     //             \s*=+\s*
@@ -25,7 +25,7 @@ function str_has_tags($string) {
     // \s*
     // /?
     // \s*
-    $re = '#</?\w+(?:(?:\s+\S+(?:\s*=+\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*>#';
+    $re = '#</?\w+(?:(?:[\s\/]+\S+(?:\s*=+\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*[<>]#';
 
     return is_string($string)
         && strlen($string) > 2
