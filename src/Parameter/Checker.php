@@ -190,7 +190,7 @@ class Checker {
             }
         }
 
-        if (!$option['allow_tags'] && is_string($value) && strlen($value) > 2 && preg_match(TAGS_REGEXP, $value)) {
+        if (!$option['allow_tags'] && \Owl\str_has_tags($value)) {
             throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
         }
 

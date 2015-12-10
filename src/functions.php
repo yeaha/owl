@@ -121,7 +121,7 @@ function array_unset_in(array &$target, array $path) {
  * //         ],
  * //     ],
  * // ];
- * $value = Complex::trim($value);
+ * $value = \Owl\array_trim($value);
  */
 function array_trim(array $target) {
     $keys = array_keys($target);
