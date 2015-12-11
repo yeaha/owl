@@ -6,30 +6,9 @@ namespace Owl;
  * @return boolean
  */
 function str_has_tags($string) {
-    // /?
-    // \w+                              tag name
-    // (?:                              attributes
-    //     (?:
-    //         [\s\/]+
-    //         \S+                      attribute key
-    //         (?:
-    //             \s*=+\s*
-    //             ["']?                quote symbol
-    //             (?:
-    //                 [^"'>]+          attribute value
-    //             )?
-    //             ["']?                quote symbol
-    //         )?
-    //     )?
-    // )+
-    // \s*
-    // /?
-    // \s*
-    $re = '#</?\w+(?:(?:[\s\/]+\S+(?:\s*=+\s*["\']?(?:[^"\'>]+)?["\']?)?)?)+\s*/?\s*[<>]#';
-
     return is_string($string)
         && strlen($string) > 2
-        && preg_match($re, $string);
+        && $string !== strip_tags($string);
 }
 
 function array_set_in(array &$target, array $path, $value, $push = false) {
