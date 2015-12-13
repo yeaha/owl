@@ -199,10 +199,8 @@ class Checker {
             }
         }
 
-        if (!$option['allow_tags'] && is_string($value)) {
-            if (strip_tags($value) !== $value) {
-                throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
-            }
+        if (!$option['allow_tags'] && \Owl\str_has_tags($value)) {
+            throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
         }
 
         return true;

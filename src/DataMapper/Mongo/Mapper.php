@@ -44,7 +44,7 @@ class Mapper extends \Owl\DataMapper\Mapper {
         $record = parent::unpack($data, $options);
 
         if ($data->isFresh()) {
-            $record = Type\Complex::trim($record);
+            $record = \Owl\array_trim($record);
         }
 
         return $record;

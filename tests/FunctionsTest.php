@@ -1,13 +1,22 @@
 <?php
-namespace Tests\DataMapper\Type;
+namespace Tests;
 
-use \Owl\DataMapper\Type\Complex;
+class FunctionsTest extends \PHPUnit_Framework_TestCase {
+    public function testStrHasTags() {
+        $cases = [
+            '<' => false,
+            '< a >' => false,
+        ];
 
-class ComplexTest extends \PHPUnit_Framework_TestCase {
-    public function testSetIn() {
+        foreach ($cases as $case => $expect) {
+            $this->assertSame($expect, \Owl\str_has_tags($case), $case);
+        }
+    }
+
+    public function testArraySetIn() {
         $target = [];
 
-        Complex::setIn($target, ['a', 'b', 'c', 'd'], 1);
+        \Owl\array_set_in($target, ['a', 'b', 'c', 'd'], 1);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -18,7 +27,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             ],
         ], $target);
 
-        Complex::setIn($target, ['a', 'b', 'e'], 2);
+        \Owl\array_set_in($target, ['a', 'b', 'e'], 2);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -30,7 +39,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             ],
         ], $target);
 
-        Complex::setIn($target, ['f'], 3);
+        \Owl\array_set_in($target, ['f'], 3);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -46,20 +55,20 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
         return $target;
     }
 
-    public function testPushIn() {
+    public function testArrayPushIn() {
         $target = [];
 
-        Complex::pushIn($target, ['a'], 1);
+        \Owl\array_push_in($target, ['a'], 1);
         $this->assertSame([
             'a' => [1],
         ], $target);
 
-        Complex::pushIn($target, ['a'], 2);
+        \Owl\array_push_in($target, ['a'], 2);
         $this->assertSame([
             'a' => [1, 2],
         ], $target);
 
-        Complex::pushIn($target, ['a', 'b'], 3);
+        \Owl\array_push_in($target, ['a', 'b'], 3);
         $this->assertSame([
             'a' => [
                 1,
@@ -68,7 +77,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             ],
         ], $target);
 
-        Complex::pushIn($target, ['b', 'c', 'd'], 'e');
+        \Owl\array_push_in($target, ['b', 'c', 'd'], 'e');
         $this->assertSame([
             'a' => [
                 1,
@@ -84,26 +93,26 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @depends testSetIn
+     * @depends testArraySetIn
      */
-    public function testGetIn(array $target) {
-        $this->assertSame(3, Complex::getIn($target, ['f']));
-        $this->assertSame(1, Complex::getIn($target, ['a', 'b', 'c', 'd']));
-        $this->assertSame(2, Complex::getIn($target, ['a', 'b', 'e']));
-        $this->assertSame(['d' => 1], Complex::getIn($target, ['a', 'b', 'c']));
+    public function testArrayGetIn(array $target) {
+        $this->assertSame(3, \Owl\array_get_in($target, ['f']));
+        $this->assertSame(1, \Owl\array_get_in($target, ['a', 'b', 'c', 'd']));
+        $this->assertSame(2, \Owl\array_get_in($target, ['a', 'b', 'e']));
+        $this->assertSame(['d' => 1], \Owl\array_get_in($target, ['a', 'b', 'c']));
 
-        $this->assertFalse(Complex::getIn($target, ['g']));
-        $this->assertFalse(Complex::getIn($target, ['a', 'c']));
-        $this->assertFalse(Complex::getIn($target, ['a', 'b', 'c', 'd', 'e']));
+        $this->assertFalse(\Owl\array_get_in($target, ['g']));
+        $this->assertFalse(\Owl\array_get_in($target, ['a', 'c']));
+        $this->assertFalse(\Owl\array_get_in($target, ['a', 'b', 'c', 'd', 'e']));
 
         return $target;
     }
 
     /**
-     * @depends testGetIn
+     * @depends testArrayGetIn
      */
-    public function testUnsetIn(array $target) {
-        Complex::unsetIn($target, ['a', 'b', 'e']);
+    public function testArrayUnsetIn(array $target) {
+        \Owl\array_unset_in($target, ['a', 'b', 'e']);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -115,7 +124,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             'f' => 3,
         ], $target);
 
-        Complex::unsetIn($target, ['a', 'b', 'c', 'd']);
+        \Owl\array_unset_in($target, ['a', 'b', 'c', 'd']);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -126,7 +135,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
             'f' => 3,
         ], $target);
 
-        Complex::unsetIn($target, ['f']);
+        \Owl\array_unset_in($target, ['f']);
         $this->assertSame([
             'a' => [
                 'b' => [
@@ -137,21 +146,21 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
         ], $target);
     }
 
-    public function testSetInException() {
+    public function testArraySetInException() {
         $target = ['a' => ['b' => 1]];
 
         $this->setExpectedException('\RuntimeException');
-        Complex::setIn($target, ['a', 'b', 'c'], 2);
+        \Owl\array_set_in($target, ['a', 'b', 'c'], 2);
     }
 
-    public function testPushInException() {
+    public function testArrayPushInException() {
         $target = ['a' => ['b' => 1]];
 
         $this->setExpectedException('\RuntimeException');
-        Complex::pushIn($target, ['a', 'b'], 2);
+        \Owl\array_push_in($target, ['a', 'b'], 2);
     }
 
-    public function testTrim() {
+    public function testArrayTrim() {
         $target = [
             'a' => 1,
             'b' => null,
@@ -179,7 +188,7 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
                     'l' => 1,
                 ],
             ],
-        ], Complex::trim($target));
+        ], \Owl\array_trim($target));
 
         $target = [
             'a' => [null, 1, '', 'a'],
@@ -187,6 +196,6 @@ class ComplexTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame([
             'a' => [1, 'a'],
-        ], Complex::trim($target));
+        ], \Owl\array_trim($target));
     }
 }

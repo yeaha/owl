@@ -296,7 +296,7 @@ abstract class Data {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        Type\Complex::setIn($target, $path, $value, $push);
+        \Owl\array_set_in($target, $path, $value, $push);
         $this->change($key, $target);
 
         return $this;
@@ -327,7 +327,7 @@ abstract class Data {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        Type\Complex::unsetIn($target, $path);
+        \Owl\array_unset_in($target, $path);
         $this->change($key, $target);
 
         return $this;
@@ -346,7 +346,7 @@ abstract class Data {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
         }
 
-        return Type\Complex::getIn($target, $path);
+        return \Owl\array_get_in($target, $path);
     }
 
     /**
@@ -516,7 +516,7 @@ abstract class Data {
                     throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", mismatching pattern %s', get_class($this), $key, $attribute['pattern']));
                 }
 
-                if (!$attribute['allow_tags'] && is_string($value) && strip_tags($value) !== $value) {
+                if (!$attribute['allow_tags'] && \Owl\str_has_tags($value)) {
                     throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", cannot contain tags', get_class($this), $key));
                 }
 

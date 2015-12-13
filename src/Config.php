@@ -28,23 +28,13 @@ class Config {
 
     static public function get($keys = null) {
         $keys = $keys === null
-              ? null
+              ? []
               : is_array($keys) ? $keys : func_get_args();
 
-        if ($keys === null) {
-            return self::$config;
+        try {
+            return \Owl\array_get_in(self::$config, $keys);
+        } catch (\RuntimeException $ex) {
+            return false;
         }
-
-        $config = &self::$config;
-
-        foreach ($keys as $key) {
-            if (!isset($config[$key])) {
-                return false;
-            }
-
-            $config = &$config[$key];
-        }
-
-        return $config;
     }
 }
