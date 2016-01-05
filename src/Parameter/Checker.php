@@ -177,13 +177,15 @@ class Checker {
             }
 
             throw $this->exception($key, sprintf('must be equal one of [%s], current value is "%s"', implode(', ', $option['enum_eq']), $value));
-        } elseif ($callback = $option['callback']) {
-            if (!call_user_func_array($callback, [$value, $option])) {
-                throw $this->exception($key, 'custom test failed');
-            }
         } elseif ($regexp = $option['regexp']) {
             if (!preg_match($regexp, $value)) {
                 throw $this->exception($key, sprintf('mismatch regexp %s, current value is "%s"', $regexp, $value));
+            }
+        }
+
+        if ($callback = $option['callback']) {
+            if (!call_user_func_array($callback, [$value, $option])) {
+                throw $this->exception($key, 'custom test failed');
             }
         }
 
