@@ -4,7 +4,7 @@ namespace Owl\DataMapper;
 use Owl\DataMapper\Exception;
 use Owl\DataMapper\Type;
 
-abstract class Data {
+abstract class Data implements \JsonSerializable {
     /**
      * 此Data class指定使用的Mapper class
      * @var string
@@ -402,6 +402,15 @@ abstract class Data {
         }
 
         return $json;
+    }
+
+    /**
+     * implement \JsonSerializable
+     *
+     * @return array
+     */
+    public function jsonSerialize() {
+        return $this->toJSON();
     }
 
     /**
