@@ -48,6 +48,12 @@ class Router {
      */
     protected $children = [];
 
+    protected function __beforeRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters) {
+    }
+
+    protected function __afterRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters) {
+    }
+
     public function __construct(array $config = []) {
         (new \Owl\Parameter\Checker)->execute($config, [
             'namespace' => ['type' => 'string'],
@@ -202,6 +208,8 @@ class Router {
         $controller->request = $request;
         $controller->response = $response;
 
+        $this->__beforeRespond($request, $response, $controller, $parameters);
+
         // 如果__beforeExecute()返回了内容就直接返回内容
         if (method_exists($controller, '__beforeExecute') && ($data = call_user_func_array([$controller, '__beforeExecute'], $parameters))) {
             if ($data instanceof \Psr\Http\Message\StreamInterface) {
@@ -236,6 +244,8 @@ class Router {
         if (method_exists($controller, '__afterExecute')) {
             $controller->__afterExecute($request, $response);
         }
+
+        $this->__afterRespond($request, $response, $controller, $parameters);
 
         return $response;
     }
