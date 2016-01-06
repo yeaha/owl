@@ -192,6 +192,15 @@ class Router {
             'method' => $request->getMethod(),
         ]);
 
+        $method = $request->getMethod();
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
+
+        if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
+            throw \Owl\Http\Exception::factory(501);
+        }
+
         $path = $this->getRequestPath($request);
         list($class, $parameters) = $this->byRewrite($path) ?: $this->byPath($path);
 
@@ -208,6 +217,10 @@ class Router {
         $controller->request = $request;
         $controller->response = $response;
 
+        if (!is_callable([$controller, $method])) {
+            throw \Owl\Http\Exception::factory(405);
+        }
+
         $this->__beforeRespond($request, $response, $controller, $parameters);
 
         // 如果__beforeExecute()返回了内容就直接返回内容
@@ -219,19 +232,6 @@ class Router {
             }
 
             return $response;
-        }
-
-        $method = $request->getMethod();
-        if ($method === 'HEAD') {
-            $method = 'GET';
-        }
-
-        if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
-            throw \Owl\Http\Exception::factory(501);
-        }
-
-        if (!is_callable([$controller, $method])) {
-            throw \Owl\Http\Exception::factory(405);
         }
 
         $data = call_user_func_array([$controller, $method], $parameters);
