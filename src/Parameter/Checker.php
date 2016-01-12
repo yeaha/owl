@@ -65,6 +65,13 @@ namespace Owl\Parameter;
  *     ],
  *
  *     'foo' => [
+ *         'type' => 'array',
+ *         'value' => [                         // 对数组的元素进行检查
+ *             // ...
+ *         ],
+ *     ],
+ *
+ *     'foo' => [
  *         'type' => 'json',
  *         'keys' => [
  *             // ...
@@ -221,8 +228,8 @@ class Checker {
             throw $this->exception($key, 'is not array type');
         }
 
-        if (!isset($option['keys']) && !isset($option['element'])) {
-            throw $this->exception($key, 'rule missing "keys" or "element"');
+        if (!isset($option['keys']) && !isset($option['element']) && !isset($option['value'])) {
+            throw $this->exception($key, 'rule missing "keys" or "element" or "value"');
         }
 
         if (isset($option['keys']) && $option['keys']) {
@@ -236,6 +243,14 @@ class Checker {
 
             foreach ($value as $element) {
                 $this->execute($element, $option['element']);
+            }
+
+            array_pop($this->path);
+        } elseif (isset($option['value']) && $option['value']) {
+            $this->path[] = $key;
+
+            foreach ($value as $k => $v) {
+                $this->check($k, $v, $option['value']);
             }
 
             array_pop($this->path);

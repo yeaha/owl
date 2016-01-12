@@ -228,6 +228,19 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
             ],
             'test "json" fails'
         );
+
+        $this->tryExecute(
+            [
+                'a' => [1, 2, 3, 'b'],
+            ],
+            [
+                'a' => [
+                    'type' => 'array',
+                    'value' => ['type' => 'integer']
+                ]
+            ],
+            'test array "value" fails'
+        );
     }
 
     public function testJson() {
