@@ -87,4 +87,14 @@ class Common {
      */
     public function validateValue($value, array $attribute) {
     }
+
+    /**
+     * 获得clone值
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public function cloneValue($value) {
+        return $value;
+    }
 }

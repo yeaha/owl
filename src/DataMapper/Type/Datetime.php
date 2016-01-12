@@ -32,4 +32,8 @@ class Datetime extends Common {
              ? null
              : new \DateTime($attribute['default']);
     }
+
+    public function cloneValue($value) {
+        return $value ? clone $value : $value;
+    }
 }

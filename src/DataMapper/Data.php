@@ -270,13 +270,17 @@ abstract class Data implements \JsonSerializable {
      */
     public function get($key) {
         $attribute = $this->prepareGet($key);
+        $type = Type::factory($attribute['type']);
 
         if (!array_key_exists($key, $this->values)) {
-            return Type::factory($attribute['type'])->getDefaultValue($attribute);
+            return $type->getDefaultValue($attribute);
         }
 
         $value = $this->values[$key];
-        return is_object($value) ? clone $value : $value;
+
+        // 当值是对象时，应该返回克隆对象而非原对象
+        // 防止对象在外部被修改
+        return $type->cloneValue($value);
     }
 
     /**
