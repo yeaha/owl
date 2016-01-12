@@ -95,6 +95,6 @@ class Common {
      * @return mixed
      */
     public function cloneValue($value) {
-        return $value;
+        return is_object($value) ? clone $value : $value;
     }
 }
