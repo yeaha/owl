@@ -24,6 +24,15 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $select;
     }
 
+    public function getBySQLAsIterator($sql, array $parameters = [], \Owl\Service $service = null) {
+        $service = $service ?: $this->getService();
+        $res = $service->execute($sql, $parameters);
+
+        while ($record = $res->fetch()) {
+            yield $this->pack($record);
+        }
+    }
+
     protected function doFind($id, \Owl\Service $service = null, $collection = null) {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
