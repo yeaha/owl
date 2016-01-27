@@ -87,8 +87,8 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
     public function testInteger() {
         $this->execute(['foo' => 1], ['foo' => ['type' => 'integer']]);
         $this->execute(['foo' => '1'], ['foo' => ['type' => 'integer']]);
-        $this->execute(['foo' => -1], ['foo' => ['type' => 'integer']]);
-        $this->execute(['foo' => '-1'], ['foo' => ['type' => 'integer']]);
+        $this->execute(['foo' => -1], ['foo' => ['type' => 'integer', 'allow_negative' => true]]);
+        $this->execute(['foo' => '-1'], ['foo' => ['type' => 'integer', 'allow_negative' => true]]);
 
         $this->tryExecute(
             ['foo' => 'bar'],
@@ -112,8 +112,8 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
     public function testNumeric() {
         $this->execute(['foo' => 1.1], ['foo' => ['type' => 'numeric']]);
         $this->execute(['foo' => '1.1'], ['foo' => ['type' => 'numeric']]);
-        $this->execute(['foo' => -1.1], ['foo' => ['type' => 'numeric']]);
-        $this->execute(['foo' => '-1.1'], ['foo' => ['type' => 'numeric']]);
+        $this->execute(['foo' => -1.1], ['foo' => ['type' => 'numeric', 'allow_negative' => true]]);
+        $this->execute(['foo' => '-1.1'], ['foo' => ['type' => 'numeric', 'allow_negative' => true]]);
 
         $this->tryExecute(
             ['foo' => 'bar'],

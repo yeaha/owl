@@ -93,11 +93,13 @@ class Checker {
     static public $types = [
         'integer' => [
             'regexp' => '/^\-?\d+$/',
-            'allow_negative' => true,
+            'allow_negative' => false,
+            'allow_zero' => true,
         ],
         'numeric' => [
             'regexp' => '/^\-?\d+(?:\.\d+)?$/',
-            'allow_negative' => true,
+            'allow_negative' => false,
+            'allow_zero' => true,
         ],
         'url' => [
             'regexp' => '#^[a-z]+://[0-9a-z\-\.]+\.[0-9a-z]{1,4}(?:\d+)?(?:/[^\?]*)?(?:\?[^\#]*)?(?:\#[0-9a-z\-\_\/]*)?$#',
@@ -190,26 +192,26 @@ class Checker {
             }
         }
 
-        if ($callback = $option['callback']) {
-            if (!call_user_func_array($callback, [$value, $option])) {
-                throw $this->exception($key, 'custom test failed');
-            }
-        }
-
         if ($option['type'] === 'bool' || $option['type'] === 'boolean') {
             if (!is_bool($value)) {
                 throw $this->exception($key, sprintf('must be TRUE or FALSE, current value is "%s"', $value));
             }
-        }
-
-        if ($option['type'] === 'integer' || $option['type'] === 'numeric') {
+        } elseif ($option['type'] === 'integer' || $option['type'] === 'numeric') {
             if ($value < 0 && !$option['allow_negative']) {
                 throw $this->exception($key, sprintf('not allow negative numeric, current value is "%s"', $value));
             }
+
+            if ($value == 0 && !$option['allow_zero']) {
+                throw $this->exception($key, sprintf('not allow zero, current value is "%s"', $value));
+            }
+        } elseif (!$option['allow_tags'] && \Owl\str_has_tags($value)) {
+            throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
         }
 
-        if (!$option['allow_tags'] && \Owl\str_has_tags($value)) {
-            throw $this->exception($key, sprintf('content not allow tags, current value is "%s"', $value));
+        if ($callback = $option['callback']) {
+            if (!call_user_func_array($callback, [$value, $option])) {
+                throw $this->exception($key, 'custom test failed');
+            }
         }
 
         return true;
