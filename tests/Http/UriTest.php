@@ -62,6 +62,18 @@ class UriTest extends \PHPUnit_Framework_TestCase {
             'getFragment' => 'f',
             '__toString' => '/p1?a=b&c=d#f',
         ]);
+
+        $this->assertMethods('//u:p@example.com/foo', [
+            'getScheme' => '',
+            'getUserInfo' => 'u:p',
+            'getAuthority' => 'u:p@example.com',
+            'getHost' => 'example.com',
+            'getPort' => null,
+            'getPath' => '/foo',
+            'getQuery' => '',
+            'getFragment' => '',
+            '__toString' => '//u:p@example.com/foo',
+        ]);
     }
 
     public function testSetter() {

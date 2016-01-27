@@ -72,14 +72,13 @@ class Uri implements UriInterface {
 
     public function getPort() {
         $port = $this->port;
-
         if ($port === null) {
             return null;
         }
 
         $scheme = $this->getScheme();
-        if (!$scheme || !isset(self::$standard_port[$scheme])) {
-            return $port;
+        if (!$scheme) {
+            return null;
         }
 
         return $port === self::$standard_port[$scheme]
@@ -127,9 +126,13 @@ class Uri implements UriInterface {
 
     public function withPort($port) {
         $uri = clone $this;
-        $uri->port = (int)$port;
+        $uri->port = ($port === null ? null : (int)$port);
 
         return $uri;
+    }
+
+    public function withoutPort() {
+        return $this->withPort(null);
     }
 
     public function withPath($path) {
@@ -165,11 +168,11 @@ class Uri implements UriInterface {
         $uri = '';
 
         if ($scheme = $this->getScheme()) {
-            $uri = $scheme.'://';
+            $uri = $scheme.':';
         }
 
         if ($authority = $this->getAuthority()) {
-            $uri .= $authority;
+            $uri .= '//'.$authority;
         } else {
             $uri = '';
         }
