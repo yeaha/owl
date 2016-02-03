@@ -30,7 +30,7 @@ class Cookie extends \Owl\Context {
     protected $response;
 
     public function __construct(array $config) {
-        (new \Owl\Parameter\Checker)->execute($config, [
+        (new \Owl\Parameter\Validator)->execute($config, [
             'request' => ['type' => 'object', 'instanceof' => '\Owl\Http\Request'],
             'response' => ['type' => 'object', 'instanceof' => '\Owl\Http\Response'],
         ]);

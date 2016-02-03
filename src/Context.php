@@ -11,7 +11,7 @@ abstract class Context {
     abstract public function clear();
 
     public function __construct(array $config) {
-        (new \Owl\Parameter\Checker)->execute($config, [
+        (new \Owl\Parameter\Validator)->execute($config, [
             'token' => ['type' => 'string'],
         ]);
 

@@ -55,7 +55,7 @@ class Router {
     }
 
     public function __construct(array $config = []) {
-        (new \Owl\Parameter\Checker)->execute($config, [
+        (new \Owl\Parameter\Validator)->execute($config, [
             'namespace' => ['type' => 'string'],
             'base_path' => ['type' => 'string', 'required' => false, 'regexp' => '#^/.+#'],
             'rewrite' => ['type' => 'hash', 'required' => false, 'allow_empty' => true, 'keys' => []],

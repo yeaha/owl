@@ -28,7 +28,7 @@ namespace Owl\DataMapper\Type;
  * $book->pushIn('doc', 'author', ['first_name' => 'F1', 'last_name' => 'L1']);
  * $book->pushIn('doc', 'author', ['first_name' => 'F2', 'last_name' => 'L2']);
  *
- * @see \Owl\Parameter\Checker
+ * @see \Owl\Parameter\Validator
  */
 class Complex extends Common {
     public function normalizeAttribute(array $attribute) {
@@ -63,7 +63,7 @@ class Complex extends Common {
         if ($attribute['schema']) {
             $value = \Owl\array_trim($value);
 
-            (new \Owl\Parameter\Checker)->execute($value, $attribute['schema']);
+            (new \Owl\Parameter\Validator)->execute($value, $attribute['schema']);
         }
     }
 }

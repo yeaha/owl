@@ -21,7 +21,7 @@ class Redis extends \Owl\Service {
 
     public function __construct(array $config = []) {
         if ($config) {
-            (new \Owl\Parameter\Checker)->execute($config, [
+            (new \Owl\Parameter\Validator)->execute($config, [
                 'host' => ['type' => 'ip', 'required' => false],
                 'port' => ['type' => 'integer', 'required' => false],
                 'timeout' => ['type' => 'integer', 'required' => false],
