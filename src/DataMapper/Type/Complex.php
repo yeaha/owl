@@ -13,9 +13,12 @@ namespace Owl\DataMapper\Type;
  *                 'description' => ['type' => 'string', 'required' => false, 'allow_empty' => true],
  *                 'author' => [
  *                     'type' => 'array',
- *                     'element' => [
- *                         'first_name' => ['type' => 'string'],
- *                         'last_name' => ['type' => 'string'],
+ *                     'value' => [
+ *                         'type' => 'array',
+ *                         'keys' => [
+ *                             'first_name' => ['type' => 'string'],
+ *                             'last_name' => ['type' => 'string'],
+ *                         ],
  *                     ],
  *                 ],
  *             ],
