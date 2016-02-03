@@ -1,8 +1,8 @@
 <?php
 namespace Tests\Parameter;
 
-class CheckerTest extends \PHPUnit_Framework_TestCase {
-    private $checker;
+class ValidatorTest extends \PHPUnit_Framework_TestCase {
+    private $validator;
 
     public function testRequired() {
         $this->execute(['foo' => 'bar'], ['foo' => ['type' => 'string']]);
@@ -415,12 +415,12 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
     }
 
     protected function setUp() {
-        $this->checker = new \Owl\Parameter\Checker;
+        $this->validator = new \Owl\Parameter\Validator;
     }
 
     private function tryExecute($values, array $options, $message) {
         try {
-            $this->checker->execute($values, $options);
+            $this->validator->execute($values, $options);
 
             $this->fail($message);
         } catch (\Owl\Parameter\Exception $ex) {
@@ -429,7 +429,7 @@ class CheckerTest extends \PHPUnit_Framework_TestCase {
     }
 
     private function execute(array $values, array $options) {
-        $result = $this->checker->execute($values, $options);
+        $result = $this->validator->execute($values, $options);
 
         $this->assertTrue($result);
     }
