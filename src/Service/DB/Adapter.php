@@ -14,6 +14,44 @@ abstract class Adapter extends \Owl\Service {
 
     abstract public function lastID($table = null, $column = null);
 
+    /**
+     * @return array
+     */
+    abstract public function getTables();
+
+    /**
+     * @param string $table
+     * @return [
+     *     (string) => [
+     *         'primary_key' => (boolean),
+     *         'type' => (string),
+     *         'sql_type' => (string),
+     *         'character_max_length' => (integer),
+     *         'numeric_precision' => (integer),
+     *         'numeric_scale' => (integer),
+     *         'default_value' => (mixed),
+     *         'not_null' => (boolean),
+     *         'comment' => (string),
+     *     ],
+     *     ...
+     * ]
+     */
+    abstract public function getColumns($table);
+
+    /**
+     * @param string $table
+     * @return [
+     *     [
+     *         'name' => (string),
+     *         'columns' => (array),
+     *         'is_primary' => (boolean),
+     *         'is_unique' => (boolean),
+     *     ],
+     *     ...
+     * ]
+     */
+    abstract public function getIndexes($table);
+
     public function __construct(array $config = []) {
         if (!isset($config['dsn'])) {
             throw new \InvalidArgumentException('Invalid database config, require "dsn" key.');

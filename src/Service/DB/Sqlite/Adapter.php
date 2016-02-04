@@ -11,4 +11,13 @@ class Adapter extends \Owl\Service\DB\Adapter {
     public function lastID($table = null, $column = null) {
         return $this->execute('SELECT last_insert_rowid()')->getCol();
     }
+
+    public function getTables() {
+    }
+
+    public function getColumns($table) {
+    }
+
+    public function getIndexes($table) {
+    }
 }
