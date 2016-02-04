@@ -220,6 +220,7 @@ class Validator {
             throw $this->exception($key, 'is not array type');
         }
 
+        // 兼容老式写法
         if (isset($rule['element'])) {
             $rule['value'] = [
                 'type' => 'array',
