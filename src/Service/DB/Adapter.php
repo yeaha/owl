@@ -198,10 +198,6 @@ abstract class Adapter extends \Owl\Service {
             return $value;
         }
 
-        if (is_numeric($value)) {
-            return $value;
-        }
-
         if ($value === null) {
             return 'NULL';
         }
