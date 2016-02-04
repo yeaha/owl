@@ -170,8 +170,11 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                         ],
                         'd' => [
                             'type' => 'array',
-                            'element' => [
-                                'e' => ['type' => 'integer'],
+                            'value' => [
+                                'type' => 'array',
+                                'keys' => [
+                                    'e' => ['type' => 'integer'],
+                                ],
                             ]
                         ]
                     ]
@@ -208,13 +211,16 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
             [
                 'a' => [
                     'type' => 'array',
-                    'element' => [
-                        'b' => ['type' => 'integer'],
-                        'c' => ['type' => 'integer'],
+                    'value' => [
+                        'type' => 'array',
+                        'keys' => [
+                            'b' => ['type' => 'integer'],
+                            'c' => ['type' => 'integer'],
+                        ],
                     ]
                 ]
             ],
-            'array "element" rule fails'
+            'array "value" rule fails'
         );
 
         $this->tryExecute(
@@ -274,8 +280,11 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                         ],
                         'd' => [
                             'type' => 'array',
-                            'element' => [
-                                'e' => ['type' => 'integer'],
+                            'value' => [
+                                'type' => 'array',
+                                'keys' => [
+                                    'e' => ['type' => 'integer'],
+                                ],
                             ]
                         ]
                     ]
@@ -312,13 +321,16 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
             [
                 'a' => [
                     'type' => 'json',
-                    'element' => [
-                        'b' => ['type' => 'integer'],
-                        'c' => ['type' => 'integer'],
+                    'value' => [
+                        'type' => 'array',
+                        'keys' => [
+                            'b' => ['type' => 'integer'],
+                            'c' => ['type' => 'integer'],
+                        ],
                     ]
                 ]
             ],
-            'json "element" rule fails'
+            'json "value" rule fails'
         );
     }
 
