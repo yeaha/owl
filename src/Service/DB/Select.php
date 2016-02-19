@@ -147,6 +147,9 @@ class Select {
      * $foo_select = $db->select('foo');
      * $bar_select = $db->select('bar');
      *
+     * // select * from foo where id in (select id from bar)
+     * $select->whereIn('id', new Expr('select id from bar'));
+     *
      * $foo_select->whereIn('id', $bar_select->setcolumns('foo_id')->where('bar > 1'));
      */
     public function whereIn($column, $relation) {
@@ -595,6 +598,8 @@ class Select {
         if ($relation instanceof Select) {
             list($sql, $params) = $relation->compile();
             $sub = $sql;
+        } elseif ($relation instanceof Expr) {
+            $sub = (string)$relation;
         } else {
             $sub = implode(',', $this->adapter->quote($relation));
         }

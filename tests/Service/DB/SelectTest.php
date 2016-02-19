@@ -98,6 +98,12 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
         list($sql, $params) = $select->compile();
 
         $this->assertEquals($sql, 'SELECT * FROM "mytable" WHERE ("id" IN (1,2,3))');
+
+        $select = $this->select('mytable');
+        $select->whereIn('id', new Expr('select id from other'));
+        list($sql, $params) = $select->compile();
+
+        $this->assertEquals($sql, 'SELECT * FROM "mytable" WHERE ("id" IN (select id from other))');
     }
 
     public function testUpdateWithoutWhere() {
