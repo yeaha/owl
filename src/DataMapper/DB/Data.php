@@ -12,7 +12,13 @@ class Data extends \Owl\DataMapper\Data {
         $result = [];
 
         foreach (static::getBySQLAsIterator($sql, $parameters, $service) as $data) {
-            $result[$data->id()] = $data;
+            $id = $data->id();
+
+            if (is_array($id)) {
+                $result[] = $data;
+            } else {
+                $result[$data->id()] = $data;
+            }
         }
 
         return $result;
