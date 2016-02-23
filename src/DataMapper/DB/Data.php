@@ -17,7 +17,7 @@ class Data extends \Owl\DataMapper\Data {
             if (is_array($id)) {
                 $result[] = $data;
             } else {
-                $result[$data->id()] = $data;
+                $result[$id] = $data;
             }
         }
 
