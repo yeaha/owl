@@ -59,6 +59,12 @@ abstract class Adapter extends \Owl\Service {
         parent::__construct($config);
     }
 
+    public function __destruct() {
+        if ($this->isConnected()) {
+            $this->rollbackAll();
+        }
+    }
+
     public function __sleep() {
         $this->disconnect();
     }
@@ -104,11 +110,7 @@ abstract class Adapter extends \Owl\Service {
 
     public function disconnect() {
         if ($this->isConnected()) {
-            $max = 9;   // 最多9次，避免死循环
-            while ($this->in_transaction && $max-- > 0) {
-                $this->rollback();
-            }
-
+            $this->rollbackAll();
             $this->handler = null;
 
             App::log('debug', 'database disconnected', ['dsn' => $this->getConfig('dsn')]);
@@ -324,5 +326,12 @@ abstract class Adapter extends \Owl\Service {
         }
 
         return $this->prepare($sql);
+    }
+
+    protected function rollbackAll() {
+        $max = 9;   // 最多9次，避免死循环
+        while ($this->in_transaction && $max-- > 0) {
+            $this->rollback();
+        }
     }
 }
