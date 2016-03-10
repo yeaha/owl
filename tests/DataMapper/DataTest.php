@@ -253,6 +253,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         try {
             $data->setIn('msg', 'foo', 1);
+            $this->fail('test setIn failed');
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
         }
 
@@ -268,11 +269,6 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertFalse($data->getIn('doc', 'foobar'));
         $this->assertFalse($data->getIn('doc', ['foo', 'bar']));
-
-        try {
-            $data->getIn('msg', 'foo');
-        } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
-        }
     }
 
     public function testPushIn() {
@@ -389,6 +385,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->setIn('doc', 'b', 1);
         try {
             $data->validate();
+            $this->fail('validate complex failed');
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
         }
 

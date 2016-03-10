@@ -347,7 +347,7 @@ abstract class Data implements \JsonSerializable {
         $path = (array)$path;
 
         if (!is_array($target)) {
-            throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
+            return false;
         }
 
         return \Owl\array_get_in($target, $path);
