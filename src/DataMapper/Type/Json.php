@@ -23,7 +23,17 @@ class Json extends Complex {
     public function store($value, array $attribute) {
         $value = parent::store($value, $attribute);
 
-        return $value ? json_encode($value, JSON_UNESCAPED_UNICODE) : null;
+        if ($this->isNull($value)) {
+            return null;
+        }
+
+        $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+
+        if ($value === false && json_last_error() !== JSON_ERROR_NONE) {
+            throw new \UnexpectedValueException(json_last_error_msg(), json_last_error());
+        }
+
+        return $value;
     }
 
     public function restore($value, array $attribute) {
