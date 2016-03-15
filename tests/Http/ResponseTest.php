@@ -1,9 +1,12 @@
 <?php
+
 namespace Tests\Http;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase {
-    public function test() {
-        $response = new \Owl\Http\Response;
+class ResponseTest extends \PHPUnit_Framework_TestCase
+{
+    public function test()
+    {
+        $response = new \Owl\Http\Response();
 
         // status
         $this->assertSame(200, $response->getStatusCode());
@@ -28,9 +31,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase {
 
         // body
         $response->write('foo');
-        $this->assertSame('foo', (string)$response->getBody());
+        $this->assertSame('foo', (string) $response->getBody());
 
         $response->write('bar');
-        $this->assertSame('foobar', (string)$response->getBody());
+        $this->assertSame('foobar', (string) $response->getBody());
     }
 }

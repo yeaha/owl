@@ -1,21 +1,26 @@
 <?php
+
 namespace Tests\DataMapper\Mongo;
 
-class MapperTest extends \PHPUnit_Framework_TestCase {
+class MapperTest extends \PHPUnit_Framework_TestCase
+{
     protected $class = '\Tests\Mock\DataMapper\Mongo\Data';
 
-    protected function setAttributes(array $attributes) {
+    protected function setAttributes(array $attributes)
+    {
         $class = $this->class;
         $class::getMapper()->setAttributes($attributes);
     }
 
-    protected function newData(array $values = [], array $options = []) {
+    protected function newData(array $values = [], array $options = [])
+    {
         $class = $this->class;
 
         return new $class($values, $options);
     }
 
-    public function testUnpack() {
+    public function testUnpack()
+    {
         $this->setAttributes([
             '_id' => ['primary_key' => true],
             'foo' => ['type' => 'string', 'allow_null' => true],

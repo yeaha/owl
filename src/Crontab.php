@@ -1,7 +1,9 @@
 <?php
+
 namespace Owl;
 
-abstract class Crontab {
+abstract class Crontab
+{
     use \Owl\Traits\Context;
 
     const KEY_PROC_ID = '__proc_id__';
@@ -13,17 +15,18 @@ abstract class Crontab {
 
     abstract protected function execute();
 
-    static private $logger;
+    private static $logger;
 
     /**
      * 执行任务
      *
-     * @return boolean
+     * @return bool
      */
-    public function start() {
+    public function start()
+    {
         $try = $this->tryStart();
         $this->log('debug', 'try start', [
-            'result' => (int)$try,
+            'result' => (int) $try,
         ]);
 
         if (!$try) {
@@ -54,11 +57,10 @@ abstract class Crontab {
     }
 
     /**
-     * 任务执行完毕
-     *
-     * @return void
+     * 任务执行完毕.
      */
-    public function stop() {
+    public function stop()
+    {
         $this->removeContext(self::KEY_PROC_ID);
         $this->removeContext(self::KEY_PROC_TIME);
         $this->saveContext();
@@ -69,9 +71,10 @@ abstract class Crontab {
     /**
      * 尝试开始任务
      *
-     * @return boolean
+     * @return bool
      */
-    protected function tryStart() {
+    protected function tryStart()
+    {
         // 检查是否达到预定时间
         try {
             if (!$this->testTimer()) {
@@ -125,15 +128,17 @@ abstract class Crontab {
     }
 
     /**
-     * 是否达到任务可执行时间
+     * 是否达到任务可执行时间.
      *
-     * @return boolean
+     * @return bool
      */
-    protected function testTimer() {
+    protected function testTimer()
+    {
         return false;
     }
 
-    protected function log($level, $message, array $context = []) {
+    protected function log($level, $message, array $context = [])
+    {
         if ($logger = self::$logger) {
             $defaults = [
                 'class' => get_class($this),
@@ -149,11 +154,13 @@ abstract class Crontab {
         }
     }
 
-    protected function getName() {
+    protected function getName()
+    {
         return $this->name ?: get_class($this);
     }
 
-    static public function setLogger(\Psr\Log\LoggerInterface $logger) {
+    public static function setLogger(\Psr\Log\LoggerInterface $logger)
+    {
         self::$logger = $logger;
     }
 }

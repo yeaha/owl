@@ -1,8 +1,11 @@
 <?php
+
 namespace Tests\Http;
 
-class UriTest extends \PHPUnit_Framework_TestCase {
-    public function testGetter() {
+class UriTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGetter()
+    {
         $this->assertMethods('', [
             'getScheme' => '',
             'getUserInfo' => '',
@@ -76,7 +79,8 @@ class UriTest extends \PHPUnit_Framework_TestCase {
         ]);
     }
 
-    public function testSetter() {
+    public function testSetter()
+    {
         $uri = new \Owl\Http\Uri('http://foo:bar@www.example.com:88/p1?a=b&c=d#f');
 
         $this->assertMethods($uri->withScheme('https'), [
@@ -130,7 +134,8 @@ class UriTest extends \PHPUnit_Framework_TestCase {
         ]);
     }
 
-    private function assertMethods($uri, $asserts) {
+    private function assertMethods($uri, $asserts)
+    {
         if (is_string($uri)) {
             $uri = new \Owl\Http\Uri($uri);
         }

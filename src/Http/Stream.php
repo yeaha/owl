@@ -1,23 +1,28 @@
 <?php
+
 namespace Owl\Http;
 
-abstract class Stream implements \Psr\Http\Message\StreamInterface {
+abstract class Stream implements \Psr\Http\Message\StreamInterface
+{
     protected $stream;
     protected $seekable = false;
     protected $readable = false;
     protected $writable = false;
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->close();
     }
 
-    public function close() {
+    public function close()
+    {
         $this->detach();
     }
 
-    public function detach() {
+    public function detach()
+    {
         if (!$this->stream) {
-            return null;
+            return;
         }
 
         $stream = $this->stream;
@@ -28,45 +33,54 @@ abstract class Stream implements \Psr\Http\Message\StreamInterface {
         return $stream;
     }
 
-    public function isSeekable() {
+    public function isSeekable()
+    {
         return $this->seekable;
     }
 
-    public function isReadable() {
+    public function isReadable()
+    {
         return $this->readable;
     }
 
-    public function isWritable() {
+    public function isWritable()
+    {
         return $this->writable;
     }
 
-    public function getSize() {
-        return null;
+    public function getSize()
+    {
+        return;
     }
 
-    public function seek($offset, $whence = SEEK_SET) {
+    public function seek($offset, $whence = SEEK_SET)
+    {
         if (!$this->seekable) {
             throw new \Exception('Stream is not seekable');
         }
     }
 
-    public function rewind() {
+    public function rewind()
+    {
         $this->seek(0);
     }
 
-    public function write($string) {
+    public function write($string)
+    {
         if (!$this->writable) {
             throw new \Exception('Stream is not writable');
         }
     }
 
-    public function read($length) {
+    public function read($length)
+    {
         if (!$this->readable) {
             throw new \Exception('Stream is not readable');
         }
     }
 
-    public function getMetaData($key = null) {
+    public function getMetaData($key = null)
+    {
         return $key === null ? [] : null;
     }
 }

@@ -1,11 +1,13 @@
 <?php
+
 namespace Owl\Service;
 
 if (!extension_loaded('redis')) {
     throw new \RuntimeException('Require redis extension!');
 }
 
-class Redis extends \Owl\Service {
+class Redis extends \Owl\Service
+{
     protected $config = array(
         'host' => '127.0.0.1',
         'port' => 6379,
@@ -19,9 +21,10 @@ class Redis extends \Owl\Service {
 
     protected $handler;
 
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         if ($config) {
-            (new \Owl\Parameter\Validator)->execute($config, [
+            (new \Owl\Parameter\Validator())->execute($config, [
                 'host' => ['type' => 'ip', 'required' => false],
                 'port' => ['type' => 'integer', 'required' => false],
                 'timeout' => ['type' => 'integer', 'required' => false],
@@ -36,19 +39,21 @@ class Redis extends \Owl\Service {
         }
     }
 
-    public function __call($fn, array $args) {
+    public function __call($fn, array $args)
+    {
         return $args
              ? call_user_func_array(array($this->connect(), $fn), $args)
              : $this->connect()->$fn();
     }
 
-    public function connect() {
+    public function connect()
+    {
         if ($this->handler) {
             return $this->handler;
         }
 
         $config = $this->config;
-        $handler = new \Redis;
+        $handler = new \Redis();
 
         // 优先使用unix socket
         $conn_args = $config['unix_socket']
@@ -81,7 +86,8 @@ class Redis extends \Owl\Service {
         return $this->handler = $handler;
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->handler instanceof \Redis) {
             $this->handler->close();
             $this->handler = null;
@@ -90,8 +96,10 @@ class Redis extends \Owl\Service {
         return $this;
     }
 
-    protected function isPersistent() {
+    protected function isPersistent()
+    {
         $config = $this->config;
+
         return $config['persistent_id'] && !$config['unix_socket'];
     }
 }

@@ -1,14 +1,18 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
-class Common {
+class Common
+{
     /**
-     * 格式化属性定义
+     * 格式化属性定义.
      *
      * @param array $attribute
+     *
      * @return array
      */
-    public function normalizeAttribute(array $attribute) {
+    public function normalizeAttribute(array $attribute)
+    {
         return $attribute;
     }
 
@@ -16,22 +20,27 @@ class Common {
      * 格式化属性值
      *
      * @see \Lysine\DataMapper\Data::set()
+     *
      * @param mixed $value
      * @param array $attribute
+     *
      * @return mixed
      */
-    public function normalize($value, array $attribute) {
+    public function normalize($value, array $attribute)
+    {
         return $value;
     }
 
     /**
-     * 把值转换为存储格式
+     * 把值转换为存储格式.
      *
      * @param mixed $value
      * @param array $attribute
+     *
      * @return mixed
      */
-    public function store($value, array $attribute) {
+    public function store($value, array $attribute)
+    {
         return $this->isNull($value) ? null : $value;
     }
 
@@ -40,9 +49,11 @@ class Common {
      *
      * @param mixed $value
      * @param array $attribute
+     *
      * @return mixed
      */
-    public function restore($value, array $attribute) {
+    public function restore($value, array $attribute)
+    {
         return $this->isNull($value)
              ? null
              : $this->normalize($value, $attribute);
@@ -52,20 +63,24 @@ class Common {
      * 获取默认值
      *
      * @param array $attribute
+     *
      * @return mixed
      */
-    public function getDefaultValue(array $attribute) {
+    public function getDefaultValue(array $attribute)
+    {
         return $attribute['default'];
     }
 
     /**
-     * 转换为对json_encode友好的格式
+     * 转换为对json_encode友好的格式.
      *
      * @param mixed $value
      * @param array $attribute
+     *
      * @return mixed
      */
-    public function toJSON($value, array $attribute) {
+    public function toJSON($value, array $attribute)
+    {
         return $value;
     }
 
@@ -73,28 +88,33 @@ class Common {
      * 判断值是否空值
      *
      * @param mixed $value
-     * @return boolean
+     *
+     * @return bool
      */
-    public function isNull($value) {
+    public function isNull($value)
+    {
         return $value === null || $value === '';
     }
 
     /**
-     * 自定义检查逻辑
+     * 自定义检查逻辑.
      *
      * @param mixed $value
      * @param array $attribute
      */
-    public function validateValue($value, array $attribute) {
+    public function validateValue($value, array $attribute)
+    {
     }
 
     /**
      * 获得clone值
      *
      * @param mixed $value
+     *
      * @return mixed
      */
-    public function cloneValue($value) {
+    public function cloneValue($value)
+    {
         return is_object($value) ? clone $value : $value;
     }
 }

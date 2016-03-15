@@ -1,11 +1,14 @@
 <?php
+
 namespace Owl\Http;
 
-class UploadFile extends \Psr\Http\Message\UploadFileInterface {
+class UploadFile extends \Psr\Http\Message\UploadFileInterface
+{
     protected $moved;
     protected $file;
 
-    public function __construct(array $file) {
+    public function __construct(array $file)
+    {
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
             throw new \InvalidArgumentException('File is invalid or not upload file via POST');
         }
@@ -13,7 +16,8 @@ class UploadFile extends \Psr\Http\Message\UploadFileInterface {
         $this->file = $file;
     }
 
-    public function getStream() {
+    public function getStream()
+    {
         if ($this->moved) {
             throw new \RuntimeException('File was moved to other directory');
         }
@@ -21,7 +25,8 @@ class UploadFile extends \Psr\Http\Message\UploadFileInterface {
         return new \Owl\Http\ResourceStream(fopen($this->file['tmp_name'], 'r'));
     }
 
-    public function moveTo($targetPath) {
+    public function moveTo($targetPath)
+    {
         if ($this->moved) {
             throw new \RuntimeException('File was moved to other directory');
         }
@@ -32,7 +37,7 @@ class UploadFile extends \Psr\Http\Message\UploadFileInterface {
 
         $this->moved = true;
 
-        $target = $targetPath .'/'. ($this->getClientFilename() ?: $this->file['tmp_name']);
+        $target = $targetPath.'/'.($this->getClientFilename() ?: $this->file['tmp_name']);
         if (!move_uploaded_file($this->file['tmp_name'], $target)) {
             throw new \RuntimeException('Unable to move upload file');
         }
@@ -40,23 +45,28 @@ class UploadFile extends \Psr\Http\Message\UploadFileInterface {
         return $target;
     }
 
-    public function getSize() {
+    public function getSize()
+    {
         return isset($this->file['size']) ? $this->file['size'] : null;
     }
 
-    public function getError() {
+    public function getError()
+    {
         return $this->file['error'];
     }
 
-    public function getClientFilename() {
+    public function getClientFilename()
+    {
         return isset($this->file['name']) ? $this->file['name'] : null;
     }
 
-    public function getClientMediaType() {
+    public function getClientMediaType()
+    {
         return isset($this->file['type']) ? $this->file['type'] : null;
     }
 
-    public function isError() {
+    public function isError()
+    {
         return $this->file['error'] !== UPLOAD_ERR_OK;
     }
 }

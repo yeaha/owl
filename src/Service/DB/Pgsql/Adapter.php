@@ -1,14 +1,17 @@
 <?php
+
 namespace Owl\Service\DB\Pgsql;
 
 if (!extension_loaded('pdo_pgsql')) {
     throw new \Exception('Require "pdo_pgsql" extension!');
 }
 
-class Adapter extends \Owl\Service\DB\Adapter {
+class Adapter extends \Owl\Service\DB\Adapter
+{
     protected $identifier_symbol = '"';
 
-    public function lastID($table = null, $column = null) {
+    public function lastID($table = null, $column = null)
+    {
         $sql = ($table && $column)
              ? sprintf("SELECT CURRVAL('%s')", $this->sequenceName($table, $column))
              : 'SELECT LASTVAL()';
@@ -16,12 +19,15 @@ class Adapter extends \Owl\Service\DB\Adapter {
         return $this->execute($sql)->getCol();
     }
 
-    public function nextID($table, $column) {
+    public function nextID($table, $column)
+    {
         $sql = sprintf("SELECT NEXTVAL('%s')", $this->sequenceName($table, $column));
+
         return $this->execute($sql)->getCol();
     }
 
-    public function getTables() {
+    public function getTables()
+    {
         $select = $this->select('information_schema.tables')
                        ->setColumns('table_schema', 'table_name')
                        ->whereNotIn('table_schema', ['pg_catalog', 'information_schema']);
@@ -34,7 +40,8 @@ class Adapter extends \Owl\Service\DB\Adapter {
         return $tables;
     }
 
-    public function getColumns($table) {
+    public function getColumns($table)
+    {
         $sql = <<< EOF
 with primary_keys as (
     select
@@ -97,7 +104,7 @@ EOF;
                 'numeric_scale' => $row['numeric_scale'] * 1,
                 'default_value' => $row['column_default'],
                 'not_null' => $row['is_nullable'] === 'NO',
-                'comment' => (string)$row['comment'],
+                'comment' => (string) $row['comment'],
             ];
 
             $columns[$name] = $column;
@@ -106,7 +113,8 @@ EOF;
         return $columns;
     }
 
-    public function getIndexes($table) {
+    public function getIndexes($table)
+    {
         list($scheme, $table) = $this->parseTableName($table);
 
         $sql = <<< EOF
@@ -154,23 +162,26 @@ EOF;
         return array_values($indexes);
     }
 
-    protected function sequenceName($table, $column) {
+    protected function sequenceName($table, $column)
+    {
         list($schema, $table) = $this->parseTableName($table);
 
         $sequence = sprintf('%s_%s_seq', $table, $column);
         if ($schema) {
-            $sequence = $schema .'.'. $sequence;
+            $sequence = $schema.'.'.$sequence;
         }
 
         return $this->quoteIdentifier($sequence);
     }
 
-    protected function parseTableName($table) {
+    protected function parseTableName($table)
+    {
         $table = str_replace('"', '', $table);
         $pos = strpos($table, '.');
 
         if ($pos) {
             list($schema, $table) = explode('.', $table, 2);
+
             return [$schema, $table];
         } else {
             return ['public', $table];

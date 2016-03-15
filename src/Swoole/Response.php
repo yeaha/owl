@@ -1,16 +1,20 @@
 <?php
+
 namespace Owl\Swoole;
 
-class Response extends \Owl\Http\Response {
+class Response extends \Owl\Http\Response
+{
     protected $swoole_response;
 
-    public function __construct($swoole_response) {
+    public function __construct($swoole_response)
+    {
         $this->swoole_response = $swoole_response;
 
         parent::__construct();
     }
 
-    protected function send() {
+    protected function send()
+    {
         $response = $this->swoole_response;
 
         $status = $this->getStatusCode();
@@ -38,7 +42,7 @@ class Response extends \Owl\Http\Response {
 
             $response->end('');
         } else {
-            $response->end((string)$body);
+            $response->end((string) $body);
         }
     }
 }

@@ -1,8 +1,11 @@
 <?php
+
 namespace Tests\Http;
 
-class RequestTest extends \PHPUnit_Framework_TestCase {
-    public function testGet() {
+class RequestTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGet()
+    {
         $request = \Owl\Http\Request::factory([
             'uri' => '/foobar?a=b',
             'get' => [
@@ -19,7 +22,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['a' => 'b', 'foo' => '1', 'bar' => ''], $request->get());
     }
 
-    public function testPost() {
+    public function testPost()
+    {
         $request = \Owl\Http\Request::factory([
             'method' => 'post',
             'post' => [
@@ -35,7 +39,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['foo' => '1', 'bar' => ''], $request->post());
     }
 
-    public function testCookie() {
+    public function testCookie()
+    {
         $request = \Owl\Http\Request::factory([
             'cookies' => [
                 'foo' => '1',
@@ -48,7 +53,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['foo' => '1', 'bar' => ''], $request->getCookies());
     }
 
-    public function testHeaders() {
+    public function testHeaders()
+    {
         $request = \Owl\Http\Request::factory([
             'headers' => [
                 'Accept-Encoding' => 'gzip,deflate',
@@ -66,7 +72,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         ], $request->getHeaders());
     }
 
-    public function testMethod() {
+    public function testMethod()
+    {
         foreach (['get', 'post', 'put', 'delete'] as $method) {
             $request = \Owl\Http\Request::factory([
                 'method' => $method,
@@ -96,7 +103,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('DELETE', $request->getMethod());
     }
 
-    public function testRequestURI() {
+    public function testRequestURI()
+    {
         $uri = '/foobar.json?foo=bar';
         $request = \Owl\Http\Request::factory([
             'uri' => $uri,
@@ -107,7 +115,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('json', $request->getUri()->getExtension());
     }
 
-    public function testGetIP() {
+    public function testGetIP()
+    {
         $server = [
             'REMOTE_ADDR' => '127.0.0.1',
             'HTTP_X_FORWARDED_FOR' => '192.168.1.2,3.3.3.3',

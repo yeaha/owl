@@ -1,21 +1,22 @@
 <?php
+
 namespace Owl\DataMapper;
 
-use Owl\DataMapper\Exception;
-use Owl\DataMapper\Type;
-
-abstract class Data implements \JsonSerializable {
+abstract class Data implements \JsonSerializable
+{
     /**
-     * 此Data class指定使用的Mapper class
+     * 此Data class指定使用的Mapper class.
+     *
      * @var string
      */
-    static protected $mapper = '\Owl\DataMapper\Mapper';
+    protected static $mapper = '\Owl\DataMapper\Mapper';
 
     /**
-     * Mapper配置信息
+     * Mapper配置信息.
+     *
      * @var array
      */
-    static protected $mapper_options = [
+    protected static $mapper_options = [
         'service' => '',        // 存储服务名
         'collection' => '',     // 存储集合名
         'readonly' => false,    // 是否只读
@@ -23,46 +24,67 @@ abstract class Data implements \JsonSerializable {
     ];
 
     /**
-     * 属性定义
+     * 属性定义.
+     *
      * @var array
      */
-    static protected $attributes = [];
+    protected static $attributes = [];
 
     /**
-     * 是否新对象，还没有保存到存储服务内的
-     * @var boolean
+     * 是否新对象，还没有保存到存储服务内的.
+     *
+     * @var bool
      */
     protected $fresh;
 
     /**
-     * 数据内容
+     * 数据内容.
+     *
      * @var array
      */
     protected $values = [];
 
     /**
-     * 被修改过的属性
+     * 被修改过的属性.
+     *
      * @var array
      */
     protected $dirty = [];
 
-    public function __beforeSave() {}
-    public function __afterSave() {}
+    public function __beforeSave()
+    {
+    }
+    public function __afterSave()
+    {
+    }
 
-    public function __beforeInsert() {}
-    public function __afterInsert() {}
+    public function __beforeInsert()
+    {
+    }
+    public function __afterInsert()
+    {
+    }
 
-    public function __beforeUpdate() {}
-    public function __afterUpdate() {}
+    public function __beforeUpdate()
+    {
+    }
+    public function __afterUpdate()
+    {
+    }
 
-    public function __beforeDelete() {}
-    public function __afterDelete() {}
+    public function __beforeDelete()
+    {
+    }
+    public function __afterDelete()
+    {
+    }
 
     /**
      * @param array [$values]
      * @param array [$options]
      */
-    public function __construct(array $values = null, array $options = null) {
+    public function __construct(array $values = null, array $options = null)
+    {
         $defaults = ['fresh' => true];
         $options = $options ? array_merge($defaults, $options) : $defaults;
 
@@ -95,36 +117,43 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * 读取属性
+     * 读取属性.
      *
      * @magic
+     *
      * @param string $key
+     *
      * @return mixed
      */
-    public function __get($key) {
+    public function __get($key)
+    {
         return $this->get($key);
     }
 
     /**
-     * 修改属性
+     * 修改属性.
      *
      * @magic
+     *
      * @param string $key
-     * $param mixed $value
-     * @return void
+     *                    $param mixed $value
      */
-    public function __set($key, $value) {
+    public function __set($key, $value)
+    {
         $this->set($key, $value, ['strict' => true]);
     }
 
     /**
-     * 检查属性值是否存在
+     * 检查属性值是否存在.
      *
      * @magic
+     *
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
-    public function __isset($key) {
+    public function __isset($key)
+    {
         return isset($this->values[$key]);
     }
 
@@ -143,10 +172,12 @@ abstract class Data implements \JsonSerializable {
      * $data->getFoobar();
      *
      * @magic
+     *
      * @param string $method
-     * @param array $args
+     * @param array  $args
      */
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         $prefix = strtolower(substr($method, 0, 3));
 
         if ($prefix != 'set' && $prefix != 'get') {
@@ -171,19 +202,23 @@ abstract class Data implements \JsonSerializable {
         }
 
         array_unshift($args, $key);
+
         return call_user_func_array([$this, $prefix], $args);
     }
 
     /**
      * 把数据打包到Data实例内
-     * 这个方法不应该被直接调用，只提供给Mapper调用
+     * 这个方法不应该被直接调用，只提供给Mapper调用.
      *
      * @internal
+     *
      * @param array $values
-     * @param boolean $replace
+     * @param bool  $replace
+     *
      * @return $this
      */
-    final public function __pack(array $values, $replace) {
+    final public function __pack(array $values, $replace)
+    {
         $this->values = $replace ? $values : array_merge($this->values, $values);
         $this->dirty = [];
         $this->fresh = false;
@@ -192,33 +227,38 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * 是否定义了指定属性
+     * 是否定义了指定属性.
      *
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
-    public function has($key) {
+    public function has($key)
+    {
         $mapper = static::getMapper();
-        return (bool)$mapper->hasAttribute($key);
+
+        return (bool) $mapper->hasAttribute($key);
     }
 
     /**
      * 修改属性值
      *
-     * @param string $key 属性名
-     * @param mixed $value 属性值
+     * @param string $key   属性名
+     * @param mixed  $value 属性值
      * @param array [$options]
-     * @param boolean [$options:force=false] 强制修改，忽略refuse_update设置
-     * @param boolean [$options:strict=true] 严格模式，出现错误会抛出异常，属性如果被标记为"strict"，就只能在严格模式下才能修改
+     * @param bool [$options:force=false] 强制修改，忽略refuse_update设置
+     * @param bool [$options:strict=true] 严格模式，出现错误会抛出异常，属性如果被标记为"strict"，就只能在严格模式下才能修改
+     *
      * @return $this
      *
-     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException 如果属性未定义
+     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException       如果属性未定义
      * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException 把null赋值给一个不允许为null的属性
      * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException 值没有通过设定的正则表达式检查
-     * @throws \Owl\DataMapper\Exception\DeprecatedPropertyException 属性被标记为“废弃”
-     * @throws \Owl\DataMapper\Exception\RefuseUpdatePropertyException 属性不允许更新修改
+     * @throws \Owl\DataMapper\Exception\DeprecatedPropertyException      属性被标记为“废弃”
+     * @throws \Owl\DataMapper\Exception\RefuseUpdatePropertyException    属性不允许更新修改
      */
-    public function set($key, $value, array $options = null) {
+    public function set($key, $value, array $options = null)
+    {
         $defaults = ['force' => false, 'strict' => true];
         $options = $options ? array_merge($defaults, $options) : $defaults;
 
@@ -242,17 +282,20 @@ abstract class Data implements \JsonSerializable {
         }
 
         $this->change($key, $value, $attribute);
+
         return $this;
     }
 
     /**
      * 把数据合并到Data实例
-     * 不允许修改或者不存在的字段会被自动忽略
+     * 不允许修改或者不存在的字段会被自动忽略.
      *
      * @param array $value
+     *
      * @return $this
      */
-    public function merge(array $values) {
+    public function merge(array $values)
+    {
         foreach ($values as $key => $value) {
             $this->set($key, $value, ['strict' => false]);
         }
@@ -264,11 +307,14 @@ abstract class Data implements \JsonSerializable {
      * 获取属性值
      *
      * @param string $key 属性名
+     *
      * @return mixed
-     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException 如果属性未定义
+     *
+     * @throws \Owl\DataMapper\Exception\UndefinedPropertyException  如果属性未定义
      * @throws \Owl\DataMapper\Exception\DeprecatedPropertyException 属性被标记为“废弃”
      */
-    public function get($key) {
+    public function get($key)
+    {
         $attribute = $this->prepareGet($key);
         $type = Type::factory($attribute['type']);
 
@@ -284,17 +330,19 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * @param string $key
+     * @param string       $key
      * @param array|string $path
-     * @param mixed $value
-     * @param boolean $push
+     * @param mixed        $value
+     * @param bool         $push
+     *
      * @return $this
      */
-    public function setIn($key, $path, $value, $push = false) {
+    public function setIn($key, $path, $value, $push = false)
+    {
         $this->prepareSet($key);
 
         $target = $this->get($key);
-        $path = (array)$path;
+        $path = (array) $path;
 
         if (!is_array($target)) {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
@@ -307,25 +355,29 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * @param string $key
+     * @param string       $key
      * @param array|string $path
-     * @param mixed $value
+     * @param mixed        $value
+     *
      * @return $this
      */
-    public function pushIn($key, $path, $value) {
+    public function pushIn($key, $path, $value)
+    {
         return $this->setIn($key, $path, $value, true);
     }
 
     /**
-     * @param string $key
+     * @param string       $key
      * @param array|string $path
+     *
      * @return $this
      */
-    public function unsetIn($key, $path) {
+    public function unsetIn($key, $path)
+    {
         $this->prepareSet($key);
 
         $target = $this->get($key);
-        $path = (array)$path;
+        $path = (array) $path;
 
         if (!is_array($target)) {
             throw new Exception\UnexpectedPropertyValueException(get_class($this).": Property {$key} is not complex type");
@@ -338,13 +390,15 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * @param string $key
+     * @param string       $key
      * @param array|string $path
+     *
      * @return mixed|false
      */
-    public function getIn($key, $path) {
+    public function getIn($key, $path)
+    {
         $target = $this->get($key);
-        $path = (array)$path;
+        $path = (array) $path;
 
         if (!is_array($target)) {
             return false;
@@ -355,9 +409,10 @@ abstract class Data implements \JsonSerializable {
 
     /**
      * 获得所有的或指定的属性值，以数组格式返回
-     * 自动忽略无效的属性值以及尚未赋值的属性
+     * 自动忽略无效的属性值以及尚未赋值的属性.
      *
      * @param mixed... $keys
+     *
      * @return mixed[]
      *
      * @example
@@ -367,7 +422,8 @@ abstract class Data implements \JsonSerializable {
      * $data->pick(array('foo', 'bar'));
      * </code>
      */
-    public function pick($keys = null) {
+    public function pick($keys = null)
+    {
         if ($keys === null) {
             $attributes = static::getMapper()->getAttributes();
             $keys = [];
@@ -392,11 +448,12 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * 获得所有的属性值，返回便于json处理的数据格式
+     * 获得所有的属性值，返回便于json处理的数据格式.
      *
      * @return mixed[]
      */
-    public function toJSON() {
+    public function toJSON()
+    {
         $mapper = static::getMapper();
         $json = [];
 
@@ -409,52 +466,59 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * implement \JsonSerializable
+     * implement \JsonSerializable.
      *
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->toJSON();
     }
 
     /**
-     * 获得所有属性值，以数组形式返回
+     * 获得所有属性值，以数组形式返回.
      *
      * @return array
      */
-    public function toArray() {
+    public function toArray()
+    {
         return $this->pick();
     }
 
     /**
-     * 此实例是否从未被保存过
+     * 此实例是否从未被保存过.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isFresh() {
+    public function isFresh()
+    {
         return $this->fresh;
     }
 
     /**
      * 是否被修改过
-     * 可以按照指定的属性名检查
+     * 可以按照指定的属性名检查.
      *
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
-    public function isDirty($key = null) {
+    public function isDirty($key = null)
+    {
         return $key === null
-             ? (bool)$this->dirty
+             ? (bool) $this->dirty
              : isset($this->dirty[$key]);
     }
 
     /**
-     * 获得主键值，如果是多字段主键，以数组方式返回
+     * 获得主键值，如果是多字段主键，以数组方式返回.
      *
-     * @param boolean $as_array
-     * @return string|integer|array
+     * @param bool $as_array
+     *
+     * @return string|int|array
      */
-    public function id($as_array = false) {
+    public function id($as_array = false)
+    {
         $keys = static::getMapper()->getPrimaryKey();
         $id = [];
 
@@ -471,42 +535,47 @@ abstract class Data implements \JsonSerializable {
 
     /**
      * 从存储服务内重新获取数据
-     * 抛弃所有尚未被保存过的修改
+     * 抛弃所有尚未被保存过的修改.
      *
      * @return $this
      */
-    public function refresh() {
+    public function refresh()
+    {
         return static::getMapper()->refresh($this);
     }
 
     /**
-     * 保存数据到存储服务内
+     * 保存数据到存储服务内.
      *
-     * @return boolean
+     * @return bool
      */
-    public function save() {
+    public function save()
+    {
         return static::getMapper()->save($this);
     }
 
     /**
-     * 从存储服务内删除本条数据
+     * 从存储服务内删除本条数据.
      *
-     * @return boolean
+     * @return bool
      */
-    public function destroy() {
+    public function destroy()
+    {
         return static::getMapper()->destroy($this);
     }
 
     /**
-     * 检查所有赋值的有效性
+     * 检查所有赋值的有效性.
      *
      * "fresh"对象会检查所有值
      * 非"fresh"对象只检查修改过的值
      *
      * @return true
+     *
      * @throws \Owl\DataMapper\Exception\UnexpectedPropertyValueException
      */
-    public function validate() {
+    public function validate()
+    {
         $attributes = static::getMapper()->getAttributes();
         $keys = $this->isFresh() ? array_keys($attributes) : array_keys($this->dirty);
 
@@ -547,30 +616,34 @@ abstract class Data implements \JsonSerializable {
 
     /**
      * 格式化属性值
-     * 可以通过重载此方法实现自定义格式化逻辑
+     * 可以通过重载此方法实现自定义格式化逻辑.
      *
-     * @param string $key 属性名
-     * @param mixed $value 属性值
-     * @param array $attribute 属性定义信息
+     * @param string $key       属性名
+     * @param mixed  $value     属性值
+     * @param array  $attribute 属性定义信息
+     *
      * @return mixed 格式化过后的值
      */
-    protected function normalize($key, $value, array $attribute) {
+    protected function normalize($key, $value, array $attribute)
+    {
         return Type::factory($attribute['type'])->normalize($value, $attribute);
     }
 
     /**
      * @param string $key
+     *
      * @return array
      */
-    protected function prepareSet($key, $force = false) {
+    protected function prepareSet($key, $force = false)
+    {
         if (!$attribute = static::getMapper()->getAttribute($key)) {
             throw new Exception\UndefinedPropertyException(get_class($this).": Undefined property {$key}");
         }
 
         if ($attribute['deprecated']) {
-            throw new Exception\DeprecatedPropertyException(get_class($this) .": Property {$key} is deprecated");
+            throw new Exception\DeprecatedPropertyException(get_class($this).": Property {$key} is deprecated");
         } elseif (!$force && $attribute['refuse_update'] && !$this->isFresh()) {
-            throw new Exception\RefuseUpdatePropertyException(get_class($this) .": Property {$key} refuse update");
+            throw new Exception\RefuseUpdatePropertyException(get_class($this).": Property {$key} refuse update");
         }
 
         return $attribute;
@@ -578,15 +651,17 @@ abstract class Data implements \JsonSerializable {
 
     /**
      * @param string $key
+     *
      * @return array
      */
-    protected function prepareGet($key) {
+    protected function prepareGet($key)
+    {
         if (!$attribute = static::getMapper()->getAttribute($key)) {
             throw new Exception\UndefinedPropertyException(get_class($this).": Undefined property {$key}");
         }
 
         if ($attribute['deprecated']) {
-            throw new Exception\DeprecatedPropertyException(get_class($this) .": Property {$key} is deprecated");
+            throw new Exception\DeprecatedPropertyException(get_class($this).": Property {$key} is deprecated");
         }
 
         return $attribute;
@@ -596,11 +671,11 @@ abstract class Data implements \JsonSerializable {
      * 修改属性值并把被修改的属性标记为被修改过的状态
      *
      * @param string $key
-     * @param mixed $value
-     * @param array $attribute
-     * @return void
+     * @param mixed  $value
+     * @param array  $attribute
      */
-    final protected function change($key, $value, array $attribute = null) {
+    final protected function change($key, $value, array $attribute = null)
+    {
         $attribute = $attribute ?: static::getMapper()->getAttribute($key);
         $type = Type::factory($attribute['type']);
 
@@ -619,41 +694,47 @@ abstract class Data implements \JsonSerializable {
     }
 
     /**
-     * 根据主键值查询生成Data实例
+     * 根据主键值查询生成Data实例.
      *
      * @param mixed $id
+     *
      * @return Data|false
      */
-    static public function find($id) {
+    public static function find($id)
+    {
         return static::getMapper()->find($id);
     }
 
     /**
-     * 获取单条数据，数据不存在则抛出异常
+     * 获取单条数据，数据不存在则抛出异常.
      *
      * @param mixed $id
+     *
      * @return Data
      */
-    static public function findOrFail($id) {
+    public static function findOrFail($id)
+    {
         if ($data = static::find($id)) {
             return $data;
         }
 
-        throw new \Owl\DataMapper\Exception\DataNotFoundException;
+        throw new \Owl\DataMapper\Exception\DataNotFoundException();
     }
 
     /**
-     * 获得当前Data class的Mapper实例
+     * 获得当前Data class的Mapper实例.
      *
      * @return Mapper
      */
-    final static public function getMapper() {
+    final public static function getMapper()
+    {
         $class = static::$mapper;
-        return $class::factory( get_called_class() );
+
+        return $class::factory(get_called_class());
     }
 
     /**
-     * 获得当前Data class的配置信息
+     * 获得当前Data class的配置信息.
      *
      * @return
      * array(
@@ -664,7 +745,8 @@ abstract class Data implements \JsonSerializable {
      *     'strict' => (boolean),
      * )
      */
-    final static public function getOptions() {
+    final public static function getOptions()
+    {
         $options = static::$mapper_options;
         $options['attributes'] = static::$attributes;
 

@@ -1,10 +1,11 @@
 <?php
+
 namespace Owl\Service\DB;
 
 use Owl\Application as App;
-use Owl\Service\DB\Expr;
 
-abstract class Adapter extends \Owl\Service {
+abstract class Adapter extends \Owl\Service
+{
     protected $handler;
 
     protected $identifier_symbol = '`';
@@ -21,65 +22,73 @@ abstract class Adapter extends \Owl\Service {
 
     /**
      * @param string $table
+     *
      * @return [
-     *     (string) => [
-     *         'primary_key' => (boolean),
-     *         'type' => (string),
-     *         'sql_type' => (string),
-     *         'character_max_length' => (integer),
-     *         'numeric_precision' => (integer),
-     *         'numeric_scale' => (integer),
-     *         'default_value' => (mixed),
-     *         'not_null' => (boolean),
-     *         'comment' => (string),
-     *     ],
-     *     ...
-     * ]
+     *           (string) => [
+     *           'primary_key' => (boolean),
+     *           'type' => (string),
+     *           'sql_type' => (string),
+     *           'character_max_length' => (integer),
+     *           'numeric_precision' => (integer),
+     *           'numeric_scale' => (integer),
+     *           'default_value' => (mixed),
+     *           'not_null' => (boolean),
+     *           'comment' => (string),
+     *           ],
+     *           ...
+     *           ]
      */
     abstract public function getColumns($table);
 
     /**
      * @param string $table
+     *
      * @return [
-     *     [
-     *         'name' => (string),
-     *         'columns' => (array),
-     *         'is_primary' => (boolean),
-     *         'is_unique' => (boolean),
-     *     ],
-     *     ...
-     * ]
+     *           [
+     *           'name' => (string),
+     *           'columns' => (array),
+     *           'is_primary' => (boolean),
+     *           'is_unique' => (boolean),
+     *           ],
+     *           ...
+     *           ]
      */
     abstract public function getIndexes($table);
 
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         if (!isset($config['dsn'])) {
             throw new \InvalidArgumentException('Invalid database config, require "dsn" key.');
         }
         parent::__construct($config);
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         if ($this->isConnected()) {
             $this->rollbackAll();
         }
     }
 
-    public function __sleep() {
+    public function __sleep()
+    {
         $this->disconnect();
     }
 
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         return $args
              ? call_user_func_array([$this->connect(), $method], $args)
              : $this->connect()->$method();
     }
 
-    public function isConnected() {
+    public function isConnected()
+    {
         return $this->handler instanceof \PDO;
     }
 
-    public function connect() {
+    public function connect()
+    {
         if ($this->isConnected()) {
             return $this->handler;
         }
@@ -108,7 +117,8 @@ abstract class Adapter extends \Owl\Service {
         return $this->handler = $handler;
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->isConnected()) {
             $this->rollbackAll();
             $this->handler = null;
@@ -119,7 +129,8 @@ abstract class Adapter extends \Owl\Service {
         return $this;
     }
 
-    public function begin() {
+    public function begin()
+    {
         if ($this->in_transaction) {
             if (!$this->support_savepoint) {
                 throw new \Exception(get_class($this).' unsupport savepoint');
@@ -136,7 +147,8 @@ abstract class Adapter extends \Owl\Service {
         return true;
     }
 
-    public function commit() {
+    public function commit()
+    {
         if ($this->in_transaction) {
             if ($this->savepoints) {
                 $savepoint = array_pop($this->savepoints);
@@ -150,7 +162,8 @@ abstract class Adapter extends \Owl\Service {
         return true;
     }
 
-    public function rollback() {
+    public function rollback()
+    {
         if ($this->in_transaction) {
             if ($this->savepoints) {
                 $savepoint = array_pop($this->savepoints);
@@ -164,11 +177,13 @@ abstract class Adapter extends \Owl\Service {
         return true;
     }
 
-    public function inTransaction() {
+    public function inTransaction()
+    {
         return $this->in_transaction;
     }
 
-    public function execute($sql, $params = null) {
+    public function execute($sql, $params = null)
+    {
         $params = $params === null
                 ? []
                 : is_array($params) ? $params : array_slice(func_get_args(), 1);
@@ -188,11 +203,13 @@ abstract class Adapter extends \Owl\Service {
         return $sth;
     }
 
-    public function quote($value) {
+    public function quote($value)
+    {
         if (is_array($value)) {
             foreach ($value as $k => $v) {
                 $value[$k] = $this->quote($v);
             }
+
             return $value;
         }
 
@@ -207,7 +224,8 @@ abstract class Adapter extends \Owl\Service {
         return $this->connect()->quote($value);
     }
 
-    public function quoteIdentifier($identifier) {
+    public function quoteIdentifier($identifier)
+    {
         if (is_array($identifier)) {
             return array_map([$this, 'quoteIdentifier'], $identifier);
         }
@@ -227,30 +245,34 @@ abstract class Adapter extends \Owl\Service {
         return new Expr(implode('.', $result));
     }
 
-    public function select($table) {
+    public function select($table)
+    {
         return new \Owl\Service\DB\Select($this, $table);
     }
 
-    public function insert($table, array $row) {
+    public function insert($table, array $row)
+    {
         $params = [];
         foreach ($row as $value) {
-            if ( !($value instanceof Expr) ) {
+            if (!($value instanceof Expr)) {
                 $params[] = $value;
             }
         }
 
         $sth = $this->prepareInsert($table, $row);
+
         return $this->execute($sth, $params)->rowCount();
     }
 
-    public function update($table, array $row, $where = null, $params = null) {
+    public function update($table, array $row, $where = null, $params = null)
+    {
         $where_params = ($where === null || $params === null)
                       ? []
                       : is_array($params) ? $params : array_slice(func_get_args(), 3);
 
         $params = [];
         foreach ($row as $value) {
-            if ( !($value instanceof Expr) ) {
+            if (!($value instanceof Expr)) {
                 $params[] = $value;
             }
         }
@@ -260,19 +282,23 @@ abstract class Adapter extends \Owl\Service {
         }
 
         $sth = $this->prepareUpdate($table, $row, $where);
+
         return $this->execute($sth, $params)->rowCount();
     }
 
-    public function delete($table, $where = null, $params = null) {
+    public function delete($table, $where = null, $params = null)
+    {
         $params = ($where === null || $params === null)
                 ? []
                 : is_array($params) ? $params : array_slice(func_get_args(), 2);
 
         $sth = $this->prepareDelete($table, $where);
+
         return $this->execute($sth, $params)->rowCount();
     }
 
-    public function prepareInsert($table, array $columns) {
+    public function prepareInsert($table, array $columns)
+    {
         $values = array_values($columns);
 
         if ($values === $columns) {
@@ -281,7 +307,9 @@ abstract class Adapter extends \Owl\Service {
             $columns = array_keys($columns);
 
             foreach ($values as $key => $value) {
-                if ($value instanceof Expr) continue;
+                if ($value instanceof Expr) {
+                    continue;
+                }
                 $values[$key] = '?';
             }
         }
@@ -296,39 +324,42 @@ abstract class Adapter extends \Owl\Service {
         return $this->prepare($sql);
     }
 
-    public function prepareUpdate($table, array $columns, $where = null) {
+    public function prepareUpdate($table, array $columns, $where = null)
+    {
         $only_column = (array_values($columns) === $columns);
 
         $set = [];
         foreach ($columns as $column => $value) {
             if ($only_column) {
-                $set[] = $this->quoteIdentifier($value) .' = ?';
+                $set[] = $this->quoteIdentifier($value).' = ?';
             } else {
                 $value = ($value instanceof Expr) ? $value : '?';
-                $set[] = $this->quoteIdentifier($column) .' = '. $value;
+                $set[] = $this->quoteIdentifier($column).' = '.$value;
             }
         }
 
         $sql = sprintf('UPDATE %s SET %s', $this->quoteIdentifier($table), implode(',', $set));
         if ($where) {
-            $sql .= ' WHERE '. $where;
+            $sql .= ' WHERE '.$where;
         }
 
         return $this->prepare($sql);
     }
 
-    public function prepareDelete($table, $where = null) {
+    public function prepareDelete($table, $where = null)
+    {
         $table = $this->quoteIdentifier($table);
 
         $sql = sprintf('DELETE FROM %s', $table);
         if ($where) {
-            $sql .= ' WHERE '. $where;
+            $sql .= ' WHERE '.$where;
         }
 
         return $this->prepare($sql);
     }
 
-    protected function rollbackAll() {
+    protected function rollbackAll()
+    {
         $max = 9;   // 最多9次，避免死循环
         while ($this->in_transaction && $max-- > 0) {
             $this->rollback();

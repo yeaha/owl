@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Service;
 
 /**
@@ -35,12 +36,14 @@ namespace Owl\Service;
  * $master = $container->get('mysql.master');
  * $slave = $container->get('mysql.slave', 123);
  */
-class Container extends \Owl\Container {
+class Container extends \Owl\Container
+{
     use \Owl\Traits\Singleton;
 
     protected $router = [];
 
-    public function setServices(array $services) {
+    public function setServices(array $services)
+    {
         foreach ($services as $id => $options) {
             $this->setService($id, $options);
         }
@@ -48,12 +51,15 @@ class Container extends \Owl\Container {
         return $this;
     }
 
-    public function setRouter($id, \Closure $handler) {
+    public function setRouter($id, \Closure $handler)
+    {
         $this->router[$id] = $handler;
+
         return $this;
     }
 
-    public function get($id) {
+    public function get($id)
+    {
         if ($this->has($id)) {
             return parent::get($id);
         }
@@ -68,12 +74,14 @@ class Container extends \Owl\Container {
         return call_user_func_array($handler, $args);
     }
 
-    public function reset() {
+    public function reset()
+    {
         parent::reset();
         $this->router = [];
     }
 
-    public function refresh() {
+    public function refresh()
+    {
         foreach ($this->values as $service) {
             $service->disconnect();
         }
@@ -81,8 +89,9 @@ class Container extends \Owl\Container {
         parent::refresh();
     }
 
-    protected function setService($id, array $options) {
-        $this->set($id, function() use ($options) {
+    protected function setService($id, array $options)
+    {
+        $this->set($id, function () use ($options) {
             if (!isset($options['class'])) {
                 throw new \InvalidArgumentException('Require service class name');
             }
@@ -93,6 +102,7 @@ class Container extends \Owl\Container {
             }
 
             unset($options['class']);
+
             return new $class($options);
         });
     }

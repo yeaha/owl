@@ -1,8 +1,11 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
-class UUID extends Common {
-    public function normalizeAttribute(array $attribute) {
+class UUID extends Common
+{
+    public function normalizeAttribute(array $attribute)
+    {
         $attribute = array_merge([
             'upper' => false,
         ], $attribute);
@@ -14,7 +17,8 @@ class UUID extends Common {
         return $attribute;
     }
 
-    public function getDefaultValue(array $attribute) {
+    public function getDefaultValue(array $attribute)
+    {
         if (!$attribute['auto_generate']) {
             return $attribute['default'];
         }
@@ -29,7 +33,8 @@ class UUID extends Common {
     }
 
     // http://php.net/manual/en/function.uniqid.php#94959
-    static public function generate() {
+    public static function generate()
+    {
         if (version_compare(PHP_VERSION, '7.0.0', '<')) {
             return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
                 mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff),

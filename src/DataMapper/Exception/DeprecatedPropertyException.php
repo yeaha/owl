@@ -1,5 +1,7 @@
 <?php
+
 namespace Owl\DataMapper\Exception;
 
-class DeprecatedPropertyException extends PropertyException {
+class DeprecatedPropertyException extends PropertyException
+{
 }

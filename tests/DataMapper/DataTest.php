@@ -1,23 +1,26 @@
 <?php
+
 namespace Tests\DataMapper;
 
-use \Owl\DataMapper\Data;
-
-class DataTest extends \PHPUnit_Framework_TestCase {
+class DataTest extends \PHPUnit_Framework_TestCase
+{
     protected $class = '\Tests\Mock\DataMapper\Data';
 
-    protected function setAttributes(array $attributes) {
+    protected function setAttributes(array $attributes)
+    {
         $class = $this->class;
         $class::getMapper()->setAttributes($attributes);
     }
 
-    protected function newData(array $values = [], array $options = []) {
+    protected function newData(array $values = [], array $options = [])
+    {
         $class = $this->class;
 
         return new $class($values, $options);
     }
 
-    public function testConstruct() {
+    public function testConstruct()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'default' => 'foo'),
@@ -32,7 +35,7 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($data->bar);
 
         $data = $this->newData(array(
-            'bar' => 'bar'
+            'bar' => 'bar',
         ));
 
         $this->assertEquals($data->bar, 'bar');
@@ -48,11 +51,13 @@ class DataTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \RuntimeException
      * @expectedExceptionMessageRegExp /primary key/
      */
-    public function testBadConstruct() {
+    public function testBadConstruct()
+    {
         $this->setAttributes(array());
     }
 
-    public function testSetStrict() {
+    public function testSetStrict()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'strict' => true),
@@ -73,7 +78,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($data->foo, 'bar');
     }
 
-    public function testSetRefuseUpdate() {
+    public function testSetRefuseUpdate()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'refuse_update' => true),
@@ -94,7 +100,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->foo = 'foo';
     }
 
-    public function testSetSame() {
+    public function testSetSame()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'allow_null' => true),
@@ -112,7 +119,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($data->isDirty('bar'));
     }
 
-    public function testSetUndefined() {
+    public function testSetUndefined()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         ));
@@ -126,7 +134,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->bar = 'bar';
     }
 
-    public function testGetUndefined() {
+    public function testGetUndefined()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         ));
@@ -137,17 +146,19 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $data->foo;
     }
 
-    public function testGetObjectValue() {
+    public function testGetObjectValue()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
-            'time' => array('type' => 'datetime', 'default' => 'now')
+            'time' => array('type' => 'datetime', 'default' => 'now'),
         ));
 
         $data = $this->newData();
         $this->assertNotSame($data->time, $data->time);
     }
 
-    public function testPick() {
+    public function testPick()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
             'foo' => array('type' => 'string', 'protected' => true),
@@ -172,7 +183,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse(array_key_exists('baz', $values));
     }
 
-    public function testGetID() {
+    public function testGetID()
+    {
         $this->setAttributes(array(
             'foo' => array('type' => 'string', 'primary_key' => true),
         ));
@@ -190,7 +202,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($data->id(), array('foo' => 'foo', 'bar' => 'bar'));
     }
 
-    public function testGetOptions() {
+    public function testGetOptions()
+    {
         $foo_options = \Tests\Mock\DataMapper\FooData::getOptions();
 
         $this->assertEquals($foo_options['service'], 'foo.service');
@@ -206,7 +219,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(count($bar_options['attributes']), 3);
     }
 
-    public function testDeprecatedPrimaryKey() {
+    public function testDeprecatedPrimaryKey()
+    {
         $this->setExpectedExceptionRegExp('\RuntimeException', '/primary key/');
 
         $this->setAttributes(array(
@@ -214,7 +228,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         ));
     }
 
-    public function testDeprecatedAttribute() {
+    public function testDeprecatedAttribute()
+    {
         $this->setAttributes(array(
             'id' => array('type' => 'string', 'primary_key' => true),
             'bar' => array('type' => 'string', 'deprecated' => true),
@@ -233,7 +248,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $bar = $data->bar;
     }
 
-    public function testSetIn() {
+    public function testSetIn()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true],
             'doc' => ['type' => 'json'],
@@ -263,7 +279,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
     /**
      * @depends testSetIn
      */
-    public function testGetIn($data) {
+    public function testGetIn($data)
+    {
         $this->assertSame(1, $data->getIn('doc', 'foo'));
         $this->assertSame(2, $data->getIn('doc', 'bar'));
 
@@ -271,7 +288,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($data->getIn('doc', ['foo', 'bar']));
     }
 
-    public function testPushIn() {
+    public function testPushIn()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true],
             'doc' => ['type' => 'json'],
@@ -294,7 +312,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(['a' => ['b' => [1, 2]]], $data->doc);
     }
 
-    public function testValidateAttributeAllowNull() {
+    public function testValidateAttributeAllowNull()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'foo' => ['type' => 'string'],
@@ -340,7 +359,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testValidateAttributePattern() {
+    public function testValidateAttributePattern()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'foo' => ['type' => 'string', 'pattern' => '/^a.+z$/'],
@@ -359,7 +379,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($data->validate());
     }
 
-    public function testValidateComplexTypeProperty() {
+    public function testValidateComplexTypeProperty()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'doc' => [
@@ -405,7 +426,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($data->validate());
     }
 
-    public function testGetterSetter() {
+    public function testGetterSetter()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'foo' => ['type' => 'string'],
@@ -436,7 +458,8 @@ class DataTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testAllowTags() {
+    public function testAllowTags()
+    {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
             'foo' => ['type' => 'string', 'allow_tags' => true],
@@ -459,23 +482,25 @@ class DataTest extends \PHPUnit_Framework_TestCase {
 
 namespace Tests\Mock\DataMapper;
 
-class FooData extends \Owl\DataMapper\Data {
-    static protected $mapper_options = [
+class FooData extends \Owl\DataMapper\Data
+{
+    protected static $mapper_options = [
         'service' => 'foo.service',
         'collection' => 'foo.collection',
     ];
-    static protected $attributes = array(
+    protected static $attributes = array(
         'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
         'foo' => array('type' => 'string'),
     );
 }
 
-class BarData extends FooData {
-    static protected $mapper_options = [
+class BarData extends FooData
+{
+    protected static $mapper_options = [
         'service' => 'bar.service',
         'collection' => 'bar.collection',
     ];
-    static protected $attributes = array(
+    protected static $attributes = array(
         'bar' => array('type' => 'string'),
     );
 }

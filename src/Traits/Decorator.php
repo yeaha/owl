@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Traits;
 
 /**
@@ -33,18 +34,22 @@ namespace Owl\Traits;
  * echo $bar->getMessage();
  * // OUTPUT: foobar
  */
-trait Decorator {
+trait Decorator
+{
     protected $reference;
 
-    public function __get($key) {
+    public function __get($key)
+    {
         return $this->getReference()->$key;
     }
 
-    public function __set($key, $value) {
+    public function __set($key, $value)
+    {
         $this->getReference()->$key = $value;
     }
 
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         $reference = $this->getReference();
 
         return $args
@@ -52,7 +57,8 @@ trait Decorator {
              : $reference->$method();
     }
 
-    protected function getReference() {
+    protected function getReference()
+    {
         if (!$this->reference) {
             throw new \Exception(get_class($this).': undefined reference object.');
         }

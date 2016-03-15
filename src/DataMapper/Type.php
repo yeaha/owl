@@ -1,28 +1,32 @@
 <?php
+
 namespace Owl\DataMapper;
 
-class Type {
+class Type
+{
     /**
-     * 数据类型helper实例缓存
+     * 数据类型helper实例缓存.
      *
      * @var array
      */
     protected $types = [];
 
     /**
-     * 数据类型对应类名数组
+     * 数据类型对应类名数组.
      *
      * @var array
      */
     protected $type_classes = [];
 
     /**
-     * 根据数据类型名字获得对应的数据类型helper
+     * 根据数据类型名字获得对应的数据类型helper.
      *
      * @param string $type
+     *
      * @return object 数据类型helper实例
      */
-    public function get($type) {
+    public function get($type)
+    {
         $type = strtolower($type);
 
         if ($type == 'int') {
@@ -42,17 +46,20 @@ class Type {
         }
 
         $class = $this->type_classes[$type];
-        return $this->types[$type] = new $class;
+
+        return $this->types[$type] = new $class();
     }
 
     /**
-     * 注册一个新的数据类型helper
+     * 注册一个新的数据类型helper.
      *
-     * @param string $type 数据类型名字
+     * @param string $type  数据类型名字
      * @param string $class helper类名
+     *
      * @return $this
      */
-    public function register($type, $class) {
+    public function register($type, $class)
+    {
         $type = strtolower($type);
         $this->type_classes[$type] = $class;
 
@@ -60,22 +67,26 @@ class Type {
     }
 
     /**
-     * 工厂方法
+     * 工厂方法.
      *
      * @param string $name
+     *
      * @return object
      */
-    static public function factory($name) {
+    public static function factory($name)
+    {
         return static::getInstance()->get($name);
     }
 
     /**
-     * 格式化并补全属性定义数组
+     * 格式化并补全属性定义数组.
      *
      * @param array $attribute
+     *
      * @return array
      */
-    static public function normalizeAttribute(array $attribute) {
+    public static function normalizeAttribute(array $attribute)
+    {
         $defaults = [
             // 是否允许为空
             'allow_null' => false,
@@ -140,10 +151,11 @@ class Type {
         return $attribute;
     }
 
-    static private $instance;
+    private static $instance;
 
-    static public function getInstance() {
-        return self::$instance ?: (self::$instance = new self);
+    public static function getInstance()
+    {
+        return self::$instance ?: (self::$instance = new self());
     }
 }
 

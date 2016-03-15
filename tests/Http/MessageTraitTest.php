@@ -1,9 +1,12 @@
 <?php
+
 namespace Tests\Http;
 
-class MessageTraitTest extends \PHPUnit_Framework_TestCase {
-    public function testImmutability() {
-        $message = new Message;
+class MessageTraitTest extends \PHPUnit_Framework_TestCase
+{
+    public function testImmutability()
+    {
+        $message = new Message();
 
         $this->assertSame('1.1', $message->getProtocolVersion());
 
@@ -17,8 +20,9 @@ class MessageTraitTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($new === $message);
     }
 
-    public function testHeaders() {
-        $message = new Message;
+    public function testHeaders()
+    {
+        $message = new Message();
 
         $this->assertSame([], $message->getHeader('foo'));
 
@@ -41,10 +45,12 @@ class MessageTraitTest extends \PHPUnit_Framework_TestCase {
     }
 }
 
-class Message {
+class Message
+{
     use \Owl\Http\MessageTrait;
 
-    public function setImmutability($value) {
-        $this->immutability = (bool)$value;
+    public function setImmutability($value)
+    {
+        $this->immutability = (bool) $value;
     }
 }

@@ -1,9 +1,11 @@
 <?php
+
 namespace Owl\Http;
 
 use Psr\Http\Message\StreamInterface;
 
-trait MessageTrait {
+trait MessageTrait
+{
     protected $immutability = true;
 
     protected $protocol_version = '1.1';
@@ -17,28 +19,33 @@ trait MessageTrait {
      */
     protected $body;
 
-    public function getProtocolVersion() {
+    public function getProtocolVersion()
+    {
         return $this->protocol_version;
     }
 
-    public function withProtocolVersion($version) {
+    public function withProtocolVersion($version)
+    {
         $result = $this->immutability ? clone $this : $this;
         $result->protocol_version = $version;
 
         return $result;
     }
 
-    public function getHeaders() {
+    public function getHeaders()
+    {
         return $this->headers;
     }
 
-    public function hasHeader($name) {
+    public function hasHeader($name)
+    {
         $name = strtolower($name);
 
         return array_key_exists($name, $this->headers);
     }
 
-    public function getHeader($name) {
+    public function getHeader($name)
+    {
         $name = strtolower($name);
 
         if (!$this->hasHeader($name)) {
@@ -46,16 +53,19 @@ trait MessageTrait {
         }
 
         $value = $this->headers[$name];
+
         return is_array($value) ? $value : [$value];
     }
 
-    public function getHeaderLine($name) {
+    public function getHeaderLine($name)
+    {
         $value = $this->getHeader($name);
 
         return $value ? implode(',', $value) : '';
     }
 
-    public function withHeader($name, $value) {
+    public function withHeader($name, $value)
+    {
         $result = $this->immutability ? clone $this : $this;
         $name = strtolower($name);
 
@@ -64,7 +74,8 @@ trait MessageTrait {
         return $result;
     }
 
-    public function withAddedHeader($name, $value) {
+    public function withAddedHeader($name, $value)
+    {
         if ($values = $this->getHeader($name)) {
             $values[] = $value;
         } else {
@@ -74,7 +85,8 @@ trait MessageTrait {
         return $this->withHeader($name, $values);
     }
 
-    public function withoutHeader($name) {
+    public function withoutHeader($name)
+    {
         if (!$this->hasHeader($name)) {
             return $this;
         }
@@ -87,11 +99,13 @@ trait MessageTrait {
         return $result;
     }
 
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
-    public function withBody(StreamInterface $body) {
+    public function withBody(StreamInterface $body)
+    {
         if ($body === $this->body) {
             return $this;
         }
@@ -102,23 +116,29 @@ trait MessageTrait {
         return $result;
     }
 
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return $this->attributes;
     }
 
-    public function getAttribute($name, $default = null) {
+    public function getAttribute($name, $default = null)
+    {
         return isset($this->attributes[$name])
              ? $this->attributes[$name]
              : $default;
     }
 
-    public function withAttribute($name, $value) {
+    public function withAttribute($name, $value)
+    {
         $this->attributes[$name] = $value;
+
         return $this;
     }
 
-    public function withoutAttribute($name) {
+    public function withoutAttribute($name)
+    {
         unset($this->attributes[$name]);
+
         return $this;
     }
 }

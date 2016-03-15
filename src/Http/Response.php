@@ -1,9 +1,9 @@
 <?php
+
 namespace Owl\Http;
 
-use Owl\Http\StringStream;
-
-class Response implements \Psr\Http\Message\ResponseInterface {
+class Response implements \Psr\Http\Message\ResponseInterface
+{
     use \Owl\Http\MessageTrait;
 
     protected $code = 200;
@@ -14,32 +14,37 @@ class Response implements \Psr\Http\Message\ResponseInterface {
 
     protected $end = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->immutability = false;
         $this->reset();
     }
 
-    public function reset() {
+    public function reset()
+    {
         $this->attributes = [];
         $this->code = 200;
         $this->cookies = [];
         $this->headers = [];
-        $this->body = new StringStream;
+        $this->body = new StringStream();
         $this->end = false;
     }
 
-    public function getStatusCode() {
+    public function getStatusCode()
+    {
         return $this->code;
     }
 
-    public function withStatus($code, $reasonPhrase = '') {
-        $this->code = (int)$code;
+    public function withStatus($code, $reasonPhrase = '')
+    {
+        $this->code = (int) $code;
         $this->reason_phrase = $reasonPhrase;
 
         return $this;
     }
 
-    public function getReasonPhrase() {
+    public function getReasonPhrase()
+    {
         if ($this->reason_phrase) {
             return $this->reason_phrase;
         }
@@ -47,32 +52,38 @@ class Response implements \Psr\Http\Message\ResponseInterface {
         return \Owl\Http::getStatusPhrase($this->code);
     }
 
-    public function getCookies() {
+    public function getCookies()
+    {
         return $this->cookies;
     }
 
-    public function withCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true) {
+    public function withCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true)
+    {
         if ($secure === null) {
-            $secure = isset($_SERVER['HTTPS']) ? (bool)$_SERVER['HTTPS'] : false;
+            $secure = isset($_SERVER['HTTPS']) ? (bool) $_SERVER['HTTPS'] : false;
         }
 
         $key = sprintf('%s@%s:%s', $name, $domain, $path);
         $this->cookies[$key] = [$name, $value, $expire, $path, $domain, $secure, $httponly];
+
         return $this;
     }
 
-    public function redirect($url, $status = 303) {
+    public function redirect($url, $status = 303)
+    {
         return $this->withStatus($status)
                     ->withHeader('Location', $url);
     }
 
-    public function write($data) {
+    public function write($data)
+    {
         $this->getBody()->write($data);
 
         return $this;
     }
 
-    public function end($data = null) {
+    public function end($data = null)
+    {
         if ($this->end) {
             return $this;
         }
@@ -88,7 +99,8 @@ class Response implements \Psr\Http\Message\ResponseInterface {
         return $this;
     }
 
-    protected function send() {
+    protected function send()
+    {
         if (!headers_sent()) {
             $code = $this->getStatusCode();
             $version = $this->getProtocolVersion();
@@ -118,63 +130,71 @@ class Response implements \Psr\Http\Message\ResponseInterface {
                 echo $string;
             }
         } else {
-            echo (string)$body;
+            echo (string) $body;
         }
     }
 
     /**
      * @deprecated
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         return $this->withStatus($status);
     }
 
     /**
      * @deprecated
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->getStatusCode();
     }
 
     /**
      * @deprecated
      */
-    public function setHeader($key, $value) {
+    public function setHeader($key, $value)
+    {
         return $this->withHeader($key, $value);
     }
 
     /**
      * @deprecated
      */
-    public function setCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true) {
+    public function setCookie($name, $value, $expire = 0, $path = '/', $domain = null, $secure = null, $httponly = true)
+    {
         return $this->withCookie($name, $value, $expire, $path, $domain, $secure, $httponly);
     }
 
     /**
      * @deprecated
      */
-    public function setBody($body) {
+    public function setBody($body)
+    {
         return $this->write($body);
     }
 
     /**
      * @deprecated
      */
-    public function setParameter($key, $value) {
+    public function setParameter($key, $value)
+    {
         return $this->withAttribute($key, $value);
     }
 
     /**
      * @deprecated
      */
-    public function getParameter($key) {
+    public function getParameter($key)
+    {
         return $this->getAttribute($key);
     }
 
     /**
      * @deprecated
      */
-    public function getParameters() {
+    public function getParameters()
+    {
         return $this->getAttributes();
     }
 }

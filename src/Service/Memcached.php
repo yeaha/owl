@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Service;
 
 if (!extension_loaded('memcached')) {
@@ -20,10 +21,12 @@ if (!extension_loaded('memcached')) {
  *
  * $memcached = new \Owl\Service\Memcached($config);
  */
-class Memcached extends \Owl\Service {
+class Memcached extends \Owl\Service
+{
     protected $memcached;
 
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         $memcached = $this->connect();
 
         return $args
@@ -31,7 +34,8 @@ class Memcached extends \Owl\Service {
              : $memcached->$method();
     }
 
-    public function connect() {
+    public function connect()
+    {
         if ($this->memcached) {
             return $this->memcached;
         }
@@ -51,7 +55,8 @@ class Memcached extends \Owl\Service {
         return $this->memcached = $memcached;
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->memcached) {
             $this->memcached->quit();
             $this->memcached = null;

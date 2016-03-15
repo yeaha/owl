@@ -1,8 +1,11 @@
 <?php
+
 namespace Tests;
 
-class FunctionsTest extends \PHPUnit_Framework_TestCase {
-    public function testStrHasTags() {
+class FunctionsTest extends \PHPUnit_Framework_TestCase
+{
+    public function testStrHasTags()
+    {
         $cases = [
             '<' => false,
             '< a >' => false,
@@ -13,7 +16,8 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testArraySetIn() {
+    public function testArraySetIn()
+    {
         $target = [];
 
         \Owl\array_set_in($target, ['a', 'b', 'c', 'd'], 1);
@@ -23,7 +27,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                     'c' => [
                         'd' => 1,
                     ],
-                ]
+                ],
             ],
         ], $target);
 
@@ -35,7 +39,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                         'd' => 1,
                     ],
                     'e' => 2,
-                ]
+                ],
             ],
         ], $target);
 
@@ -47,7 +51,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                         'd' => 1,
                     ],
                     'e' => 2,
-                ]
+                ],
             ],
             'f' => 3,
         ], $target);
@@ -55,7 +59,8 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
         return $target;
     }
 
-    public function testArrayPushIn() {
+    public function testArrayPushIn()
+    {
         $target = [];
 
         \Owl\array_push_in($target, ['a'], 1);
@@ -86,8 +91,8 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
             ],
             'b' => [
                 'c' => [
-                    'd' => ['e']
-                ]
+                    'd' => ['e'],
+                ],
             ],
         ], $target);
     }
@@ -95,7 +100,8 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @depends testArraySetIn
      */
-    public function testArrayGetIn(array $target) {
+    public function testArrayGetIn(array $target)
+    {
         $this->assertSame(3, \Owl\array_get_in($target, ['f']));
         $this->assertSame(1, \Owl\array_get_in($target, ['a', 'b', 'c', 'd']));
         $this->assertSame(2, \Owl\array_get_in($target, ['a', 'b', 'e']));
@@ -111,7 +117,8 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
     /**
      * @depends testArrayGetIn
      */
-    public function testArrayUnsetIn(array $target) {
+    public function testArrayUnsetIn(array $target)
+    {
         \Owl\array_unset_in($target, ['a', 'b', 'e']);
         $this->assertSame([
             'a' => [
@@ -119,7 +126,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                     'c' => [
                         'd' => 1,
                     ],
-                ]
+                ],
             ],
             'f' => 3,
         ], $target);
@@ -130,7 +137,7 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                 'b' => [
                     'c' => [
                     ],
-                ]
+                ],
             ],
             'f' => 3,
         ], $target);
@@ -141,26 +148,29 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase {
                 'b' => [
                     'c' => [
                     ],
-                ]
+                ],
             ],
         ], $target);
     }
 
-    public function testArraySetInException() {
+    public function testArraySetInException()
+    {
         $target = ['a' => ['b' => 1]];
 
         $this->setExpectedException('\RuntimeException');
         \Owl\array_set_in($target, ['a', 'b', 'c'], 2);
     }
 
-    public function testArrayPushInException() {
+    public function testArrayPushInException()
+    {
         $target = ['a' => ['b' => 1]];
 
         $this->setExpectedException('\RuntimeException');
         \Owl\array_push_in($target, ['a', 'b'], 2);
     }
 
-    public function testArrayTrim() {
+    public function testArrayTrim()
+    {
         $target = [
             'a' => 1,
             'b' => null,

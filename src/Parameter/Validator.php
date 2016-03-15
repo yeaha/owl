@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Parameter;
 
 /**
@@ -87,8 +88,9 @@ namespace Owl\Parameter;
  *     ],
  * ]);
  */
-class Validator {
-    static public $types = [
+class Validator
+{
+    public static $types = [
         'integer' => [
             'regexp' => '/^\-?\d+$/',
             'allow_negative' => false,
@@ -115,7 +117,8 @@ class Validator {
 
     private $path = [];
 
-    public function execute(array $values, array $rules) {
+    public function execute(array $values, array $rules)
+    {
         foreach ($rules as $key => $rule) {
             $rule = $this->normalizeRule($rule);
 
@@ -142,7 +145,8 @@ class Validator {
         return true;
     }
 
-    protected function check($key, $value, array $rule) {
+    protected function check($key, $value, array $rule)
+    {
         if (!isset($rule['__normalized__'])) {
             $rule = $this->normalizeRule($rule);
         }
@@ -159,7 +163,8 @@ class Validator {
         }
     }
 
-    protected function checkScalar($key, $value, array $rule) {
+    protected function checkScalar($key, $value, array $rule)
+    {
         if (isset($rule['same'])) {
             if ($value === $rule['same']) {
                 return true;
@@ -215,7 +220,8 @@ class Validator {
         return true;
     }
 
-    protected function checkArray($key, $value, array $rule) {
+    protected function checkArray($key, $value, array $rule)
+    {
         if (!is_array($value)) {
             throw $this->exception($key, 'is not array type');
         }
@@ -253,17 +259,19 @@ class Validator {
         return true;
     }
 
-    protected function checkJson($key, $value, array $rule) {
+    protected function checkJson($key, $value, array $rule)
+    {
         $value = json_decode($value, true);
 
         if ($value === null && ($error = json_last_error_msg())) {
-            throw $this->exception($key, 'json_decode() failed, '. $error);
+            throw $this->exception($key, 'json_decode() failed, '.$error);
         }
 
         return $this->checkArray($key, $value, $rule);
     }
 
-    protected function checkObject($key, $value, array $rule) {
+    protected function checkObject($key, $value, array $rule)
+    {
         if (!is_object($value)) {
             throw $this->exception($key, 'is not object');
         }
@@ -275,7 +283,8 @@ class Validator {
         return true;
     }
 
-    protected function normalizeRule(array $rule) {
+    protected function normalizeRule(array $rule)
+    {
         if (isset($rule['type'], self::$types[$rule['type']])) {
             $rule = array_merge(self::$types[$rule['type']], $rule);
         }
@@ -312,7 +321,8 @@ class Validator {
         return $rule;
     }
 
-    private function exception($key, $message) {
+    private function exception($key, $message)
+    {
         $this->path[] = $key;
         $message = 'Key ['.implode('=>', $this->path).'], '.$message;
 
@@ -322,7 +332,8 @@ class Validator {
         return $exception;
     }
 
-    static public function setType($type, array $rule) {
+    public static function setType($type, array $rule)
+    {
         static::$types[$type] = $rule;
     }
 }

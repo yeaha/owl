@@ -1,10 +1,13 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
-use \Owl\Service\DB\Expr;
+use Owl\Service\DB\Expr;
 
-class PgsqlHstore extends Complex {
-    public function normalize($value, array $attribute) {
+class PgsqlHstore extends Complex
+{
+    public function normalize($value, array $attribute)
+    {
         if ($this->isNull($value)) {
             return [];
         }
@@ -16,13 +19,15 @@ class PgsqlHstore extends Complex {
         return $value;
     }
 
-    public function store($value, array $attribute) {
+    public function store($value, array $attribute)
+    {
         $value = parent::store($value, $attribute);
 
         return $value ? self::encode($value) : null;
     }
 
-    public function restore($value, array $attribute) {
+    public function restore($value, array $attribute)
+    {
         if ($this->isNull($value)) {
             return [];
         }
@@ -30,9 +35,10 @@ class PgsqlHstore extends Complex {
         return self::decode($value);
     }
 
-    static public function encode($array) {
+    public static function encode($array)
+    {
         if (!$array) {
-            return NULL;
+            return;
         }
 
         if (!is_array($array)) {
@@ -47,7 +53,7 @@ class PgsqlHstore extends Complex {
 
             $key = str_replace($search, $replace, $key);
 
-            if ($val === NULL) {
+            if ($val === null) {
                 $val = 'NULL';
             } else {
                 $val = rtrim($val, '\\');       // 以\结尾的字符串，无法用正则表达式解析
@@ -60,7 +66,8 @@ class PgsqlHstore extends Complex {
         return new Expr(sprintf("'%s'::hstore", implode(',', $expr)));
     }
 
-    static public function decode($hstore) {
+    public static function decode($hstore)
+    {
         if (!$hstore || !preg_match_all('/"(.+)(?<!\\\)"=>(NULL|""|".+(?<!\\\)"),?/Us', $hstore, $match, PREG_SET_ORDER)) {
             return [];
         }
@@ -71,14 +78,14 @@ class PgsqlHstore extends Complex {
             list(, $k, $v) = $set;
 
             $v = $v === 'NULL'
-               ? NULL
+               ? null
                : substr($v, 1, -1);
 
             $search = ['\"', '\\\\'];
             $replace = ['"', '\\'];
 
             $k = str_replace($search, $replace, $k);
-            if ($v !== NULL) {
+            if ($v !== null) {
                 $v = str_replace($search, $replace, $v);
             }
 

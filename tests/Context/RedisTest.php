@@ -1,12 +1,15 @@
 <?php
+
 namespace Tests\Context;
 
-class RedisTest extends \PHPUnit_Framework_TestCase {
-    public function testRedisContext() {
+class RedisTest extends \PHPUnit_Framework_TestCase
+{
+    public function testRedisContext()
+    {
         $config = [
             'token' => uniqid(),
             'ttl' => 300,
-            'service' => new \Owl\Service\Redis,
+            'service' => new \Owl\Service\Redis(),
         ];
         $handler = new \Tests\Mock\Context\Redis($config);
 

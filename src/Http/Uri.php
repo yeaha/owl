@@ -1,10 +1,12 @@
 <?php
+
 namespace Owl\Http;
 
 use Psr\Http\Message\UriInterface;
 
-class Uri implements UriInterface {
-    static public $standard_port = [
+class Uri implements UriInterface
+{
+    public static $standard_port = [
         'ftp' => 21,
         'ssh' => 22,
         'smtp' => 25,
@@ -22,7 +24,8 @@ class Uri implements UriInterface {
     protected $query;
     protected $fragment;
 
-    public function __construct($uri = '') {
+    public function __construct($uri = '')
+    {
         $parsed = [];
         if ($uri) {
             $parsed = parse_url($uri) ?: [];
@@ -38,11 +41,13 @@ class Uri implements UriInterface {
         $this->fragment = isset($parsed['fragment']) ? $parsed['fragment'] : '';
     }
 
-    public function getScheme() {
+    public function getScheme()
+    {
         return $this->scheme;
     }
 
-    public function getAuthority() {
+    public function getAuthority()
+    {
         $authority = $this->getHost();
 
         if ($user_info = $this->getUserInfo()) {
@@ -56,7 +61,8 @@ class Uri implements UriInterface {
         return $authority;
     }
 
-    public function getUserInfo() {
+    public function getUserInfo()
+    {
         $user_info = $this->user;
 
         if ($user_info !== '' && $this->password) {
@@ -66,19 +72,21 @@ class Uri implements UriInterface {
         return $user_info;
     }
 
-    public function getHost() {
+    public function getHost()
+    {
         return $this->host;
     }
 
-    public function getPort() {
+    public function getPort()
+    {
         $port = $this->port;
         if ($port === null) {
-            return null;
+            return;
         }
 
         $scheme = $this->getScheme();
         if (!$scheme) {
-            return null;
+            return;
         }
 
         return $port === self::$standard_port[$scheme]
@@ -86,30 +94,36 @@ class Uri implements UriInterface {
              : $port;
     }
 
-    public function getPath() {
+    public function getPath()
+    {
         return $this->path;
     }
 
-    public function getExtension() {
+    public function getExtension()
+    {
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }
 
-    public function getQuery() {
+    public function getQuery()
+    {
         return $this->query;
     }
 
-    public function getFragment() {
+    public function getFragment()
+    {
         return $this->fragment;
     }
 
-    public function withScheme($scheme) {
+    public function withScheme($scheme)
+    {
         $uri = clone $this;
         $uri->scheme = $scheme;
 
         return $uri;
     }
 
-    public function withUserInfo($user, $password = null) {
+    public function withUserInfo($user, $password = null)
+    {
         $uri = clone $this;
         $uri->user = $user;
         $uri->password = $password;
@@ -117,32 +131,37 @@ class Uri implements UriInterface {
         return $uri;
     }
 
-    public function withHost($host) {
+    public function withHost($host)
+    {
         $uri = clone $this;
         $uri->host = $host;
 
         return $uri;
     }
 
-    public function withPort($port) {
+    public function withPort($port)
+    {
         $uri = clone $this;
-        $uri->port = ($port === null ? null : (int)$port);
+        $uri->port = ($port === null ? null : (int) $port);
 
         return $uri;
     }
 
-    public function withoutPort() {
+    public function withoutPort()
+    {
         return $this->withPort(null);
     }
 
-    public function withPath($path) {
+    public function withPath($path)
+    {
         $uri = clone $this;
         $uri->path = $path ?: '/';
 
         return $uri;
     }
 
-    public function withQuery($query) {
+    public function withQuery($query)
+    {
         if (is_array($query)) {
             $query = http_build_query($query);
         }
@@ -153,7 +172,8 @@ class Uri implements UriInterface {
         return $uri;
     }
 
-    public function withFragment($fragment) {
+    public function withFragment($fragment)
+    {
         if (!is_string($fragment)) {
             throw new \InvalidArgumentException('Invalid URI fragment');
         }
@@ -164,7 +184,8 @@ class Uri implements UriInterface {
         return $uri;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         $uri = '';
 
         if ($scheme = $this->getScheme()) {

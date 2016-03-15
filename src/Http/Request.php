@@ -1,12 +1,14 @@
 <?php
+
 namespace Owl\Http;
 
-use \Owl\Http\ResourceStream;
-use \Owl\Http\Uri;
-use \Psr\Http\Message\ServerRequestInterface;
-use \Psr\Http\Message\UriInterface;
+use Owl\Http\ResourceStream;
+use Owl\Http\Uri;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 
-class Request implements ServerRequestInterface {
+class Request implements ServerRequestInterface
+{
     use \Owl\Http\MessageTrait;
 
     protected $get;
@@ -17,7 +19,8 @@ class Request implements ServerRequestInterface {
     protected $uri;
     protected $allow_client_proxy_ip = false;
 
-    public function __construct($get = null, $post = null, $server = null, $cookies = null, $files = null) {
+    public function __construct($get = null, $post = null, $server = null, $cookies = null, $files = null)
+    {
         $this->get = $get === null ? $_GET : $get;
         $this->post = $post === null ? $_POST : $post;
         $this->server = $server === null ? $_SERVER : $server;
@@ -27,12 +30,14 @@ class Request implements ServerRequestInterface {
         $this->initialize();
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->method = null;
         $this->uri = null;
     }
 
-    public function get($key = null) {
+    public function get($key = null)
+    {
         if ($key === null) {
             return $this->get;
         }
@@ -40,7 +45,8 @@ class Request implements ServerRequestInterface {
         return isset($this->get[$key]) ? $this->get[$key] : null;
     }
 
-    public function post($key = null) {
+    public function post($key = null)
+    {
         if ($key === null) {
             return $this->post;
         }
@@ -48,19 +54,23 @@ class Request implements ServerRequestInterface {
         return isset($this->post[$key]) ? $this->post[$key] : null;
     }
 
-    public function hasGet($key) {
+    public function hasGet($key)
+    {
         return array_key_exists($key, $this->get);
     }
 
-    public function hasPost($key) {
+    public function hasPost($key)
+    {
         return array_key_exists($key, $this->post);
     }
 
-    public function getRequestTarget() {
+    public function getRequestTarget()
+    {
         return isset($this->server['REQUEST_URI']) ? $this->server['REQUEST_URI'] : '/';
     }
 
-    public function withRequestTarget($requestTarget) {
+    public function withRequestTarget($requestTarget)
+    {
         $result = clone $this;
 
         $result->server['REQUEST_URI'] = $requestTarget;
@@ -68,7 +78,8 @@ class Request implements ServerRequestInterface {
         return $result;
     }
 
-    public function getMethod() {
+    public function getMethod()
+    {
         if ($this->method !== null) {
             return $this->method;
         }
@@ -90,14 +101,16 @@ class Request implements ServerRequestInterface {
         return $this->method = strtoupper($method);
     }
 
-    public function withMethod($method) {
+    public function withMethod($method)
+    {
         $result = clone $this;
         $result->method = strtoupper($method);
 
         return $result;
     }
 
-    public function getUri() {
+    public function getUri()
+    {
         if ($this->uri) {
             return $this->uri;
         }
@@ -115,29 +128,35 @@ class Request implements ServerRequestInterface {
                             ->withPort($port);
     }
 
-    public function withUri(UriInterface $uri, $preserveHost = false) {
+    public function withUri(UriInterface $uri, $preserveHost = false)
+    {
         throw new \Exception('Request::withUri() not implemented');
     }
 
-    public function getServerParams() {
+    public function getServerParams()
+    {
         return $this->server;
     }
 
-    public function getServerParam($name) {
+    public function getServerParam($name)
+    {
         $name = strtoupper($name);
 
         return isset($this->server[$name]) ? $this->server[$name] : false;
     }
 
-    public function getCookieParams() {
+    public function getCookieParams()
+    {
         return $this->cookies;
     }
 
-    public function getCookieParam($name) {
+    public function getCookieParam($name)
+    {
         return isset($this->cookies[$name]) ? $this->cookies[$name] : false;
     }
 
-    public function withCookieParams(array $cookies) {
+    public function withCookieParams(array $cookies)
+    {
         $result = clone $this;
 
         $result->cookies = $cookies;
@@ -145,11 +164,13 @@ class Request implements ServerRequestInterface {
         return $result;
     }
 
-    public function getQueryParams() {
+    public function getQueryParams()
+    {
         return $this->get;
     }
 
-    public function withQueryParams(array $query) {
+    public function withQueryParams(array $query)
+    {
         $result = clone $this;
 
         $result->get = $query;
@@ -157,7 +178,8 @@ class Request implements ServerRequestInterface {
         return $result;
     }
 
-    public function getUploadedFiles() {
+    public function getUploadedFiles()
+    {
         $files = [];
 
         foreach ($this->files as $key => $file) {
@@ -167,11 +189,13 @@ class Request implements ServerRequestInterface {
         return $files;
     }
 
-    public function withUploadedFiles(array $uploadFiles) {
+    public function withUploadedFiles(array $uploadFiles)
+    {
         throw new \Exception('Request::withUploadedFiles() not implemented');
     }
 
-    public function getParsedBody() {
+    public function getParsedBody()
+    {
         $content_type = $this->getHeaderLine('content-type');
         $method = $this->getServerParam('REQUEST_METHOD');
 
@@ -179,10 +203,10 @@ class Request implements ServerRequestInterface {
             return $this->post;
         }
 
-        $body = (string)$this->body;
+        $body = (string) $this->body;
 
         if ($body === '') {
-            return null;
+            return;
         }
 
         if ($content_type === 'application/json') {
@@ -192,19 +216,23 @@ class Request implements ServerRequestInterface {
         return $body;
     }
 
-    public function withParsedBody($data) {
+    public function withParsedBody($data)
+    {
         throw new \Exception('Request::withParsedBody() not implemented');
     }
 
-    public function allowClientProxyIP() {
+    public function allowClientProxyIP()
+    {
         $this->allow_client_proxy_ip = true;
     }
 
-    public function disallowClientProxyIP() {
+    public function disallowClientProxyIP()
+    {
         $this->allow_client_proxy_ip = false;
     }
 
-    public function getClientIP() {
+    public function getClientIP()
+    {
         if (!$this->allow_client_proxy_ip || !($ip = $this->getServerParam('http_x_forwarded_for'))) {
             return $this->getServerParam('remote_addr');
         }
@@ -246,34 +274,43 @@ class Request implements ServerRequestInterface {
                 }
             }
 
-            if (!$is_private) return $ip;
+            if (!$is_private) {
+                return $ip;
+            }
         }
 
         return array_shift($ip_set) ?: '0.0.0.0';
     }
 
-    public function isGet() {
+    public function isGet()
+    {
         return $this->getMethod() === 'GET' || $this->getMethod() === 'HEAD';
     }
 
-    public function isPost() {
+    public function isPost()
+    {
         return $this->getMethod() === 'POST';
     }
 
-    public function isPut() {
+    public function isPut()
+    {
         return $this->getMethod() === 'PUT';
     }
 
-    public function isDelete() {
+    public function isDelete()
+    {
         return $this->getMethod() === 'DELETE';
     }
 
-    public function isAjax() {
+    public function isAjax()
+    {
         $val = $this->getHeader('x-requested-with');
+
         return $val && (strtolower($val[0]) === 'xmlhttprequest');
     }
 
-    protected function initialize() {
+    protected function initialize()
+    {
         $this->body = new ResourceStream(fopen('php://input', 'r'));
 
         $headers = [];
@@ -287,7 +324,7 @@ class Request implements ServerRequestInterface {
     }
 
     /**
-     * 构造http请求对象，供测试使用
+     * 构造http请求对象，供测试使用.
      *
      * @example
      * $request = Request::factory([
@@ -311,7 +348,8 @@ class Request implements ServerRequestInterface {
      *     ],
      * ]);
      */
-    static public function factory(array $options = []) {
+    public static function factory(array $options = [])
+    {
         $options = array_merge([
             'uri' => '/',
             'method' => 'GET',
@@ -344,59 +382,66 @@ class Request implements ServerRequestInterface {
         }
 
         foreach ($options['headers'] as $key => $value) {
-            $key = 'HTTP_'. strtoupper(str_replace('-', '_', $key));
+            $key = 'HTTP_'.strtoupper(str_replace('-', '_', $key));
             $server[$key] = $value;
         }
 
-        return new Request($get, $post, $server, $cookies);
+        return new self($get, $post, $server, $cookies);
     }
 
     /**
      * @deprecated
      */
-    public function getRequestURI() {
+    public function getRequestURI()
+    {
         return $this->getRequestTarget();
     }
 
     /**
      * @deprecated
      */
-    public function getRequestPath() {
+    public function getRequestPath()
+    {
         return $this->getUri()->getPath();
     }
 
     /**
      * @deprecated
      */
-    public function getExtension() {
+    public function getExtension()
+    {
         return $this->getUri()->getExtension();
     }
 
     /**
      * @deprecated
      */
-    public function setParameter($key, $value) {
+    public function setParameter($key, $value)
+    {
         return $this->withAttribute($key, $value);
     }
 
     /**
      * @deprecated
      */
-    public function getParameter($key) {
+    public function getParameter($key)
+    {
         return $this->getAttribute($key);
     }
 
     /**
      * @deprecated
      */
-    public function getParameters() {
+    public function getParameters()
+    {
         return $this->getAttributes();
     }
 
     /**
      * @deprecated
      */
-    public function getServer($key = null) {
+    public function getServer($key = null)
+    {
         if ($key === null) {
             return $this->getServerParams();
         }
@@ -407,21 +452,24 @@ class Request implements ServerRequestInterface {
     /**
      * @deprecated
      */
-    public function getCookie($key) {
+    public function getCookie($key)
+    {
         return $this->getCookieParam($key);
     }
 
     /**
      * @deprecated
      */
-    public function getCookies() {
+    public function getCookies()
+    {
         return $this->getCookieParams();
     }
 
     /**
      * @deprecated
      */
-    public function getIP() {
+    public function getIP()
+    {
         return $this->getClientIP();
     }
 }

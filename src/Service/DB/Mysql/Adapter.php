@@ -1,16 +1,17 @@
 <?php
-namespace Owl\Service\DB\Mysql;
 
-use Owl\Service\DB\Expr;
+namespace Owl\Service\DB\Mysql;
 
 if (!extension_loaded('pdo_mysql')) {
     throw new \Exception('Require "pdo_mysql" extension.');
 }
 
-class Adapter extends \Owl\Service\DB\Adapter {
+class Adapter extends \Owl\Service\DB\Adapter
+{
     protected $identifier_symbol = '`';
 
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         if (isset($config['options'])) {
             $config['options'][\PDO::MYSQL_ATTR_FOUND_ROWS] = true;
         } else {
@@ -20,21 +21,27 @@ class Adapter extends \Owl\Service\DB\Adapter {
         parent::__construct($config);
     }
 
-    public function lastID($table = null, $column = null) {
+    public function lastID($table = null, $column = null)
+    {
         return $this->execute('SELECT last_insert_id()')->getCol();
     }
 
-    public function enableBufferedQuery() {
+    public function enableBufferedQuery()
+    {
         $this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+
         return $this;
     }
 
-    public function disableBufferedQuery() {
+    public function disableBufferedQuery()
+    {
         $this->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
+
         return $this;
     }
 
-    public function getTables() {
+    public function getTables()
+    {
         return $this->select('information_schema.TABLES')
                     ->setColumns('TABLE_NAME')
                     ->where('TABLE_SCHEMA = database()')
@@ -42,7 +49,8 @@ class Adapter extends \Owl\Service\DB\Adapter {
                     ->getCols();
     }
 
-    public function getColumns($table) {
+    public function getColumns($table)
+    {
         $select = $this->select('information_schema.COLUMNS')
                        ->where('TABLE_SCHEMA = database()')
                        ->where('TABLE_NAME = ?', $table)
@@ -72,7 +80,8 @@ class Adapter extends \Owl\Service\DB\Adapter {
         return $columns;
     }
 
-    public function getIndexes($table) {
+    public function getIndexes($table)
+    {
         $indexes = [];
 
         $sql = sprintf('show indexes from %s', $this->quoteIdentifier($table));

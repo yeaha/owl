@@ -1,7 +1,9 @@
 <?php
+
 namespace Owl;
 
-class Http {
+class Http
+{
     const SWITCHING_PROTOCOLS = 101;
     const PROCESSING = 102;
     const OK = 200;
@@ -59,7 +61,7 @@ class Http {
     const LOOP_DETECTED = 508;
     const NETWORK_AUTHENTICATION_REQUIRED = 511;
 
-    static protected $phrases = [
+    protected static $phrases = [
         // INFORMATIONAL CODES
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -124,7 +126,8 @@ class Http {
         511 => 'Network Authentication Required',
     ];
 
-    static public function getStatusPhrase($code) {
+    public static function getStatusPhrase($code)
+    {
         return isset(self::$phrases[$code])
              ? self::$phrases[$code]
              : null;

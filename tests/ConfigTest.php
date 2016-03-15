@@ -1,14 +1,17 @@
 <?php
+
 namespace Tests;
 
 use Owl\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase {
-    public function test() {
+class ConfigTest extends \PHPUnit_Framework_TestCase
+{
+    public function test()
+    {
         $config = [
             'foo' => [
                 'bar' => 1,
-            ]
+            ],
         ];
 
         Config::merge($config);

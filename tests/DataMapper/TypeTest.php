@@ -1,10 +1,13 @@
 <?php
+
 namespace Tests;
 
-use \Owl\DataMapper;
+use Owl\DataMapper;
 
-class TypeTest extends \PHPUnit_Framework_TestCase {
-    public function testNormalizeAttribute() {
+class TypeTest extends \PHPUnit_Framework_TestCase
+{
+    public function testNormalizeAttribute()
+    {
         $attribute = DataMapper\Type::normalizeAttribute(array('primary_key' => true));
 
         $this->assertFalse($attribute['allow_null']);
@@ -19,7 +22,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertNull($attribute['default']);
     }
 
-    public function testCommon() {
+    public function testCommon()
+    {
         $type = $this->getType(null);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
 
@@ -36,7 +40,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('foo', $type->getDefaultValue(array('default' => 'foo')));
     }
 
-    public function testNumber() {
+    public function testNumber()
+    {
         $type = $this->getType('number');
         $this->assertInstanceOf('\Owl\DataMapper\Type\Number', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
@@ -46,7 +51,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('\Owl\DataMapper\Type\Number', $this->getType('numeric'));
     }
 
-    public function testInteger() {
+    public function testInteger()
+    {
         $type = $this->getType('integer');
         $this->assertInstanceOf('\Owl\DataMapper\Type\Integer', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
@@ -54,7 +60,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(1, $type->normalize('1.11', array()));
     }
 
-    public function testString() {
+    public function testString()
+    {
         $type = $this->getType('string');
         $this->assertInstanceOf('\Owl\DataMapper\Type\Text', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
@@ -62,7 +69,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame('1.11', $type->normalize(1.11, array()));
     }
 
-    public function testUUID() {
+    public function testUUID()
+    {
         $type = $this->getType('uuid');
         $this->assertInstanceOf('\Owl\DataMapper\Type\UUID', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
@@ -75,12 +83,13 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertRegExp($re, $type->getDefaultValue(array('auto_generate' => true, 'upper' => true)));
     }
 
-    public function testDateTime() {
+    public function testDateTime()
+    {
         $type = $this->getType('datetime');
         $this->assertInstanceOf('\Owl\DataMapper\Type\Datetime', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Common', $type);
 
-        $now = new \Datetime;
+        $now = new \Datetime();
         $this->assertSame($now, $type->normalize($now, array()));
 
         $this->assertInstanceOf('\Datetime', $type->normalize('now', array()));
@@ -101,7 +110,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $type->normalize($ts, array('format' => 'c'));
     }
 
-    public function testJSON() {
+    public function testJSON()
+    {
         $attribute = DataMapper\Type::normalizeAttribute(array('type' => 'json'));
 
         $type = $this->getType('json');
@@ -122,7 +132,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame(array(), $type->getDefaultValue(array('allow_null' => true)));
     }
 
-    public function testRestoreNull() {
+    public function testRestoreNull()
+    {
         $expect = array(
             'mixed' => null,
             'string' => null,
@@ -140,7 +151,8 @@ class TypeTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    protected function getType($name) {
+    protected function getType($name)
+    {
         return DataMapper\Type::getInstance()->get($name);
     }
 }

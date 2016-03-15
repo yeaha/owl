@@ -1,27 +1,30 @@
 <?php
+
 namespace Owl\DataMapper;
 
-use Owl\DataMapper\Registry;
-
-abstract class Mapper {
+abstract class Mapper
+{
     /**
-     * Data class名
+     * Data class名.
+     *
      * @var string
      */
     protected $class;
 
     /**
-     * 配置，存储服务、存储集合、属性定义等等
+     * 配置，存储服务、存储集合、属性定义等等.
+     *
      * @var array
      */
     protected $options = [];
 
     /**
-     * 根据主键值返回查询到的单条记录
+     * 根据主键值返回查询到的单条记录.
      *
-     * @param string|integer|array $id 主键值
+     * @param string|int|array $id 主键值
      * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
+     *
      * @return array 数据结果
      */
     abstract protected function doFind($id, \Owl\Service $service = null, $collection = null);
@@ -32,6 +35,7 @@ abstract class Mapper {
      * @param Data $data Data实例
      * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
+     *
      * @return array 新的主键值
      */
     abstract protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
@@ -42,70 +46,96 @@ abstract class Mapper {
      * @param Data $data Data实例
      * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
-     * @return boolean
+     *
+     * @return bool
      */
     abstract protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
 
     /**
-     * 从存储服务删除数据
+     * 从存储服务删除数据.
      *
      * @param Data $data Data实例
      * @param Owl\Service [$service] 存储服务连接
      * @param string [$collection] 存储集合名
-     * @return boolean
+     *
+     * @return bool
      */
     abstract protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null);
 
     /**
      * @param string $class
      */
-    public function __construct($class) {
+    public function __construct($class)
+    {
         $this->class = $class;
         $this->options = $this->normalizeOptions($class::getOptions());
     }
 
-    protected function __beforeSave(\Owl\DataMapper\Data $data) {}
-    protected function __afterSave(\Owl\DataMapper\Data $data) {}
+    protected function __beforeSave(\Owl\DataMapper\Data $data)
+    {
+    }
+    protected function __afterSave(\Owl\DataMapper\Data $data)
+    {
+    }
 
-    protected function __beforeInsert(\Owl\DataMapper\Data $data) {}
-    protected function __afterInsert(\Owl\DataMapper\Data $data) {}
+    protected function __beforeInsert(\Owl\DataMapper\Data $data)
+    {
+    }
+    protected function __afterInsert(\Owl\DataMapper\Data $data)
+    {
+    }
 
-    protected function __beforeUpdate(\Owl\DataMapper\Data $data) {}
-    protected function __afterUpdate(\Owl\DataMapper\Data $data) {}
+    protected function __beforeUpdate(\Owl\DataMapper\Data $data)
+    {
+    }
+    protected function __afterUpdate(\Owl\DataMapper\Data $data)
+    {
+    }
 
-    protected function __beforeDelete(\Owl\DataMapper\Data $data) {}
-    protected function __afterDelete(\Owl\DataMapper\Data $data) {}
+    protected function __beforeDelete(\Owl\DataMapper\Data $data)
+    {
+    }
+    protected function __afterDelete(\Owl\DataMapper\Data $data)
+    {
+    }
 
-    final private function __before($event, \Owl\DataMapper\Data $data) {
+    final private function __before($event, \Owl\DataMapper\Data $data)
+    {
         $event = ucfirst($event);
         call_user_func([$data, '__before'.$event]);
         call_user_func([$this, '__before'.$event], $data);
     }
 
-    final private function __after($event, \Owl\DataMapper\Data $data) {
+    final private function __after($event, \Owl\DataMapper\Data $data)
+    {
         $event = ucfirst($event);
         call_user_func([$data, '__after'.$event]);
         call_user_func([$this, '__after'.$event], $data);
     }
 
     /**
-     * 指定的配置是否存在
+     * 指定的配置是否存在.
      *
      * @param string $key
-     * @return boolean
+     *
+     * @return bool
      */
-    public function hasOption($key) {
+    public function hasOption($key)
+    {
         return isset($this->options[$key]);
     }
 
     /**
-     * 获取指定的配置内容
+     * 获取指定的配置内容.
      *
      * @param string $key
+     *
      * @return mixed
+     *
      * @throws \RuntimeException 指定的配置不存在
      */
-    public function getOption($key) {
+    public function getOption($key)
+    {
         if (!isset($this->options[$key])) {
             throw new \RuntimeException('Mapper: undefined option "'.$key.'"');
         }
@@ -114,55 +144,64 @@ abstract class Mapper {
     }
 
     /**
-     * 获取所有的配置内容
+     * 获取所有的配置内容.
      *
      * @return array
      */
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 
     /**
-     * 获得存储服务连接实例
+     * 获得存储服务连接实例.
      *
      * @return Owl\Service
+     *
      * @throws \RuntimeException Data class没有配置存储服务
      */
-    public function getService() {
+    public function getService()
+    {
         $service = $this->getOption('service');
+
         return \Owl\Service\Container::getInstance()->get($service);
     }
 
     /**
      * 获得存储集合的名字
-     * 对于数据库来说，就是表名
+     * 对于数据库来说，就是表名.
      *
      * @return string
+     *
      * @throws \RuntimeException 存储集合名未配置
      */
-    public function getCollection() {
+    public function getCollection()
+    {
         return $this->getOption('collection');
     }
 
     /**
-     * 获得主键定义
+     * 获得主键定义.
      *
      * @return
      * [
      *     (string) => array,  // 主键字段名 => 属性定义
      * ]
      */
-    public function getPrimaryKey() {
+    public function getPrimaryKey()
+    {
         return $this->getOption('primary_key');
     }
 
     /**
-     * 获得指定属性的定义
+     * 获得指定属性的定义.
      *
      * @param string $key 属性名
+     *
      * @return array|false
      */
-    public function getAttribute($key) {
+    public function getAttribute($key)
+    {
         return isset($this->options['attributes'][$key])
              ? $this->options['attributes'][$key]
              : false;
@@ -170,15 +209,17 @@ abstract class Mapper {
 
     /**
      * 获得所有的属性定义
-     * 默认忽略被标记为“废弃”的属性
+     * 默认忽略被标记为“废弃”的属性.
      *
-     * @param boolean $without_deprecated 不包含废弃属性
+     * @param bool $without_deprecated 不包含废弃属性
+     *
      * @return [
-     *     (string) => (array),  // 属性名 => 属性定义
-     *     ...
-     * ]
+     *           (string) => (array),  // 属性名 => 属性定义
+     *           ...
+     *           ]
      */
-    public function getAttributes($without_deprecated = true) {
+    public function getAttributes($without_deprecated = true)
+    {
         $attributes = $this->getOption('attributes');
 
         if ($without_deprecated) {
@@ -194,33 +235,39 @@ abstract class Mapper {
 
     /**
      * 是否定义了指定的属性
-     * 如果定义了属性，但被标记为“废弃”，也返回未定义
+     * 如果定义了属性，但被标记为“废弃”，也返回未定义.
      *
      * @param string $key 属性名
-     * @return boolean
+     *
+     * @return bool
      */
-    public function hasAttribute($key) {
+    public function hasAttribute($key)
+    {
         $attribute = $this->getAttribute($key);
+
         return $attribute ? !$attribute['deprecated'] : false;
     }
 
     /**
-     * Mapper是否只读
+     * Mapper是否只读.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isReadonly() {
+    public function isReadonly()
+    {
         return $this->getOption('readonly');
     }
 
     /**
-     * 把存储服务内获取的数据，打包成Data实例
+     * 把存储服务内获取的数据，打包成Data实例.
      *
      * @param array $record
      * @param Data [$data]
+     *
      * @return Data
      */
-    public function pack(array $record, Data $data = null) {
+    public function pack(array $record, Data $data = null)
+    {
         $types = Type::getInstance();
         $values = [];
 
@@ -247,13 +294,15 @@ abstract class Mapper {
     }
 
     /**
-     * 把Data实例内的数据，转换为适用于存储的格式
+     * 把Data实例内的数据，转换为适用于存储的格式.
      *
      * @param Data $data
      * @param array [$options]
+     *
      * @return array
      */
-    public function unpack(Data $data, array $options = null) {
+    public function unpack(Data $data, array $options = null)
+    {
         $defaults = ['dirty' => false];
         $options = $options ? array_merge($defaults, $options) : $defaults;
 
@@ -277,13 +326,15 @@ abstract class Mapper {
     }
 
     /**
-     * 根据指定的主键值生成Data实例
+     * 根据指定的主键值生成Data实例.
      *
-     * @param string|integer|array $id 主键值
+     * @param string|int|array $id 主键值
      * @param Data [$data]
+     *
      * @return Data|false
      */
-    public function find($id, Data $data = null) {
+    public function find($id, Data $data = null)
+    {
         $registry = Registry::getInstance();
 
         if (!$data) {
@@ -303,12 +354,14 @@ abstract class Mapper {
     }
 
     /**
-     * 从存储服务内重新获取数据并刷新Data实例
+     * 从存储服务内重新获取数据并刷新Data实例.
      *
      * @param Data $data
+     *
      * @return Data
      */
-    public function refresh(Data $data) {
+    public function refresh(Data $data)
+    {
         if ($data->isFresh()) {
             return $data;
         }
@@ -317,12 +370,14 @@ abstract class Mapper {
     }
 
     /**
-     * 保存Data
+     * 保存Data.
      *
      * @param Data $data
-     * @return boolean
+     *
+     * @return bool
      */
-    public function save(Data $data) {
+    public function save(Data $data)
+    {
         if ($this->isReadonly()) {
             throw new \RuntimeException($this->class.' is readonly');
         }
@@ -345,12 +400,14 @@ abstract class Mapper {
     }
 
     /**
-     * 删除Data
+     * 删除Data.
      *
      * @param Data $data
-     * @return boolean
+     *
+     * @return bool
      */
-    public function destroy(Data $data) {
+    public function destroy(Data $data)
+    {
         if ($this->isReadonly()) {
             throw new \RuntimeException($this->class.' is readonly');
         }
@@ -373,12 +430,14 @@ abstract class Mapper {
     }
 
     /**
-     * 把新的Data数据插入到存储集合中
+     * 把新的Data数据插入到存储集合中.
      *
      * @param Data $data
-     * @return boolean
+     *
+     * @return bool
      */
-    protected function insert(Data $data) {
+    protected function insert(Data $data)
+    {
         $this->__before('insert', $data);
         $data->validate();
 
@@ -393,12 +452,14 @@ abstract class Mapper {
     }
 
     /**
-     * 更新Data数据到存储集合内
+     * 更新Data数据到存储集合内.
      *
      * @param Data $data
-     * @return boolean
+     *
+     * @return bool
      */
-    protected function update(Data $data) {
+    protected function update(Data $data)
+    {
         $this->__before('update', $data);
         $data->validate();
 
@@ -413,12 +474,14 @@ abstract class Mapper {
     }
 
     /**
-     * 格式化从Data class获得的配置信息
+     * 格式化从Data class获得的配置信息.
      *
      * @param array $options
+     *
      * @return array
      */
-    protected function normalizeOptions(array $options) {
+    protected function normalizeOptions(array $options)
+    {
         $options = array_merge([
             'service' => null,
             'collection' => null,
@@ -452,21 +515,25 @@ abstract class Mapper {
     }
 
     /**
-     * Mapper实例缓存数组
+     * Mapper实例缓存数组.
+     *
      * @var array
      */
-    static private $instance = [];
+    private static $instance = [];
 
     /**
-     * 获得指定Data class的Mapper实例
+     * 获得指定Data class的Mapper实例.
      *
      * @param string $class
+     *
      * @return Mapper
      */
-    final static public function factory($class) {
+    final public static function factory($class)
+    {
         if (!isset(self::$instance[$class])) {
             self::$instance[$class] = new static($class);
         }
+
         return self::$instance[$class];
     }
 }

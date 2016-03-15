@@ -1,8 +1,9 @@
 <?php
+
 namespace Owl;
 
 /**
- * 中间件
+ * 中间件.
  *
  * @example
  *
@@ -37,33 +38,35 @@ namespace Owl;
  * // after 2
  * // after 1
  * $middleware->execute(1, 2, 3);
- *
  */
-class Middleware {
+class Middleware
+{
     protected $handlers = [];
 
     /**
-     * 添加一个新的中间件到队列中
+     * 添加一个新的中间件到队列中.
      *
      * @param callable $handler
+     *
      * @return $this
      */
-    public function insert($handler) {
+    public function insert($handler)
+    {
         if (!is_callable($handler)) {
             throw new \Exception('Middleware handler is not callable.');
         }
 
         $this->handlers[] = $handler;
+
         return $this;
     }
 
     /**
      * 执行队列里的所有中间件
-     * 调用此方法传递的任意参数都会被传递给每个中间件
-     *
-     * @return void
+     * 调用此方法传递的任意参数都会被传递给每个中间件.
      */
-    public function execute(array $arguments = [], array $handlers = []) {
+    public function execute(array $arguments = [], array $handlers = [])
+    {
         $handlers = $handlers ?: $this->handlers;
 
         if (!$handlers) {
@@ -89,11 +92,10 @@ class Middleware {
     }
 
     /**
-     * 清空中间件队列
-     *
-     * @return void
+     * 清空中间件队列.
      */
-    public function reset() {
+    public function reset()
+    {
         $this->handlers = [];
     }
 }

@@ -1,10 +1,13 @@
 <?php
+
 namespace Tests\Parameter;
 
-class ValidatorTest extends \PHPUnit_Framework_TestCase {
+class ValidatorTest extends \PHPUnit_Framework_TestCase
+{
     private $validator;
 
-    public function testRequired() {
+    public function testRequired()
+    {
         $this->execute(['foo' => 'bar'], ['foo' => ['type' => 'string']]);
         $this->execute([], ['foo' => ['type' => 'string', 'required' => false]]);
 
@@ -15,7 +18,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testAllowEmpty() {
+    public function testAllowEmpty()
+    {
         $this->execute(['foo' => ''], ['foo' => ['allow_empty' => true]]);
         $this->execute(['foo' => ''], ['foo' => ['type' => 'array', 'allow_empty' => true]]);
 
@@ -32,7 +36,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testEquals() {
+    public function testEquals()
+    {
         $this->execute(['foo' => 1], ['foo' => ['eq' => '1']]);
         $this->execute(['foo' => 1], ['foo' => ['eq' => 1]]);
 
@@ -53,7 +58,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testSame() {
+    public function testSame()
+    {
         $this->execute(['foo' => '1'], ['foo' => ['same' => '1']]);
         $this->execute(['foo' => 1], ['foo' => ['same' => 1]]);
 
@@ -74,7 +80,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testRegexp() {
+    public function testRegexp()
+    {
         $this->execute(['foo' => 'aab'], ['foo' => ['regexp' => '/^a+b$/']]);
 
         $this->tryExecute(
@@ -84,7 +91,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testInteger() {
+    public function testInteger()
+    {
         $this->execute(['foo' => 1], ['foo' => ['type' => 'integer']]);
         $this->execute(['foo' => '1'], ['foo' => ['type' => 'integer']]);
         $this->execute(['foo' => -1], ['foo' => ['type' => 'integer', 'allow_negative' => true]]);
@@ -109,7 +117,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testNumeric() {
+    public function testNumeric()
+    {
         $this->execute(['foo' => 1.1], ['foo' => ['type' => 'numeric']]);
         $this->execute(['foo' => '1.1'], ['foo' => ['type' => 'numeric']]);
         $this->execute(['foo' => -1.1], ['foo' => ['type' => 'numeric', 'allow_negative' => true]]);
@@ -128,7 +137,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testBoolean() {
+    public function testBoolean()
+    {
         $this->execute(['foo' => true], ['foo' => ['type' => 'boolean']]);
         $this->execute(['foo' => false], ['foo' => ['type' => 'boolean']]);
 
@@ -139,7 +149,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    public function testArray() {
+    public function testArray()
+    {
         $this->execute(
             [
                 'a' => [
@@ -153,9 +164,9 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                         ],
                         [
                             'e' => 2,
-                        ]
+                        ],
                     ],
-                ]
+                ],
             ],
             [
                 'a' => [
@@ -166,7 +177,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                             'type' => 'array',
                             'keys' => [
                                 'd' => ['type' => 'email'],
-                            ]
+                            ],
                         ],
                         'd' => [
                             'type' => 'array',
@@ -175,10 +186,10 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                                 'keys' => [
                                     'e' => ['type' => 'integer'],
                                 ],
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -194,8 +205,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                     'keys' => [
                         'b' => ['type' => 'integer'],
                         'c' => ['type' => 'integer'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'array "keys" rule fails'
         );
@@ -205,7 +216,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                 'a' => [
                     [
                         'b' => 1,
-                    ]
+                    ],
                 ],
             ],
             [
@@ -217,8 +228,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                             'b' => ['type' => 'integer'],
                             'c' => ['type' => 'integer'],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'array "value" rule fails'
         );
@@ -230,7 +241,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
             [
                 'a' => [
                     'type' => 'json',
-                ]
+                ],
             ],
             'test "json" fails'
         );
@@ -242,14 +253,15 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
             [
                 'a' => [
                     'type' => 'array',
-                    'value' => ['type' => 'integer']
-                ]
+                    'value' => ['type' => 'integer'],
+                ],
             ],
             'test array "value" fails'
         );
     }
 
-    public function testJson() {
+    public function testJson()
+    {
         $this->execute(
             [
                 'a' => json_encode([
@@ -263,9 +275,9 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                         ],
                         [
                             'e' => 2,
-                        ]
+                        ],
                     ],
-                ])
+                ]),
             ],
             [
                 'a' => [
@@ -276,7 +288,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                             'type' => 'array',
                             'keys' => [
                                 'd' => ['type' => 'email'],
-                            ]
+                            ],
                         ],
                         'd' => [
                             'type' => 'array',
@@ -285,10 +297,10 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                                 'keys' => [
                                     'e' => ['type' => 'integer'],
                                 ],
-                            ]
-                        ]
-                    ]
-                ]
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
 
@@ -304,8 +316,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                     'keys' => [
                         'b' => ['type' => 'integer'],
                         'c' => ['type' => 'integer'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'json "keys" rule fails'
         );
@@ -315,7 +327,7 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                 'a' => json_encode([
                     [
                         'b' => 1,
-                    ]
+                    ],
                 ]),
             ],
             [
@@ -327,23 +339,24 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                             'b' => ['type' => 'integer'],
                             'c' => ['type' => 'integer'],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'json "value" rule fails'
         );
     }
 
-    public function testObject() {
+    public function testObject()
+    {
         $this->execute(
             [
-                'a' => new \stdClass,
+                'a' => new \stdClass(),
             ],
             [
                 'a' => [
                     'type' => 'object',
                     'instanceof' => '\stdClass',
-                ]
+                ],
             ]
         );
 
@@ -355,13 +368,14 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
                 'a' => [
                     'type' => 'object',
                     'instanceof' => '\stdClass',
-                ]
+                ],
             ],
             'test "object" fails'
         );
     }
 
-    public function testURL() {
+    public function testURL()
+    {
         $options = ['foo' => ['type' => 'url']];
 
         $test = [
@@ -379,7 +393,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testURI() {
+    public function testURI()
+    {
         $options = ['foo' => ['type' => 'uri']];
 
         $test = [
@@ -396,7 +411,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testAllowTags() {
+    public function testAllowTags()
+    {
         $this->execute(
             [
                 'a' => 'foo bar',
@@ -426,11 +442,13 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         );
     }
 
-    protected function setUp() {
-        $this->validator = new \Owl\Parameter\Validator;
+    protected function setUp()
+    {
+        $this->validator = new \Owl\Parameter\Validator();
     }
 
-    private function tryExecute($values, array $options, $message) {
+    private function tryExecute($values, array $options, $message)
+    {
         try {
             $this->validator->execute($values, $options);
 
@@ -440,7 +458,8 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    private function execute(array $values, array $options) {
+    private function execute(array $values, array $options)
+    {
         $result = $this->validator->execute($values, $options);
 
         $this->assertTrue($result);

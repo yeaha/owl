@@ -1,52 +1,56 @@
 <?php
+
 namespace Owl\DataMapper;
 
-use Owl\DataMapper\Data;
-
-class Registry {
+class Registry
+{
     /**
-     * 是否开启DataMapper的Data注册表功能
-     * @var boolean
+     * 是否开启DataMapper的Data注册表功能.
+     *
+     * @var bool
      */
     private $enabled = true;
 
     /**
-     * 缓存的Data实例
+     * 缓存的Data实例.
+     *
      * @var array
      */
     private $members = [];
 
     /**
-     * 开启缓存
-     * @return void
+     * 开启缓存.
      */
-    public function enable() {
+    public function enable()
+    {
         $this->enabled = true;
     }
 
     /**
-     * 关闭缓存
-     * @return void
+     * 关闭缓存.
      */
-    public function disable() {
+    public function disable()
+    {
         $this->enabled = false;
     }
 
     /**
-     * 缓存是否开启
-     * @return boolean
+     * 缓存是否开启.
+     *
+     * @return bool
      */
-    public function isEnabled() {
+    public function isEnabled()
+    {
         return $this->enabled;
     }
 
     /**
-     * 把Data实例缓存起来
+     * 把Data实例缓存起来.
      *
      * @param Data $data
-     * @return void
      */
-    public function set(Data $data) {
+    public function set(Data $data)
+    {
         $class = get_class($data);
         if (!$this->isEnabled()) {
             return false;
@@ -65,31 +69,34 @@ class Registry {
     }
 
     /**
-     * 根据类名和主键值，获得缓存结果
+     * 根据类名和主键值，获得缓存结果.
      *
      * @param string class
-     * @param string|integer|array $id
+     * @param string|int|array $id
+     *
      * @return Data|false
      */
-    public function get($class, $id) {
+    public function get($class, $id)
+    {
         if (!$this->isEnabled()) {
             return false;
         }
 
         $key = self::key($class, $id);
+
         return isset($this->members[$key])
              ? $this->members[$key]
              : false;
     }
 
     /**
-     * 删除缓存结果
+     * 删除缓存结果.
      *
      * @param string $class
-     * @param mixed $id
-     * @return void
+     * @param mixed  $id
      */
-    public function remove($class, $id) {
+    public function remove($class, $id)
+    {
         if (!$this->isEnabled()) {
             return false;
         }
@@ -99,28 +106,31 @@ class Registry {
     }
 
     /**
-     * 把所有的缓存都删除掉
-     *
-     * @return void
+     * 把所有的缓存都删除掉.
      */
-    public function clear() {
+    public function clear()
+    {
         $this->members = array();
     }
 
     /**
-     * 生成缓存数组的key
+     * 生成缓存数组的key.
      *
      * @param string $class
-     * @param mixed $id
+     * @param mixed  $id
+     *
      * @return string
      */
-    static private function key($class, $id) {
+    private static function key($class, $id)
+    {
         $key = '';
         if (is_array($id)) {
             ksort($id);
 
             foreach ($id as $prop => $val) {
-                if ($key) $key .= ';';
+                if ($key) {
+                    $key .= ';';
+                }
                 $key .= "{$prop}:{$val}";
             }
         } else {
@@ -130,9 +140,10 @@ class Registry {
         return $class.'@'.$key;
     }
 
-    static private $instance;
+    private static $instance;
 
-    static public function getInstance() {
-        return self::$instance ?: (self::$instance = new self);
+    public static function getInstance()
+    {
+        return self::$instance ?: (self::$instance = new self());
     }
 }

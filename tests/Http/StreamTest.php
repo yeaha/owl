@@ -1,15 +1,18 @@
 <?php
+
 namespace Tests\Http;
 
-class StreamTest extends \PHPUnit_Framework_TestCase {
-    public function testResource() {
+class StreamTest extends \PHPUnit_Framework_TestCase
+{
+    public function testResource()
+    {
         $stream = new \Owl\Http\ResourceStream(fopen('php://memory', 'r+'));
 
         $this->assertSame(0, $stream->getSize());
 
         $stream->write('foobar');
         $this->assertSame(6, $stream->getSize());
-        $this->assertSame('foobar', (string)$stream);
+        $this->assertSame('foobar', (string) $stream);
 
         $stream->rewind();
         $this->assertSame('f', $stream->read(1));
@@ -22,15 +25,16 @@ class StreamTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($stream->eof());
     }
 
-    public function testString() {
+    public function testString()
+    {
         $stream = new \Owl\Http\StringStream('foo');
 
         $this->assertSame(3, $stream->getSize());
-        $this->assertSame('foo', (string)$stream);
+        $this->assertSame('foo', (string) $stream);
 
         $stream->write('bar');
         $this->assertSame(6, $stream->getSize());
-        $this->assertSame('foobar', (string)$stream);
+        $this->assertSame('foobar', (string) $stream);
 
         $stream->rewind();
         $this->assertSame('f', $stream->read(1));
@@ -44,8 +48,9 @@ class StreamTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($stream->eof());
     }
 
-    public function testIteartor() {
-        $fn = function() {
+    public function testIteartor()
+    {
+        $fn = function () {
             $words = ['foo', 'bar', 'baz'];
 
             foreach ($words as $word) {
@@ -73,6 +78,6 @@ class StreamTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($stream->eof());
 
         $stream = new \Owl\Http\IteratorStream($fn());
-        $this->assertSame('foobarbaz', (string)$stream);
+        $this->assertSame('foobarbaz', (string) $stream);
     }
 }

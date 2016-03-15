@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Context;
 
 /**
@@ -11,12 +12,14 @@ namespace Owl\Context;
  *
  * $context = new \Owl\Context\Redis($config);
  */
-class Redis extends \Owl\Context {
+class Redis extends \Owl\Context
+{
     protected $data;
     protected $saved_keys;
     protected $dirty = false;
 
-    public function __construct(array $config) {
+    public function __construct(array $config)
+    {
         parent::__construct($config);
 
         $redis = $this->getService();
@@ -26,11 +29,13 @@ class Redis extends \Owl\Context {
         $this->saved_keys = array_keys($this->data);
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->save();
     }
 
-    public function set($key, $val) {
+    public function set($key, $val)
+    {
         if (isset($this->data[$key]) && $this->data[$key] === $val) {
             return true;
         }
@@ -39,7 +44,8 @@ class Redis extends \Owl\Context {
         $this->dirty = true;
     }
 
-    public function get($key = null) {
+    public function get($key = null)
+    {
         if ($key === null) {
             return $this->data;
         }
@@ -47,11 +53,13 @@ class Redis extends \Owl\Context {
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
 
-    public function has($key) {
+    public function has($key)
+    {
         return isset($this->data[$key]);
     }
 
-    public function remove($key) {
+    public function remove($key)
+    {
         if (!isset($this->data[$key])) {
             return false;
         }
@@ -60,19 +68,22 @@ class Redis extends \Owl\Context {
         $this->dirty = true;
     }
 
-    public function clear() {
+    public function clear()
+    {
         $this->data = [];
         $this->dirty = true;
     }
 
-    public function setTimeout($ttl) {
+    public function setTimeout($ttl)
+    {
         $redis = $this->getService();
         $token = $this->getToken();
 
         return $redis->expire($token, $ttl);
     }
 
-    public function save() {
+    public function save()
+    {
         if (!$this->dirty) {
             return true;
         }
@@ -85,6 +96,7 @@ class Redis extends \Owl\Context {
         if (!$data = $this->data) {
             $redis->delete($token);
             $this->saved_keys = [];
+
             return true;
         }
 
@@ -100,17 +112,19 @@ class Redis extends \Owl\Context {
         }
         $tx->hMSet($token, $data);
 
-        if ($ttl = (int)$this->getConfig('ttl')) {
+        if ($ttl = (int) $this->getConfig('ttl')) {
             $tx->expire($token, $ttl);
         }
 
         $tx->exec();
 
         $this->saved_keys = array_keys($data);
+
         return true;
     }
 
-    protected function getService() {
+    protected function getService()
+    {
         if (!$service = $this->getConfig('service')) {
             throw new \Exception('Invalid redis service.');
         }

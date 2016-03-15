@@ -1,10 +1,11 @@
 <?php
+
 namespace Owl\DataMapper\Mongo;
 
-use \Owl\DataMapper\Type;
-
-class Mapper extends \Owl\DataMapper\Mapper {
-    public function query($expr) {
+class Mapper extends \Owl\DataMapper\Mapper
+{
+    public function query($expr)
+    {
         $result = [];
 
         foreach (static::iterator($expr) as $data) {
@@ -14,7 +15,8 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $result;
     }
 
-    public function iterator($expr = null) {
+    public function iterator($expr = null)
+    {
         if ($expr instanceof \MongoCursor) {
             $cursor = $expr;
         } elseif ($expr === null || is_array($expr)) {
@@ -32,15 +34,17 @@ class Mapper extends \Owl\DataMapper\Mapper {
         }
     }
 
-    public function pack(array $record, \Owl\DataMapper\Data $data = null) {
+    public function pack(array $record, \Owl\DataMapper\Data $data = null)
+    {
         if (isset($record['_id'])) {
-            $record['_id'] = (string)$record['_id'];
+            $record['_id'] = (string) $record['_id'];
         }
 
         return parent::pack($record, $data);
     }
 
-    public function unpack(\Owl\DataMapper\Data $data, array $options = null) {
+    public function unpack(\Owl\DataMapper\Data $data, array $options = null)
+    {
         $record = parent::unpack($data, $options);
 
         if ($data->isFresh()) {
@@ -50,14 +54,16 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $record;
     }
 
-    protected function doFind($id, \Owl\Service $service = null, $collection = null) {
+    protected function doFind($id, \Owl\Service $service = null, $collection = null)
+    {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
 
         return $service->findOne($collection, ['_id' => $this->normalizeID($id)]);
     }
 
-    protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
+    protected function doInsert(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null)
+    {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
 
@@ -71,7 +77,8 @@ class Mapper extends \Owl\DataMapper\Mapper {
         ];
     }
 
-    protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
+    protected function doUpdate(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null)
+    {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
         $record = $this->unpack($data, ['dirty' => true]);
@@ -96,14 +103,16 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $service->update($collection, ['_id' => $this->normalizeID($data)], $new);
     }
 
-    protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null) {
+    protected function doDelete(\Owl\DataMapper\Data $data, \Owl\Service $service = null, $collection = null)
+    {
         $service = $service ?: $this->getService();
         $collection = $collection ?: $this->getCollection();
 
         return $service->remove($collection, ['_id' => $this->normalizeID($data)]);
     }
 
-    protected function normalizeOptions(array $options) {
+    protected function normalizeOptions(array $options)
+    {
         $options = parent::normalizeOptions($options);
 
         if (count($options['primary_key']) !== 1 || $options['primary_key'][0] !== '_id') {
@@ -115,7 +124,8 @@ class Mapper extends \Owl\DataMapper\Mapper {
         return $options;
     }
 
-    protected function normalizeID($data) {
+    protected function normalizeID($data)
+    {
         $id = $data instanceof \Owl\DataMapper\Data
             ? $data->id()
             : $data;

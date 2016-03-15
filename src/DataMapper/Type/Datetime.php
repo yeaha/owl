@@ -1,8 +1,11 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
-class Datetime extends Common {
-    public function normalize($value, array $attribute) {
+class Datetime extends Common
+{
+    public function normalize($value, array $attribute)
+    {
         if ($value instanceof \DateTime) {
             return $value;
         }
@@ -18,7 +21,8 @@ class Datetime extends Common {
         return $value;
     }
 
-    public function store($value, array $attribute) {
+    public function store($value, array $attribute)
+    {
         if ($value instanceof \DateTime) {
             $format = isset($attribute['format']) ? $attribute['format'] : 'c'; // ISO 8601
             $value = $value->format($format);
@@ -27,7 +31,8 @@ class Datetime extends Common {
         return $value;
     }
 
-    public function getDefaultValue(array $attribute) {
+    public function getDefaultValue(array $attribute)
+    {
         return ($attribute['default'] === null)
              ? null
              : new \DateTime($attribute['default']);

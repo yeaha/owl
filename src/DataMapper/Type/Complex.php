@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
 /**
@@ -33,14 +34,17 @@ namespace Owl\DataMapper\Type;
  *
  * @see \Owl\Parameter\Validator
  */
-class Complex extends Common {
-    public function normalizeAttribute(array $attribute) {
+class Complex extends Common
+{
+    public function normalizeAttribute(array $attribute)
+    {
         return array_merge([
             'schema' => [],
         ], $attribute);
     }
 
-    public function store($value, array $attribute) {
+    public function store($value, array $attribute)
+    {
         if ($value) {
             $value = \Owl\array_trim($value);
         }
@@ -48,25 +52,29 @@ class Complex extends Common {
         return $this->isNull($value) ? null : $value;
     }
 
-    public function restore($value, array $attribute) {
+    public function restore($value, array $attribute)
+    {
         return $this->isNull($value) ? [] : $value;
     }
 
-    public function getDefaultValue(array $attribute) {
+    public function getDefaultValue(array $attribute)
+    {
         return isset($attribute['default'])
              ? $attribute['default']
              : [];
     }
 
-    public function isNull($value) {
+    public function isNull($value)
+    {
         return $value === null || $value === '' || $value === [];
     }
 
-    public function validateValue($value, array $attribute) {
+    public function validateValue($value, array $attribute)
+    {
         if ($attribute['schema']) {
             $value = \Owl\array_trim($value);
 
-            (new \Owl\Parameter\Validator)->execute($value, $attribute['schema']);
+            (new \Owl\Parameter\Validator())->execute($value, $attribute['schema']);
         }
     }
 }

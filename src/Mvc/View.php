@@ -1,7 +1,9 @@
 <?php
+
 namespace Owl\Mvc;
 
-class View {
+class View
+{
     const BLOCK_REPLACE = 'replace';
     const BLOCK_PREPEND = 'prepend';
     const BLOCK_APPEND = 'append';
@@ -19,16 +21,18 @@ class View {
     /**
      * @param string $directory View file directory
      */
-    public function __construct($directory) {
+    public function __construct($directory)
+    {
         if (!realpath($directory)) {
             throw new \Exception('View directory "'.$directory.'" not exist!');
         }
 
         $directory = realpath($directory);
-        $this->directory = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $this->directory = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->reset();
     }
 
@@ -37,7 +41,8 @@ class View {
      *
      * @return $this
      */
-    public function reset() {
+    public function reset()
+    {
         $this->extend_view = null;
         $this->vars = [];
         $this->block_content = [];
@@ -47,34 +52,38 @@ class View {
     }
 
     /**
-     * 设置视图变量
+     * 设置视图变量.
      *
      * @param string $key
-     * @param mixed $value
-     * @return void
+     * @param mixed  $value
      */
-    public function set($key, $value) {
+    public function set($key, $value)
+    {
         $this->vars[$key] = $value;
     }
 
     /**
-     * 获得视图变量
+     * 获得视图变量.
      *
      * @param string $key
+     *
      * @return mixed|false
      */
-    public function get($key) {
+    public function get($key)
+    {
         return isset($this->vars[$key]) ? $this->vars[$key] : false;
     }
 
     /**
-     * 渲染视图
+     * 渲染视图.
      *
      * @param string $view
-     * @param array $vars
+     * @param array  $vars
+     *
      * @return string
      */
-    public function render($view, array $vars = []) {
+    public function render($view, array $vars = [])
+    {
         if ($vars) {
             $this->vars = array_merge($this->vars, $vars);
         }
@@ -90,29 +99,32 @@ class View {
         }
 
         $this->extend_view = null;
+
         return $this->render($extend_view);
     }
 
     /**
-     * 继承视图
+     * 继承视图.
      *
      * @param string $view
-     * @return void
      */
-    protected function extendView($view) {
+    protected function extendView($view)
+    {
         $this->extend_view = $view;
     }
 
     /**
-     * 包含视图片段
+     * 包含视图片段.
      *
      * @param string $view
-     * @param array $vars
-     * @param boolean $return_content
+     * @param array  $vars
+     * @param bool   $return_content
+     *
      * @return void|string
      */
-    protected function includeView($view, array $vars = [], $return_content = false) {
-        $view_file = $this->directory . $view .'.php';
+    protected function includeView($view, array $vars = [], $return_content = false)
+    {
+        $view_file = $this->directory.$view.'.php';
 
         if (!$file = realpath($view_file)) {
             throw new \Exception('View file "'.$view_file.'" not exist!');
@@ -150,35 +162,34 @@ class View {
     }
 
     /**
-     * 载入视图片段，忽略重复载入
+     * 载入视图片段，忽略重复载入.
      *
      * @param string $view
-     * @return void
      */
-    protected function includeViewOnce($view) {
+    protected function includeViewOnce($view)
+    {
         if (!isset($this->included_view[$view])) {
             $this->includeView($view);
         }
     }
 
     /**
-     * 开始块
+     * 开始块.
      *
      * @param string $name
      * @param string $method
-     * @return void
      */
-    protected function beginBlock($name, $method = null) {
+    protected function beginBlock($name, $method = null)
+    {
         $this->block_stack[] = [$name, $method ?: self::BLOCK_REPLACE];
         ob_start();
     }
 
     /**
-     * 结束块
-     *
-     * @return void
+     * 结束块.
      */
-    protected function endBlock() {
+    protected function endBlock()
+    {
         if (!$this->block_stack) {
             return;
         }
@@ -205,23 +216,23 @@ class View {
     }
 
     /**
-     * 把内容中的html特殊字符转码后输出
+     * 把内容中的html特殊字符转码后输出.
      *
      * @param string
-     * @return void
      */
-    protected function eprint($string) {
+    protected function eprint($string)
+    {
         echo htmlspecialchars($string);
     }
 
     /**
-     * 显示已经生成好的块
+     * 显示已经生成好的块.
      *
      * @param string $name
-     * @param boolean $remove Remove content after show
-     * @return void
+     * @param bool   $remove Remove content after show
      */
-    protected function showBlock($name, $remove = true) {
+    protected function showBlock($name, $remove = true)
+    {
         if (isset($this->block_content[$name])) {
             echo $this->block_content[$name];
 
@@ -232,13 +243,13 @@ class View {
     }
 
     /**
-     * 在视图内载入js文件，忽略重复载入
+     * 在视图内载入js文件，忽略重复载入.
      *
      * @param string $file
-     * @param array $properties
-     * @return void
+     * @param array  $properties
      */
-    protected function loadJs($file, array $properties = []) {
+    protected function loadJs($file, array $properties = [])
+    {
         if (!isset($this->loaded_js[$file])) {
             $this->loaded_js[$file] = true;
 
@@ -252,13 +263,13 @@ class View {
     }
 
     /**
-     * 在视图内载入css文件，忽略重复载入
+     * 在视图内载入css文件，忽略重复载入.
      *
      * @param string $file
-     * @param array $properties
-     * @return void
+     * @param array  $properties
      */
-    protected function loadCss($file, array $properties = []) {
+    protected function loadCss($file, array $properties = [])
+    {
         if (!isset($this->loaded_css[$file])) {
             $this->loaded_css[$file] = true;
 
@@ -273,13 +284,15 @@ class View {
     }
 
     /**
-     * 生成html标签
+     * 生成html标签.
      *
      * @param string $tag
-     * @param array $properties
+     * @param array  $properties
+     *
      * @return string
      */
-    protected function buildElement($tag, array $properties) {
+    protected function buildElement($tag, array $properties)
+    {
         $self_close = [
             'input' => true,
             'link' => true,

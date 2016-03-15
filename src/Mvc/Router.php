@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Mvc;
 
 use Owl\Application as App;
@@ -22,7 +23,8 @@ use Owl\Application as App;
  * ]);
  * $router->delegate('/admin', $admin_router);
  */
-class Router {
+class Router
+{
     /**
      * @var array
      */
@@ -48,14 +50,17 @@ class Router {
      */
     protected $children = [];
 
-    protected function __beforeRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters) {
+    protected function __beforeRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters)
+    {
     }
 
-    protected function __afterRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters) {
+    protected function __afterRespond(\Owl\Http\Request $request, \Owl\Http\Response $response, $controller, array $paramters)
+    {
     }
 
-    public function __construct(array $config = []) {
-        (new \Owl\Parameter\Validator)->execute($config, [
+    public function __construct(array $config = [])
+    {
+        (new \Owl\Parameter\Validator())->execute($config, [
             'namespace' => ['type' => 'string'],
             'base_path' => ['type' => 'string', 'required' => false, 'regexp' => '#^/.+#'],
             'rewrite' => ['type' => 'hash', 'required' => false, 'allow_empty' => true, 'keys' => []],
@@ -71,14 +76,16 @@ class Router {
 
         $this->config = $config;
 
-        $this->middleware = new \Owl\Middleware;
+        $this->middleware = new \Owl\Middleware();
     }
 
     /**
      * @param string $key
+     *
      * @return mixed|false
      */
-    public function getConfig($key) {
+    public function getConfig($key)
+    {
         return isset($this->config[$key])
              ? $this->config[$key]
              : false;
@@ -86,26 +93,31 @@ class Router {
 
     /**
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return $this
      */
-    public function setConfig($key, $value) {
+    public function setConfig($key, $value)
+    {
         $this->config[$key] = $value;
+
         return $this;
     }
 
     /**
-     * 把指定路径的访问委托到另外一个router
+     * 把指定路径的访问委托到另外一个router.
      *
-     * @param string $path
+     * @param string         $path
      * @param Owl\Mvc\Router $router
+     *
      * @return $this
      */
-    public function delegate($path, Router $router) {
+    public function delegate($path, Router $router)
+    {
         $path = $this->normalizePath($path);
 
         if ($base_path = $this->getConfig('base_path')) {
-            $base_path = $base_path .ltrim($path, '/');
+            $base_path = $base_path.ltrim($path, '/');
         } else {
             $base_path = $path;
         }
@@ -118,13 +130,15 @@ class Router {
     }
 
     /**
-     * 给指定路径的请求绑定中间件
+     * 给指定路径的请求绑定中间件.
      *
-     * @param string $path
+     * @param string   $path
      * @param callable $handler
+     *
      * @return $this
      */
-    public function middleware($path, $handler = null) {
+    public function middleware($path, $handler = null)
+    {
         if ($handler === null) {
             $handler = $path;
             $path = '/';
@@ -137,11 +151,13 @@ class Router {
     }
 
     /**
-     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Request  $request
      * @param \Owl\Http\Response $response
+     *
      * @return $response
      */
-    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response)
+    {
         if ($router = $this->getDelegateRouter($request)) {
             return $router->execute($request, $response);
         }
@@ -150,7 +166,7 @@ class Router {
             if (!$handlers = $this->getMiddlewareHandlers($request)) {
                 $this->respond($request, $response);
             } else {
-                $handlers[] = function($request, $response) {
+                $handlers[] = function ($request, $response) {
                     $this->respond($request, $response);
 
                     yield true;
@@ -171,24 +187,29 @@ class Router {
 
     /**
      * @param callable $handler
+     *
      * @return $this
      */
-    public function setExceptionHandler($handler) {
+    public function setExceptionHandler($handler)
+    {
         $this->exception_handler = $handler;
+
         return $this;
     }
 
     /**
-     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Request  $request
      * @param \Owl\Http\Response $response
+     *
      * @return \Owl\Http\Response $response
      *
      * @throws \Owl\Http\Exception 404
      * @throws \Owl\Http\Exception 501
      */
-    protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    protected function respond(\Owl\Http\Request $request, \Owl\Http\Response $response)
+    {
         App::log('debug', 'router respond', [
-            'url' => (string)$request->getUri(),
+            'url' => (string) $request->getUri(),
             'method' => $request->getMethod(),
         ]);
 
@@ -251,13 +272,15 @@ class Router {
     }
 
     /**
-     * 正则表达式方式匹配controller
+     * 正则表达式方式匹配controller.
      *
      * @param string $path
-     * @param array $rules
+     * @param array  $rules
+     *
      * @return [string $class, array $parameters]
      */
-    protected function byRewrite($path, array $rules = null) {
+    protected function byRewrite($path, array $rules = null)
+    {
         if ($rules === null) {
             $rules = $this->getConfig('rewrite') ?: [];
         }
@@ -280,12 +303,14 @@ class Router {
     }
 
     /**
-     * 以路径匹配controller
+     * 以路径匹配controller.
      *
      * @param string $path
+     *
      * @return [string $class, array $parameters]
      */
-    protected function byPath($path) {
+    protected function byPath($path)
+    {
         $pathinfo = pathinfo(strtolower($path));
 
         if ($pathinfo['dirname'] === '\\') {
@@ -293,8 +318,8 @@ class Router {
         }
 
         $path = ($pathinfo['dirname'] === '/')
-              ? $pathinfo['dirname'] . $pathinfo['filename']
-              : $pathinfo['dirname'] .'/'. $pathinfo['filename'];
+              ? $pathinfo['dirname'].$pathinfo['filename']
+              : $pathinfo['dirname'].'/'.$pathinfo['filename'];
         $path = $this->normalizePath($path);
 
         if ($path === '/') {
@@ -308,14 +333,17 @@ class Router {
             }
         }
         $class = $this->getConfig('namespace').implode('\\', array_map('ucfirst', $class));
+
         return [$class, []];
     }
 
     /**
      * @param string $path
+     *
      * @return string
      */
-    protected function normalizePath($path) {
+    protected function normalizePath($path)
+    {
         if ($path === '/') {
             return '/';
         }
@@ -328,12 +356,14 @@ class Router {
     }
 
     /**
-     * 去掉路径内的base_path
+     * 去掉路径内的base_path.
      *
      * @param string $path
+     *
      * @return string
      */
-    protected function trimBasePath($path) {
+    protected function trimBasePath($path)
+    {
         $base_path = $this->getConfig('base_path');
 
         if (!$base_path || $base_path === '/') {
@@ -348,12 +378,14 @@ class Router {
     }
 
     /**
-     * get middleware handlers by request path
+     * get middleware handlers by request path.
      *
      * @param Owl\Http\Request $request
+     *
      * @return array
      */
-    protected function getMiddlewareHandlers(\Owl\Http\Request $request) {
+    protected function getMiddlewareHandlers(\Owl\Http\Request $request)
+    {
         if (!$this->middleware_handlers) {
             return [];
         }
@@ -371,12 +403,14 @@ class Router {
     }
 
     /**
-     * 获得托管的下级router
+     * 获得托管的下级router.
      *
      * @param Owl\Http\Request $request
+     *
      * @return Owl\Mvc\Router | false
      */
-    protected function getDelegateRouter(\Owl\Http\Request $request) {
+    protected function getDelegateRouter(\Owl\Http\Request $request)
+    {
         if (!$this->children) {
             return false;
         }
@@ -393,13 +427,16 @@ class Router {
     }
 
     /**
-     * 获得请求路径，去掉了base_path后的内容
+     * 获得请求路径，去掉了base_path后的内容.
      *
      * @param Owl\Http\Request $request
+     *
      * @return string
      */
-    protected function getRequestPath(\Owl\Http\Request $request) {
+    protected function getRequestPath(\Owl\Http\Request $request)
+    {
         $path = $this->normalizePath($request->getUri()->getPath());
+
         return $this->trimBasePath($path);
     }
 }

@@ -1,31 +1,38 @@
 <?php
+
 namespace Owl\Service;
 
 if (!extension_loaded('mongo')) {
     throw new \Exception('Require "mongo" extension');
 }
 
-class Mongodb extends \Owl\Service {
+class Mongodb extends \Owl\Service
+{
     private $client;
 
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         parent::__construct(static::normalizeConfig($config));
     }
 
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         return call_user_func_array([$this->connect(), $method], $args);
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->isConnected()) {
             $this->client->close();
         }
 
         $this->client = null;
+
         return true;
     }
 
-    public function connect() {
+    public function connect()
+    {
         if (!$this->client) {
             $this->client = new \MongoClient($this->getConfig('dsn'), $this->getConfig('options') ?: []);
         } elseif (!$this->client->connected) {
@@ -35,7 +42,8 @@ class Mongodb extends \Owl\Service {
         return $this->client;
     }
 
-    public function isConnected() {
+    public function isConnected()
+    {
         return $this->client && $this->client->connected;
     }
 
@@ -45,7 +53,8 @@ class Mongodb extends \Owl\Service {
      * $collection = $mongo->getCollection('db.collection');
      * $collection = $mongo->getCollection(['db', 'collection']);
      */
-    public function getCollection($db, $collection = null) {
+    public function getCollection($db, $collection = null)
+    {
         if ($db instanceof \MongoCollection) {
             return $db;
         }
@@ -63,39 +72,46 @@ class Mongodb extends \Owl\Service {
         return $this->selectCollection($db, $collection);
     }
 
-    public function find($collection, array $query = [], array $fields = []) {
+    public function find($collection, array $query = [], array $fields = [])
+    {
         return $this->getCollection($collection)->find($query, $fields);
     }
 
-    public function findOne($collection, array $query = [], array $fields = []) {
+    public function findOne($collection, array $query = [], array $fields = [])
+    {
         return $this->getCollection($collection)->findOne($query, $fields);
     }
 
-    public function insert($collection, array $record, array $options = []) {
+    public function insert($collection, array $record, array $options = [])
+    {
         return $this->getCollection($collection)->insert($record, $options);
     }
 
-    public function save($collection, array $record, array $options = []) {
+    public function save($collection, array $record, array $options = [])
+    {
         return $this->getCollection($collection)->save($record, $options);
     }
 
-    public function update($collection, array $criteria, array $record, array $options = []) {
+    public function update($collection, array $criteria, array $record, array $options = [])
+    {
         return $this->getCollection($collection)->update($criteria, $record, $options);
     }
 
-    public function remove($collection, array $criteria, $options = []) {
+    public function remove($collection, array $criteria, $options = [])
+    {
         return $this->getCollection($collection)->remove($criteria, $options);
     }
 
     /**
-     * 格式化配置数据
+     * 格式化配置数据.
      *
      * @param array $config
      * @static
-     * @access public
+     *
      * @return array
      */
-    static public function normalizeConfig(array $config) {
+    public static function normalizeConfig(array $config)
+    {
         $config = array_merge([
             'dsn' => sprintf('mongodb://%s:%s', ini_get('mongo.default_host'), ini_get('mongo.default_port')),
         ], $config);

@@ -1,14 +1,18 @@
 <?php
+
 namespace Owl\DataMapper\DB;
 
-class Data extends \Owl\DataMapper\Data {
-    static protected $mapper = '\Owl\DataMapper\DB\Mapper';
+class Data extends \Owl\DataMapper\Data
+{
+    protected static $mapper = '\Owl\DataMapper\DB\Mapper';
 
-    static public function select() {
+    public static function select()
+    {
         return static::getMapper()->select();
     }
 
-    static public function getBySQL($sql, array $parameters = [], \Owl\Service $service = null) {
+    public static function getBySQL($sql, array $parameters = [], \Owl\Service $service = null)
+    {
         $result = [];
 
         foreach (static::getBySQLAsIterator($sql, $parameters, $service) as $data) {
@@ -24,7 +28,8 @@ class Data extends \Owl\DataMapper\Data {
         return $result;
     }
 
-    static public function getBySQLAsIterator($sql, array $parameters = [], \Owl\Service $service = null) {
+    public static function getBySQLAsIterator($sql, array $parameters = [], \Owl\Service $service = null)
+    {
         return static::getMapper()->getBySQLAsIterator($sql, $parameters, $service);
     }
 }

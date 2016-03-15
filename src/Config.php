@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl;
 
 /**
@@ -19,14 +20,17 @@ namespace Owl;
  * Config::get('foo', 'bar', 'baz');
  * Config::get(['foo', 'bar', 'baz']);
  */
-class Config {
-    static private $config = [];
+class Config
+{
+    private static $config = [];
 
-    static public function merge(array $config) {
+    public static function merge(array $config)
+    {
         self::$config = array_merge(self::$config, $config);
     }
 
-    static public function get($keys = null) {
+    public static function get($keys = null)
+    {
         $keys = $keys === null
               ? []
               : is_array($keys) ? $keys : func_get_args();

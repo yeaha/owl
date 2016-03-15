@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Service;
 
 use Owl\Application as App;
@@ -25,7 +26,8 @@ if (!class_exists('\Predis\Client')) {
  *
  * $redis = new \Owl\Service\Predis($parameters, $options);
  */
-class Predis extends \Owl\Service {
+class Predis extends \Owl\Service
+{
     protected $client;
 
     protected $command_alias = [
@@ -33,7 +35,8 @@ class Predis extends \Owl\Service {
         'delete' => 'del',
     ];
 
-    public function __call($method, array $args) {
+    public function __call($method, array $args)
+    {
         $client = $this->connect();
 
         $command = strtolower($method);
@@ -49,7 +52,8 @@ class Predis extends \Owl\Service {
         return $args ? call_user_func_array([$client, $method], $args) : $client->$method();
     }
 
-    public function connect() {
+    public function connect()
+    {
         if (!$this->client || !$this->client->isConnected()) {
             $parameters = $this->getConfig('parameters');
             $options = $this->getConfig('options') ?: [];
@@ -73,7 +77,8 @@ class Predis extends \Owl\Service {
         return $this->client;
     }
 
-    public function disconnect() {
+    public function disconnect()
+    {
         if ($this->client) {
             $parameters = $this->getConfig('parameters');
 
@@ -90,11 +95,13 @@ class Predis extends \Owl\Service {
         }
     }
 
-    public function multi() {
+    public function multi()
+    {
         return $this->connect()->transaction();
     }
 
-    public function hMGet($key, array $fields) {
+    public function hMGet($key, array $fields)
+    {
         $redis = $this->connect();
 
         $values = $redis->hmget($key, $fields);

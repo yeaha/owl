@@ -1,8 +1,11 @@
 <?php
+
 namespace Owl\DataMapper\Type;
 
-class Json extends Complex {
-    public function normalize($value, array $attribute) {
+class Json extends Complex
+{
+    public function normalize($value, array $attribute)
+    {
         if (is_array($value)) {
             return $value;
         }
@@ -20,11 +23,12 @@ class Json extends Complex {
         return $value;
     }
 
-    public function store($value, array $attribute) {
+    public function store($value, array $attribute)
+    {
         $value = parent::store($value, $attribute);
 
         if ($this->isNull($value)) {
-            return null;
+            return;
         }
 
         $value = json_encode($value, JSON_UNESCAPED_UNICODE);
@@ -36,7 +40,8 @@ class Json extends Complex {
         return $value;
     }
 
-    public function restore($value, array $attribute) {
+    public function restore($value, array $attribute)
+    {
         if ($this->isNull($value)) {
             return [];
         }

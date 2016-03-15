@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl;
 
 /**
@@ -38,65 +39,72 @@ namespace Owl;
  *
  * $app->start();
  */
-
-class Application {
+class Application
+{
     protected $exception_handler;
     protected $middleware;
 
-    public function __construct() {
-        $this->middleware = new \Owl\Middleware;
+    public function __construct()
+    {
+        $this->middleware = new \Owl\Middleware();
     }
 
     /**
-     * 添加中间件
+     * 添加中间件.
      *
      * @param callable $handler
+     *
      * @return $this
      */
-    public function middleware($handler) {
+    public function middleware($handler)
+    {
         $this->middleware->insert($handler);
+
         return $this;
     }
 
     /**
-     * 清除所有已添加的中间件
-     *
-     * @return void
+     * 清除所有已添加的中间件.
      */
-    public function resetMiddleware() {
+    public function resetMiddleware()
+    {
         $this->middleware->reset();
     }
 
     /**
-     * 添加异常处理逻辑
+     * 添加异常处理逻辑.
      *
      * @param \Closure $handler
+     *
      * @return $this
      */
-    public function setExceptionHandler($handler) {
+    public function setExceptionHandler($handler)
+    {
         $this->exception_handler = $handler;
+
         return $this;
     }
 
-    public function start() {
-        $request = new \Owl\Http\Request;
-        $response = new \Owl\Http\Response;
+    public function start()
+    {
+        $request = new \Owl\Http\Request();
+        $response = new \Owl\Http\Response();
 
         return $this->execute($request, $response);
     }
 
     /**
-     * 响应请求，依次执行添加的中间件逻辑
+     * 响应请求，依次执行添加的中间件逻辑.
      *
-     * @param \Owl\Http\Request $request
+     * @param \Owl\Http\Request  $request
      * @param \Owl\Http\Response $response
-     * @return void
      */
-    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response) {
+    public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response)
+    {
         try {
             $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
-            $handler = $this->exception_handler ?: function($exception, $request, $response) {
+            $handler = $this->exception_handler ?: function ($exception, $request, $response) {
                 $response->withStatus(500)
                          ->withBody(new \Owl\Http\StringStream('')); // reset response stream
             };
@@ -114,18 +122,20 @@ class Application {
     }
 
     /**
-     * class loader
+     * class loader.
      *
      * @param string $namespace
      * @param string $path
      * @param string $classname For test
+     *
      * @return void|string
      */
-    static public function registerNamespace($namespace, $path, $classname = null) {
+    public static function registerNamespace($namespace, $path, $classname = null)
+    {
         $namespace = trim($namespace, '\\');
         $path = rtrim($path, '/\\');
 
-        $loader = function($classname, $return_filename = false) use ($namespace, $path) {
+        $loader = function ($classname, $return_filename = false) use ($namespace, $path) {
             if (class_exists($classname, false) || interface_exists($classname, false)) {
                 return true;
             }
@@ -138,7 +148,7 @@ class Application {
                 $filename = trim(substr($classname, strlen($namespace)), '\\');
             }
 
-            $filename = $path .DIRECTORY_SEPARATOR. str_replace('\\', DIRECTORY_SEPARATOR, $filename).'.php';
+            $filename = $path.DIRECTORY_SEPARATOR.str_replace('\\', DIRECTORY_SEPARATOR, $filename).'.php';
 
             if ($return_filename) {
                 return $filename;
@@ -148,6 +158,7 @@ class Application {
                 }
 
                 require $filename;
+
                 return class_exists($classname, false) || interface_exists($classname, false);
             }
         };
@@ -159,17 +170,20 @@ class Application {
         }
     }
 
-    static protected $logger;
+    protected static $logger;
 
-    static public function setLogger(\Psr\Log\LoggerInterface $logger) {
+    public static function setLogger(\Psr\Log\LoggerInterface $logger)
+    {
         self::$logger = $logger;
     }
 
-    static public function unsetLogger() {
+    public static function unsetLogger()
+    {
         self::$logger = null;
     }
 
-    static public function log($level, $message, array $context = []) {
+    public static function log($level, $message, array $context = [])
+    {
         if ($logger = self::$logger) {
             $logger->log($level, $message, $context);
         }

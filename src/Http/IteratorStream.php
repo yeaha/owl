@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\Http;
 
 /**
@@ -13,13 +14,15 @@ namespace Owl\Http;
  * $body = new \Owl\Http\IteratorStream($output());
  * $response->withBody($body);
  */
-class IteratorStream extends \Owl\Http\Stream {
+class IteratorStream extends \Owl\Http\Stream
+{
     protected $position = 0;
     protected $seekable = false;
     protected $readable = false;
     protected $writable = false;
 
-    public function __construct($iterator) {
+    public function __construct($iterator)
+    {
         if (!($iterator instanceof \Iterator)) {
             throw new \Exception('Stream must be a Iterator object');
         }
@@ -27,7 +30,8 @@ class IteratorStream extends \Owl\Http\Stream {
         $this->stream = $iterator;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         try {
             return $this->getContents();
         } catch (\Exception $ex) {
@@ -35,18 +39,20 @@ class IteratorStream extends \Owl\Http\Stream {
         }
     }
 
-    public function iterator() {
+    public function iterator()
+    {
         if ($this->eof()) {
             throw new \Exception('Stream was closed');
         }
 
         foreach ($this->stream as $result) {
-            $this->position++;
+            ++$this->position;
             yield $result;
         }
     }
 
-    public function getContents() {
+    public function getContents()
+    {
         $string = '';
         foreach ($this->iterator() as $result) {
             $string .= $result;
@@ -55,11 +61,13 @@ class IteratorStream extends \Owl\Http\Stream {
         return $string;
     }
 
-    public function tell() {
+    public function tell()
+    {
         return $this->position;
     }
 
-    public function eof() {
+    public function eof()
+    {
         return !$this->stream->valid();
     }
 }

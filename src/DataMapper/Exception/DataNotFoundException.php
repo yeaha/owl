@@ -1,5 +1,7 @@
 <?php
+
 namespace Owl\DataMapper\Exception;
 
-class DataNotFoundException extends \Exception {
+class DataNotFoundException extends \Exception
+{
 }

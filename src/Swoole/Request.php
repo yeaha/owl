@@ -1,10 +1,13 @@
 <?php
+
 namespace Owl\Swoole;
 
-class Request extends \Owl\Http\Request {
+class Request extends \Owl\Http\Request
+{
     protected $swoole_request;
 
-    public function __construct($swoole_request) {
+    public function __construct($swoole_request)
+    {
         $this->swoole_request = $swoole_request;
 
         $get = isset($swoole_request->get) ? $swoole_request->get : [];

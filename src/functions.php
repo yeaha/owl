@@ -1,17 +1,21 @@
 <?php
+
 namespace Owl;
 
 /**
  * @param string $string
- * @return boolean
+ *
+ * @return bool
  */
-function str_has_tags($string) {
+function str_has_tags($string)
+{
     return is_string($string)
         && strlen($string) > 2
         && $string !== strip_tags($string);
 }
 
-function array_set_in(array &$target, array $path, $value, $push = false) {
+function array_set_in(array &$target, array $path, $value, $push = false)
+{
     $last_key = array_pop($path);
 
     foreach ($path as $key) {
@@ -41,16 +45,18 @@ function array_set_in(array &$target, array $path, $value, $push = false) {
 
 /**
  * // set in
- * $target[$path] = $value;
+ * $target[$path] = $value;.
  *
  * // push in
  * $target[$path][] = $value;
  */
-function array_push_in(array &$target, array $path, $value) {
+function array_push_in(array &$target, array $path, $value)
+{
     return array_set_in($target, $path, $value, true);
 }
 
-function array_get_in(array $target, array $path) {
+function array_get_in(array $target, array $path)
+{
     foreach ($path as $key) {
         if (!isset($target[$key])) {
             return false;
@@ -62,7 +68,8 @@ function array_get_in(array $target, array $path) {
     return $target;
 }
 
-function array_unset_in(array &$target, array $path) {
+function array_unset_in(array &$target, array $path)
+{
     $last_key = array_pop($path);
 
     foreach ($path as $key) {
@@ -102,7 +109,8 @@ function array_unset_in(array &$target, array $path) {
  * // ];
  * $value = \Owl\array_trim($value);
  */
-function array_trim(array $target) {
+function array_trim(array $target)
+{
     $keys = array_keys($target);
     $is_array = ($keys === array_keys($keys));
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Owl\DataMapper;
 
 /**
@@ -37,34 +38,38 @@ namespace Owl\DataMapper;
  *     ];
  * }
  */
-trait CacheMapper {
+trait CacheMapper
+{
     /**
      * @param mixed $id
+     *
      * @return array|false
      */
     abstract protected function getCache($id);
 
     /**
      * @param mixed $id
-     * @return boolean
+     *
+     * @return bool
      */
     abstract protected function deleteCache($id);
 
     /**
      * @param mixed $id
      * @param array $record
-     * @param integer $ttl
-     * @return boolean
+     * @param int   $ttl
+     *
+     * @return bool
      */
     abstract protected function saveCache($id, array $record, $ttl = null);
 
     /**
-     * create cache after save new data, if cache policy set
+     * create cache after save new data, if cache policy set.
      *
      * @param \Owl\DataMapper\Data $data
-     * @return void
      */
-    protected function __afterInsert(\Owl\DataMapper\Data $data) {
+    protected function __afterInsert(\Owl\DataMapper\Data $data)
+    {
         $policy = $this->getCachePolicy();
 
         $id = $data->id();
@@ -82,12 +87,12 @@ trait CacheMapper {
     }
 
     /**
-     * delete or update cache after save data
+     * delete or update cache after save data.
      *
      * @param \Owl\DataMapper\Data $data
-     * @return void
      */
-    protected function __afterUpdate(\Owl\DataMapper\Data $data) {
+    protected function __afterUpdate(\Owl\DataMapper\Data $data)
+    {
         $policy = $this->getCachePolicy();
 
         if ($policy['update']) {
@@ -104,35 +109,38 @@ trait CacheMapper {
     }
 
     /**
-     * delete cache after delete data
+     * delete cache after delete data.
      *
      * @param \Owl\DataMapper\Data $data
-     * @return void
      */
-    protected function __afterDelete(\Owl\DataMapper\Data $data) {
+    protected function __afterDelete(\Owl\DataMapper\Data $data)
+    {
         $this->deleteCache($data->id());
 
         parent::__afterDelete($data);
     }
 
     /**
-     * delete cache before refresh data
+     * delete cache before refresh data.
      *
      * @param \Owl\DataMapper\Data $data
+     *
      * @return \Owl\DataMapper\Data
      */
-    public function refresh(\Owl\DataMapper\Data $data) {
+    public function refresh(\Owl\DataMapper\Data $data)
+    {
         $this->deleteCache($data->id());
 
         return parent::refresh($data);
     }
 
     /**
-     * 获得缓存策略配置
+     * 获得缓存策略配置.
      *
-     * @return integer
+     * @return int
      */
-    protected function getCachePolicy() {
+    protected function getCachePolicy()
+    {
         $defaults = [
             'insert' => false,
             'update' => false,
@@ -142,7 +150,6 @@ trait CacheMapper {
         if (!$this->hasOption('cache_policy')) {
             return $defaults;
         }
-
 
         $policy = $this->getOption('cache_policy');
 
@@ -158,14 +165,16 @@ trait CacheMapper {
     }
 
     /**
-     * return record from cache if cache is created, or save data into cache
+     * return record from cache if cache is created, or save data into cache.
      *
-     * @param mixed $id
+     * @param mixed        $id
      * @param \Owl\Service $service
-     * @param string $collection
+     * @param string       $collection
+     *
      * @return array
      */
-    protected function doFind($id, \Owl\Service $service = null, $collection = null) {
+    protected function doFind($id, \Owl\Service $service = null, $collection = null)
+    {
         if ($record = $this->getCache($id)) {
             return isset($record['__IS_NOT_FOUND__']) ? false : $record;
         }
@@ -177,7 +186,7 @@ trait CacheMapper {
             $policy = $this->getCachePolicy();
 
             if ($ttl = $policy['not_found']) {
-                $ttl = is_numeric($ttl) ? (int)$ttl : null;
+                $ttl = is_numeric($ttl) ? (int) $ttl : null;
                 $this->saveCache($id, ['__IS_NOT_FOUND__' => 1], $ttl);
             }
         }
@@ -186,12 +195,14 @@ trait CacheMapper {
     }
 
     /**
-     * remove NULL value from record
+     * remove NULL value from record.
      *
      * @param array $record
+     *
      * @return array
      */
-    protected function normalizeCacheRecord(array $record) {
+    protected function normalizeCacheRecord(array $record)
+    {
         // 值为NULL的字段不用缓存
         foreach ($record as $key => $val) {
             if ($val === null) {

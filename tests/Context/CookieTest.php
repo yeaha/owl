@@ -1,22 +1,26 @@
 <?php
+
 namespace Tests\Context;
 
-class CookieTest extends \PHPUnit_Framework_TestCase {
-    protected function setUp() {
+class CookieTest extends \PHPUnit_Framework_TestCase
+{
+    protected function setUp()
+    {
         \Tests\Mock\Cookie::getInstance()->reset();
     }
 
-    public function testCookieContext() {
+    public function testCookieContext()
+    {
         $config_list = [
             '明文' => [
                 'request' => \Owl\Http\Request::factory(),
-                'response' => new \Tests\Mock\Http\Response,
+                'response' => new \Tests\Mock\Http\Response(),
                 'token' => 'test',
-                'sign_salt' => 'fdajkfldsjfldsf'
+                'sign_salt' => 'fdajkfldsjfldsf',
             ],
             '明文+压缩' => [
                 'request' => \Owl\Http\Request::factory(),
-                'response' => new \Tests\Mock\Http\Response,
+                'response' => new \Tests\Mock\Http\Response(),
                 'token' => 'test',
                 'sign_salt' => 'fdajkfldsjfldsf',
                 'zip' => true,
@@ -32,14 +36,15 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
             $handler = new \Owl\Context\Cookie(array_merge($config, [
                 'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies()]),
-                'response' => new \Tests\Mock\Http\Response,
+                'response' => new \Tests\Mock\Http\Response(),
             ]));
 
             $this->assertEquals($handler->get('test'), 'abc 中文', $msg);
         }
     }
 
-    public function testCookieEncrypt() {
+    public function testCookieEncrypt()
+    {
         if (!extension_loaded('mcrypt')) {
             $this->markTestSkipped('没有加载mcrypt模块，无法测试cookie加密功能');
         }
@@ -58,7 +63,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
             foreach ($crypt['mode'] as $mode) {
                 $config = array_merge($config_default, [
                     'request' => \Owl\Http\Request::factory(),
-                    'response' => new \Tests\Mock\Http\Response,
+                    'response' => new \Tests\Mock\Http\Response(),
                     'encrypt' => ['uf43jrojfosdf', $cipher, $mode],
                 ]);
 
@@ -69,7 +74,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
                 $handler = new \Owl\Context\Cookie(array_merge($config, [
                     'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies()]),
-                    'response' => new \Tests\Mock\Http\Response,
+                    'response' => new \Tests\Mock\Http\Response(),
                 ]));
 
                 $this->assertEquals($handler->get('test'), 'abc 中文', "cipher:{$cipher} mode: {$mode} 加密解密失败");
@@ -78,10 +83,11 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
     }
 
     // 数字签名
-    public function testCookieContextSign() {
+    public function testCookieContextSign()
+    {
         $config = [
             'request' => \Owl\Http\Request::factory(),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
             'token' => 'test',
             'sign_salt' => 'fdajkfldsjfldsf',
         ];
@@ -91,7 +97,7 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
         $handler = new \Owl\Context\Cookie(array_merge($config, [
             'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies()]),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
         ]));
 
         $handler->setConfig('sign_salt', 'r431oj0if31jr3');
@@ -102,22 +108,24 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
         $handler = new \Owl\Context\Cookie(array_merge($config, [
             'request' => \Owl\Http\Request::factory(['cookies' => $cookies_data]),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
         ]));
 
         $this->assertNull($handler->get('test'), '篡改cookie内容');
     }
 
     // 从自定义方法内计算sign salt
-    public function testCookieContextSignSaltFunc() {
-        $salt_func = function($string) {
+    public function testCookieContextSignSaltFunc()
+    {
+        $salt_func = function ($string) {
             $context = json_decode($string, true) ?: array();
+
             return isset($context['id']) ? $context['id'] : 'rj102jrojfoe';
         };
 
         $config = [
             'request' => \Owl\Http\Request::factory(),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
             'token' => 'test',
             'sign_salt' => $salt_func,
         ];
@@ -129,22 +137,23 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
         $handler = new \Owl\Context\Cookie(array_merge($config, [
             'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies()]),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
         ]));
 
         $this->assertEquals($id, $handler->get('id'), '自定义sign salt没有起作用');
     }
 
     // 地址绑定
-    public function testBindIpCookieContext() {
+    public function testBindIpCookieContext()
+    {
         $config = [
             'request' => \Owl\Http\Request::factory([
                 'ip' => '192.168.1.1',
             ]),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
             'token' => 'test',
             'sign_salt' => 'fdajkfldsjfldsf',
-            'bind_ip' => true
+            'bind_ip' => true,
         ];
 
         $handler = new \Owl\Context\Cookie($config);
@@ -152,14 +161,14 @@ class CookieTest extends \PHPUnit_Framework_TestCase {
 
         $handler = new \Owl\Context\Cookie(array_merge($config, [
             'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies(), 'ip' => '192.168.1.3']),
-            'response' => new \Tests\Mock\Http\Response,
+            'response' => new \Tests\Mock\Http\Response(),
         ]));
 
         $this->assertEquals($handler->get('test'), 'abc', '同子网IP取值');
 
         $handler = new \Owl\Context\Cookie(array_merge($config, [
             'request' => \Owl\Http\Request::factory(['cookies' => $handler->getConfig('response')->getCookies(), 'ip' => '192.168.2.1']),
-            'response' => new \Owl\Http\Response,
+            'response' => new \Owl\Http\Response(),
         ]));
         $this->assertNull($handler->get('test'), '不同子网IP取值');
     }
