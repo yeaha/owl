@@ -53,7 +53,7 @@ class Container extends \Owl\Container
 
     public function setRouter($id, \Closure $handler)
     {
-        $this->router[$id] = $handler;
+        $this->router[$id] = $handler->bindTo($this);
 
         return $this;
     }
