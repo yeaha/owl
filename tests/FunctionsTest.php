@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace tests;
 
 class FunctionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -207,5 +207,22 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([
             'a' => [1, 'a'],
         ], \Owl\array_trim($target));
+    }
+
+    public function testSafeJson()
+    {
+        try {
+            $json = '{a:1';
+            \Owl\safe_json_decode($json, true);
+            $this->fail('test safe_json_decode() failed');
+        } catch (\UnexpectedValueException $ex) {
+        }
+
+        try {
+            $string = substr('爱', 0, 1);
+            \Owl\safe_json_encode($string);
+            $this->fail('test safe_json_encode() failed');
+        } catch (\UnexpectedValueException $ex) {
+        }
     }
 }

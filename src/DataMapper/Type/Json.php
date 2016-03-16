@@ -14,13 +14,7 @@ class Json extends Complex
             return [];
         }
 
-        $value = json_decode($value, true);
-
-        if ($value === null && json_last_error() !== JSON_ERROR_NONE) {
-            throw new \UnexpectedValueException(json_last_error_msg(), json_last_error());
-        }
-
-        return $value;
+        return \Owl\safe_json_decode($value, true);
     }
 
     public function store($value, array $attribute)
@@ -31,13 +25,7 @@ class Json extends Complex
             return;
         }
 
-        $value = json_encode($value, JSON_UNESCAPED_UNICODE);
-
-        if ($value === false && json_last_error() !== JSON_ERROR_NONE) {
-            throw new \UnexpectedValueException(json_last_error_msg(), json_last_error());
-        }
-
-        return $value;
+        return \Owl\safe_json_encode($value, true);
     }
 
     public function restore($value, array $attribute)
