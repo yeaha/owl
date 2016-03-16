@@ -261,10 +261,10 @@ class Validator
 
     protected function checkJson($key, $value, array $rule)
     {
-        $value = json_decode($value, true);
-
-        if ($value === null && ($error = json_last_error_msg())) {
-            throw $this->exception($key, 'json_decode() failed, '.$error);
+        try {
+            $value = \Owl\safe_json_decode($value, true);
+        } catch (\UnexpectedValueException $ex) {
+            throw $this->exception($key, 'json_decode() falied, '. $ex->getMessage());
         }
 
         return $this->checkArray($key, $value, $rule);

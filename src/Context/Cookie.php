@@ -127,7 +127,7 @@ class Cookie extends \Owl\Context
     // return string
     protected function encode($data)
     {
-        $data = json_encode($data);
+        $data = \Owl\safe_json_encode($data);
 
         // 添加数字签名
         $data = $data.$this->getSign($data);
@@ -176,7 +176,7 @@ class Cookie extends \Owl\Context
                 break;
             }
 
-            return json_decode($string, true) ?: [];
+            return \Owl\safe_json_decode($string, true) ?: [];
         } while (false);
 
         return [];

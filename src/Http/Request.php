@@ -210,7 +210,7 @@ class Request implements ServerRequestInterface
         }
 
         if ($content_type === 'application/json') {
-            return json_decode($body, true);
+            return \Owl\safe_json_decode($body, true);
         }
 
         return $body;
