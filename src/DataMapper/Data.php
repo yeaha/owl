@@ -594,8 +594,8 @@ abstract class Data implements \JsonSerializable
                     throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", not allow null', get_class($this), $key));
                 }
             } else {
-                if ($attribute['pattern'] && !preg_match($attribute['pattern'], $value)) {
-                    throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", mismatching pattern %s', get_class($this), $key, $attribute['pattern']));
+                if ($attribute['regexp'] && !preg_match($attribute['regexp'], $value)) {
+                    throw new Exception\UnexpectedPropertyValueException(sprintf('%s: Property "%s", mismatching pattern %s', get_class($this), $key, $attribute['regexp']));
                 }
 
                 if (!$attribute['allow_tags'] && \Owl\str_has_tags($value)) {

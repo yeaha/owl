@@ -105,7 +105,7 @@ class Type
             'deprecated' => false,
 
             // 正则表达式检查
-            'pattern' => null,
+            'regexp' => null,
 
             // 是否主键
             'primary_key' => false,
@@ -128,6 +128,11 @@ class Type
         ];
 
         $type = isset($attribute['type']) ? $attribute['type'] : null;
+
+        if (isset($attribute['pattern'])) {
+            $attribute['regexp'] = $attribute['pattern'];
+            unset($attribute['pattern']);
+        }
 
         $attribute = array_merge(
             $defaults,

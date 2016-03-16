@@ -359,11 +359,11 @@ class DataTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testValidateAttributePattern()
+    public function testValidateAttributeRegexp()
     {
         $this->setAttributes([
             'id' => ['type' => 'integer', 'primary_key' => true, 'auto_generate' => true],
-            'foo' => ['type' => 'string', 'pattern' => '/^a.+z$/'],
+            'foo' => ['type' => 'string', 'regexp' => '/^a.+z$/'],
         ]);
 
         $data = $this->newData();
@@ -371,7 +371,7 @@ class DataTest extends \PHPUnit_Framework_TestCase
 
         try {
             $data->validate();
-            $this->fail('validate "pattern" failed');
+            $this->fail('validate "regexp" failed');
         } catch (\Owl\DataMapper\Exception\UnexpectedPropertyValueException $ex) {
         }
 

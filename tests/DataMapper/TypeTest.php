@@ -9,17 +9,19 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeAttribute()
     {
         $attribute = DataMapper\Type::normalizeAttribute(array('primary_key' => true));
-
         $this->assertFalse($attribute['allow_null']);
         $this->assertTrue($attribute['refuse_update']);
         $this->assertTrue($attribute['strict']);
 
         $attribute = DataMapper\Type::normalizeAttribute(array('protected' => true));
-
         $this->assertTrue($attribute['strict']);
 
         $attribute = DataMapper\Type::normalizeAttribute(array('default' => 'foo', 'allow_null' => true));
         $this->assertNull($attribute['default']);
+
+        $attribute = DataMapper\Type::normalizeAttribute(array('pattern' => '/\d+/'));
+        $this->assertTrue(isset($attribute['regexp']));
+        $this->assertFalse(isset($attribute['pattern']));
     }
 
     public function testCommon()
@@ -112,8 +114,6 @@ class TypeTest extends \PHPUnit_Framework_TestCase
 
     public function testJSON()
     {
-        $attribute = DataMapper\Type::normalizeAttribute(array('type' => 'json'));
-
         $type = $this->getType('json');
         $this->assertInstanceOf('\Owl\DataMapper\Type\JSON', $type);
         $this->assertInstanceOf('\Owl\DataMapper\Type\Complex', $type);
