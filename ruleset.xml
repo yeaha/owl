@@ -51,5 +51,12 @@
         <exclude name="LongVariable" />
     </rule>
 
-    <rule ref="rulesets/unusedcode.xml" />
+    <rule ref="rulesets/unusedcode.xml/UnusedPrivateField" />
+    <rule ref="rulesets/unusedcode.xml/UnusedPrivateMethod" />
+    <rule ref="rulesets/unusedcode.xml/UnusedFormalParameter" />
+    <rule ref="rulesets/unusedcode.xml/UnusedLocalVariable">
+        <properties>
+            <property name="allow-unused-foreach-variables" value="true" />
+        </properties>
+    </rule>
 </ruleset>
