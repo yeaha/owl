@@ -185,7 +185,8 @@ abstract class Mapper
      *
      * @return
      * [
-     *     (string) => array,  // 主键字段名 => 属性定义
+     *     (string),    // 主键字段名
+     *     ...
      * ]
      */
     public function getPrimaryKey()
