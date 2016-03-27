@@ -47,6 +47,38 @@ class DataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $data->foo);
     }
 
+    public function testClone()
+    {
+        $class = $this->class;
+        $mapper = $class::getMapper();
+
+        $this->setAttributes(array(
+            'id' => array('type' => 'integer', 'primary_key' => true, 'auto_generate' => true),
+        ));
+
+        $data = $mapper->pack(['id' => 1]);
+
+        $this->assertFalse($data->isFresh());
+
+        $new_data = clone $data;
+
+        $this->assertTrue($new_data->isFresh());
+        $this->assertNull($new_data->id());
+
+        //////////////////////////////////////////////////////////////////////////
+        $this->setAttributes(array(
+            'id' => array('type' => 'uuid', 'primary_key' => true),
+        ));
+
+        $data = $mapper->pack([
+            'id' => '5c376c3a-53bf-4c26-8974-2ac9dc0f4b29',
+        ]);
+        $new_data = clone $data;
+
+        $this->assertFalse($data->id() === $new_data->id());
+        $this->assertRegexp('/^[0-9a-f\-]{36}$/', $new_data->id());
+    }
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessageRegExp /primary key/
