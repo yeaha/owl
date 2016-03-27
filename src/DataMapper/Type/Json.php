@@ -25,7 +25,7 @@ class Json extends Complex
             return;
         }
 
-        return \Owl\safe_json_encode($value, true);
+        return \Owl\safe_json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
     public function restore($value, array $attribute)
