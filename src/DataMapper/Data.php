@@ -222,11 +222,17 @@ abstract class Data implements \JsonSerializable
             $type = Type::factory($attribute['type']);
 
             if ($attribute['primary_key']) {
-                $this->$key = $type->getDefaultValue($attribute);
+                if ($value = $type->getDefaultValue($attribute)) {
+                    $this->values[$key] = $value;
+                } else {
+                    unset($this->values[$key]);
+                }
             } else {
-                $this->$key = $type->cloneValue($value);
+                $this->values[$key] = $type->cloneValue($value);
             }
         }
+
+        $this->dirty = array_keys($this->values);
     }
 
     /**
