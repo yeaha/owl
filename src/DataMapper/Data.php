@@ -207,6 +207,29 @@ abstract class Data implements \JsonSerializable
     }
 
     /**
+     * clone新对象
+     * 新对象的主键会被重置
+     */
+    public function __clone()
+    {
+        $this->fresh = true;
+
+        $mapper = static::getMapper();
+        $attributes = $mapper->getAttributes();
+
+        foreach ($this->values as $key => $value) {
+            $attribute = $attributes[$key];
+            $type = Type::factory($attribute['type']);
+
+            if ($attribute['primary_key']) {
+                $this->$key = $type->getDefaultValue($attribute);
+            } else {
+                $this->$key = $type->cloneValue($value);
+            }
+        }
+    }
+
+    /**
      * 把数据打包到Data实例内
      * 这个方法不应该被直接调用，只提供给Mapper调用.
      *
