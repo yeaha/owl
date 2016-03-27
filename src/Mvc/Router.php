@@ -180,6 +180,12 @@ class Router
             } else {
                 throw $exception;
             }
+        } catch (\Throwable $error) {
+            if ($this->exception_handler) {
+                call_user_func($this->exception_handler, $error, $request, $response);
+            } else {
+                throw $error;
+            }
         }
 
         return $response;

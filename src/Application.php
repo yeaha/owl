@@ -101,15 +101,19 @@ class Application
      */
     public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response)
     {
+        if (!$exception_handler = $this->exception_handler) {
+            $exception_handler = function ($exception, $request, $response) {
+                $response->withStatus(500)
+                         ->withBody(new \Owl\Http\StringStream('')); // reset response body
+            };
+        }
+
         try {
             $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
-            $handler = $this->exception_handler ?: function ($exception, $request, $response) {
-                $response->withStatus(500)
-                         ->withBody(new \Owl\Http\StringStream('')); // reset response stream
-            };
-
-            call_user_func($handler, $exception, $request, $response);
+            call_user_func($exception_handler, $exception, $request, $response);
+        } catch (\Throwable $error) {
+            call_user_func($exception_handler, $error, $request, $response);
         }
 
         if (!TEST) {
