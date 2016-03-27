@@ -5,6 +5,7 @@ if (!file_exists(__DIR__.'/../vendor')) {
 }
 
 defined('TEST') or define('TEST', true);
+define('TEST_DIR', __DIR__);
 
 require __DIR__.'/../vendor/autoload.php';
 
