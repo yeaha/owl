@@ -193,11 +193,16 @@ abstract class Adapter extends \Owl\Service
             'parameters' => $params,
         ]);
 
-        $sth = $sql instanceof \PDOStatement
-             ? $sql
-             : $this->connect()->prepare($sql);
+        if ($sql instanceof \PDOStatement) {
+            $sth = $sql;
+            $sth->execute($params);
+        } elseif ($params) {
+            $sth = $this->connect()->prepare($sql);
+            $sth->execute($params);
+        } else {
+            $sth = $this->connect()->query($sql);
+        }
 
-        $sth->execute($params);
         $sth->setFetchMode(\PDO::FETCH_ASSOC);
 
         return $sth;
