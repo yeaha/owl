@@ -6,6 +6,10 @@ class Datetime extends Common
 {
     public function normalize($value, array $attribute)
     {
+        if ($this->isNull($value)) {
+            return null;
+        }
+
         if ($value instanceof \DateTime) {
             return $value;
         }
