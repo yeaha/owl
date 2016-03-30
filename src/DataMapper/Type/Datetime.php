@@ -41,4 +41,9 @@ class Datetime extends Common
              ? null
              : new \DateTime($attribute['default']);
     }
+
+    public function toJSON($value, array $attribute)
+    {
+        return $this->store($value, $attribute);
+    }
 }
