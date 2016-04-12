@@ -32,7 +32,7 @@ class UploadFile extends \Psr\Http\Message\UploadedFileInterface
         }
 
         if (!$target_path = realpath($targetPath)) {
-            throw new \InvalidArgumentException('Invalid target path, '.$targetPath);
+            throw new \InvalidArgumentException('Invalid target path, '.$target_path);
         }
 
         $this->moved = true;
