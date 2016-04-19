@@ -183,7 +183,7 @@ class Request implements ServerRequestInterface
         $files = [];
 
         foreach ($this->files as $key => $file) {
-            $files[$key] = new \Owl\Http\UploadFile($file);
+            $files[$key] = new \Owl\Http\UploadedFile($file);
         }
 
         return $files;
