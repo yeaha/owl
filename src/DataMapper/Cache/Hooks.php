@@ -1,11 +1,11 @@
 <?php
 
-namespace Owl\DataMapper;
+namespace Owl\DataMapper\Cache;
 
 /**
  * @example
  * class MyMapper extends \Owl\DataMapper\DB\Mapper {
- *     use \Owl\DataMapper\CacheMapper;
+ *     use \Owl\DataMapper\Cache\Hooks;
  *
  *     protected function getCache($id) {
  *         // ...
@@ -38,7 +38,7 @@ namespace Owl\DataMapper;
  *     ];
  * }
  */
-trait CacheMapper
+trait Hooks
 {
     /**
      * @param mixed $id
@@ -211,5 +211,50 @@ trait CacheMapper
         }
 
         return $record;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return object
+     */
+    protected function getCacheService($key)
+    {
+        $service_name = $this->getOption('cache_service');
+
+        return \Owl\Service\get($service_name, $key);
+    }
+
+    /**
+     * @param mixed $id
+     *
+     * @return string
+     */
+    protected function getCacheKey($id)
+    {
+        $prefix = sprintf('entity:%s@', str_replace('\\', ':', trim($this->class, '\\')));
+
+        if (is_array($id)) {
+            ksort($id);
+
+            $kv = [];
+            foreach ($id as $k => $v) {
+                $kv = sprintf('%s:%s', $k, $v);
+            }
+
+            $key = $prefix.implode(':', $kv);
+        } else {
+            $key = $prefix.$id;
+        }
+
+        return strtolower($key);
+    }
+
+    /**
+     * @return int
+     */
+    protected function getCacheTTL()
+    {
+        return $this->hasOption('cache_ttl') ? $this->getOption('cache_ttl') : 300;
     }
 }
