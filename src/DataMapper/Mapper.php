@@ -68,7 +68,7 @@ abstract class Mapper
     public function __construct($class)
     {
         $this->class = $class;
-        $this->options = $this->normalizeOptions($class::getOptions());
+        $this->options = array_merge($this->normalizeOptions($class::getOptions()), $this->options);
     }
 
     protected function __beforeSave(\Owl\DataMapper\Data $data)
