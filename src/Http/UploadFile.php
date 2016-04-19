@@ -2,7 +2,7 @@
 
 namespace Owl\Http;
 
-class UploadFile extends \Psr\Http\Message\UploadedFileInterface
+class UploadFile implements \Psr\Http\Message\UploadedFileInterface
 {
     protected $moved;
     protected $file;
