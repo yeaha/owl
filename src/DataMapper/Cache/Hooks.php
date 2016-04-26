@@ -239,7 +239,7 @@ trait Hooks
 
             $kv = [];
             foreach ($id as $k => $v) {
-                $kv = sprintf('%s:%s', $k, $v);
+                $kv[] = sprintf('%s:%s', $k, $v);
             }
 
             $key = $prefix.implode(':', $kv);
