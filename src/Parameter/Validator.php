@@ -228,10 +228,14 @@ class Validator
 
         // 兼容老式写法
         if (isset($rule['element'])) {
-            $rule['value'] = [
-                'type' => 'array',
-                'keys' => $rule['element'],
-            ];
+            if ($rule['element']) {
+                $rule['value'] = [
+                    'type' => 'array',
+                    'keys' => $rule['element'],
+                ];
+            } else {
+                $rule['value'] = [];
+            }
 
             unset($rule['element']);
         }
