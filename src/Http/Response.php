@@ -101,8 +101,8 @@ class Response implements \Psr\Http\Message\ResponseInterface
 
     protected function send()
     {
+        $code = $this->getStatusCode();
         if (!headers_sent()) {
-            $code = $this->getStatusCode();
             $version = $this->getProtocolVersion();
 
             if ($code !== 200 || $version !== '1.1') {
@@ -125,7 +125,9 @@ class Response implements \Psr\Http\Message\ResponseInterface
         }
 
         $body = $this->getBody();
-        if ($body instanceof \Owl\Http\IteratorStream) {
+        if ($code === 204 || $code === 304) {
+            echo '';
+        } elseif ($body instanceof \Owl\Http\IteratorStream) {
             foreach ($body->iterator() as $string) {
                 echo $string;
             }
