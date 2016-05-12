@@ -219,15 +219,6 @@ class Router
             'method' => $request->getMethod(),
         ]);
 
-        $method = $request->getMethod();
-        if ($method === 'HEAD') {
-            $method = 'GET';
-        }
-
-        if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
-            throw \Owl\Http\Exception::factory(501);
-        }
-
         $path = $this->getRequestPath($request);
         list($class, $parameters) = $this->byRewrite($path) ?: $this->byPath($path);
 
@@ -244,7 +235,12 @@ class Router
         $controller->request = $request;
         $controller->response = $response;
 
-        if (!is_callable([$controller, $method])) {
+        $method = $request->getMethod();
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
+
+        if (!method_exists($controller, $method)) {
             throw \Owl\Http\Exception::factory(405);
         }
 

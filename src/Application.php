@@ -108,7 +108,13 @@ class Application
             };
         }
 
+        $method = $request->getMethod();
+
         try {
+            if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
+                throw \Owl\Http\Exception::factory(501);
+            }
+
             $this->middleware->execute([$request, $response]);
         } catch (\Exception $exception) {
             call_user_func($exception_handler, $exception, $request, $response);
