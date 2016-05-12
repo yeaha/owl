@@ -1,5 +1,4 @@
 <?php
-
 namespace Owl\Parameter;
 
 /**
@@ -268,7 +267,7 @@ class Validator
         try {
             $value = \Owl\safe_json_decode($value, true);
         } catch (\UnexpectedValueException $ex) {
-            throw $this->exception($key, 'json_decode() falied, '. $ex->getMessage());
+            throw $this->exception($key, 'json_decode() falied, '.$ex->getMessage());
         }
 
         return $this->checkArray($key, $value, $rule);
@@ -289,20 +288,7 @@ class Validator
 
     protected function normalizeRule(array $rule)
     {
-        if (isset($rule['type'], self::$types[$rule['type']])) {
-            $rule = array_merge(self::$types[$rule['type']], $rule);
-        }
-
-        $rule = array_merge([
-            'type' => null,
-            'required' => true,
-            'allow_empty' => false,
-            'allow_tags' => false,
-            'regexp' => '',
-            'callback' => null,
-            '__normalized__' => true,
-        ], $rule);
-
+        $rule['type'] = isset($rule['type']) ? strtolower($rule['type']) : 'string';
         switch ($rule['type']) {
             case 'bool':
                 $rule['type'] = 'boolean';
@@ -321,6 +307,19 @@ class Validator
                 $rule['type'] = 'string';
                 break;
         }
+
+        if (isset(self::$types[$rule['type']])) {
+            $rule = array_merge(self::$types[$rule['type']], $rule);
+        }
+
+        $rule = array_merge([
+            'required' => true,
+            'allow_empty' => false,
+            'allow_tags' => false,
+            'regexp' => '',
+            'callback' => null,
+            '__normalized__' => true,
+        ], $rule);
 
         return $rule;
     }

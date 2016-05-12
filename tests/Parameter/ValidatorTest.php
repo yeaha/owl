@@ -1,5 +1,4 @@
 <?php
-
 namespace Tests\Parameter;
 
 class ValidatorTest extends \PHPUnit_Framework_TestCase
@@ -114,6 +113,13 @@ class ValidatorTest extends \PHPUnit_Framework_TestCase
             ['foo' => -1],
             ['foo' => ['type' => 'integer', 'allow_negative' => false]],
             'test "allow_negative" rule failed'
+        );
+
+        // test type alias
+        $this->tryExecute(
+            ['foo' => 'aa'],
+            ['foo' => ['type' => 'int']],
+            'test type alias failed'
         );
     }
 
