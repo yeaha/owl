@@ -1,5 +1,4 @@
 <?php
-
 namespace Owl;
 
 /**
@@ -101,15 +100,8 @@ class Application
      */
     public function execute(\Owl\Http\Request $request, \Owl\Http\Response $response)
     {
-        if (!$exception_handler = $this->exception_handler) {
-            $exception_handler = function ($exception, $request, $response) {
-                $response->withStatus(500)
-                         ->withBody(new \Owl\Http\StringStream('')); // reset response body
-            };
-        }
-
+        $exception_handler = $this->getExceptionHandler();
         $method = $request->getMethod();
-
         try {
             if (!in_array($method, ['HEAD', 'GET', 'POST', 'PUT', 'DELETE', 'PATCH'])) {
                 throw \Owl\Http\Exception::factory(501);
@@ -129,6 +121,22 @@ class Application
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
+    }
+
+    protected function getExceptionHandler()
+    {
+        if ($this->exception_handler) {
+            return $this->exception_handler;
+        }
+
+        return function ($exception, $request, $response) {
+            $code = $exception instanceof \Owl\Http\Exception
+            ? $exception->getCode()
+            : 500;
+
+            $response->withStatus($code)
+                     ->withBody(new \Owl\Http\StringStream('')); // reset response body
+        };
     }
 
     /**
