@@ -64,11 +64,11 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
         })->bindTo($this));
 
         // stop here
-        $middleware->insert((function () {
+        $middleware->insert(function () {
             yield false;
 
             return 'bar';
-        })->bindTo($this));
+        });
 
         $middleware->insert(function () {
             return 'foo';
@@ -80,11 +80,11 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
         ///////////////////////////////////////////
         $middleware = new \Owl\Middleware();
 
-        $middleware->insert((function () {
+        $middleware->insert(function () {
             yield;
 
             return 'bar';
-        })->bindTo($this));
+        });
 
         // return without yield
         $middleware->insert(function () {
@@ -93,6 +93,21 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
 
         $result = $middleware->execute();
         $this->assertEquals('foo', $result);
+
+        ///////////////////////////////////////////
+        $middleware = new \Owl\Middleware();
+
+        // ignore this return value
+        $middleware->insert(function () {
+            return 'bar';
+        });
+
+        $middleware->insert(function () {
+            yield;
+        });
+
+        $result = $middleware->execute();
+        $this->assertNull($result);
     }
 
     public function testInvalidHandler()
