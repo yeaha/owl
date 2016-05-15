@@ -1,5 +1,4 @@
 <?php
-
 namespace Owl;
 
 /**
@@ -86,9 +85,22 @@ class Middleware
             }
         }
 
+        $return = false;
+        $result = null;
         while ($generator = array_pop($stack)) {
+            if ($return) {
+                $generator->send($result);
+            }
+
             $generator->next();
+
+            if (!$return) {
+                $return = true;
+                $result = $generator->getReturn();
+            }
         }
+
+        return $result;
     }
 
     /**

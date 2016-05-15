@@ -1,5 +1,4 @@
 <?php
-
 namespace Tests;
 
 class MiddelwareTest extends \PHPUnit_Framework_TestCase
@@ -34,6 +33,44 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
         // test execute empty queue
         $middleware->reset();
         $middleware->execute();
+    }
+
+    public function testReturnValue()
+    {
+        $middleware = new \Owl\Middleware();
+
+        $middleware->insert((function () {
+            $result = yield;
+
+            $this->assertEquals('foobar', $result);
+        })->bindTo($this));
+
+        $middleware->insert(function () {
+            yield;
+
+            return 'foobar';
+        });
+
+        $result = $middleware->execute();
+        $this->assertEquals('foobar', $result);
+
+        ///////////////////////////////////////////
+        $middleware = new \Owl\Middleware();
+
+        $middleware->insert((function () {
+            $result = yield false;
+
+            return 'bar';
+        })->bindTo($this));
+
+        $middleware->insert(function () {
+            yield;
+
+            return 'foo';
+        });
+
+        $result = $middleware->execute();
+        $this->assertEquals('bar', $result);
     }
 
     public function testInvalidHandler()
