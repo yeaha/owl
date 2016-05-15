@@ -58,19 +58,41 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
         $middleware = new \Owl\Middleware();
 
         $middleware->insert((function () {
-            $result = yield false;
+            $result = yield;
+
+            $this->assertEquals('bar', $result);
+        })->bindTo($this));
+
+        // stop here
+        $middleware->insert((function () {
+            yield false;
 
             return 'bar';
         })->bindTo($this));
 
         $middleware->insert(function () {
-            yield;
-
             return 'foo';
         });
 
         $result = $middleware->execute();
         $this->assertEquals('bar', $result);
+
+        ///////////////////////////////////////////
+        $middleware = new \Owl\Middleware();
+
+        $middleware->insert((function () {
+            yield;
+
+            return 'bar';
+        })->bindTo($this));
+
+        // return without yield
+        $middleware->insert(function () {
+            return 'foo';
+        });
+
+        $result = $middleware->execute();
+        $this->assertEquals('foo', $result);
     }
 
     public function testInvalidHandler()

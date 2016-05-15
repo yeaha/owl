@@ -73,20 +73,25 @@ class Middleware
         }
 
         $stack = [];
+        $result = null;
         foreach ($handlers as $handler) {
+            // reset before each loop, only save last handler return value
+            $result = null;
             $generator = call_user_func_array($handler, $arguments);
 
-            if ($generator && $generator instanceof \Generator) {
+            if ($generator instanceof \Generator) {
                 $stack[] = $generator;
 
                 if ($generator->current() === false) {
                     break;
                 }
+            } elseif ($generator !== null) {
+                // return without yield
+                $result = $generator;
             }
         }
 
-        $return = false;
-        $result = null;
+        $return = ($result !== null);
         while ($generator = array_pop($stack)) {
             if ($return) {
                 $generator->send($result);
