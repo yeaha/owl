@@ -110,6 +110,25 @@ class MiddelwareTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 
+    public function testArguments()
+    {
+        $middleware = new \Owl\Middleware();
+
+        $middleware->insert((function ($a) {
+            $this->assertEquals('a', $a);
+
+            yield new \Owl\Middleware\Arguments('b', 'c');
+        })->bindTo($this));
+
+        $middleware->insert(function () {});
+        $middleware->insert((function ($b, $c) {
+            $this->assertEquals('b', $b);
+            $this->assertEquals('c', $c);
+        })->bindTo($this));
+
+        $middleware->execute(['a']);
+    }
+
     public function testInvalidHandler()
     {
         $middleware = new \Owl\Middleware();

@@ -1,6 +1,8 @@
 <?php
 namespace Owl;
 
+use Owl\Middleware\Arguments;
+
 /**
  * 中间件.
  *
@@ -82,8 +84,13 @@ class Middleware
             if ($generator instanceof \Generator) {
                 $stack[] = $generator;
 
-                if ($generator->current() === false) {
+                $yield_value = $generator->current();
+
+                if ($yield_value === false) {
                     break;
+                } elseif ($yield_value instanceof Arguments) {
+                    // replace arguments
+                    $arguments = $yield_value->toArray();
                 }
             } elseif ($generator !== null) {
                 // return without yield
