@@ -1,5 +1,4 @@
 <?php
-
 namespace Owl\Service\DB;
 
 use Owl\Application as App;
@@ -24,19 +23,19 @@ abstract class Adapter extends \Owl\Service
      * @param string $table
      *
      * @return [
-     *           (string) => [
-     *           'primary_key' => (boolean),
-     *           'type' => (string),
-     *           'sql_type' => (string),
-     *           'character_max_length' => (integer),
-     *           'numeric_precision' => (integer),
-     *           'numeric_scale' => (integer),
-     *           'default_value' => (mixed),
-     *           'not_null' => (boolean),
-     *           'comment' => (string),
-     *           ],
-     *           ...
-     *           ]
+     *     (string) => [
+     *         'primary_key' => (boolean),
+     *         'type' => (string),
+     *         'sql_type' => (string),
+     *         'character_max_length' => (integer),
+     *         'numeric_precision' => (integer),
+     *         'numeric_scale' => (integer),
+     *         'default_value' => (mixed),
+     *         'not_null' => (boolean),
+     *         'comment' => (string),
+     *     ],
+     *     ...
+     * ]
      */
     abstract public function getColumns($table);
 
@@ -44,14 +43,14 @@ abstract class Adapter extends \Owl\Service
      * @param string $table
      *
      * @return [
-     *           [
-     *           'name' => (string),
-     *           'columns' => (array),
-     *           'is_primary' => (boolean),
-     *           'is_unique' => (boolean),
-     *           ],
-     *           ...
-     *           ]
+     *     [
+     *         'name' => (string),
+     *         'columns' => [(string), ...],
+     *         'is_primary' => (boolean),
+     *         'is_unique' => (boolean),
+     *     ],
+     *     ...
+     * ]
      */
     abstract public function getIndexes($table);
 
@@ -78,8 +77,8 @@ abstract class Adapter extends \Owl\Service
     public function __call($method, array $args)
     {
         return $args
-             ? call_user_func_array([$this->connect(), $method], $args)
-             : $this->connect()->$method();
+        ? call_user_func_array([$this->connect(), $method], $args)
+        : $this->connect()->$method();
     }
 
     public function isConnected()
@@ -185,8 +184,8 @@ abstract class Adapter extends \Owl\Service
     public function execute($sql, $params = null)
     {
         $params = $params === null
-                ? []
-                : is_array($params) ? $params : array_slice(func_get_args(), 1);
+        ? []
+        : is_array($params) ? $params : array_slice(func_get_args(), 1);
 
         App::log('debug', 'database execute', [
             'sql' => ($sql instanceof \PDOStatement) ? $sql->queryString : $sql,
@@ -255,6 +254,11 @@ abstract class Adapter extends \Owl\Service
         return new \Owl\Service\DB\Select($this, $table);
     }
 
+    public function getTable($table)
+    {
+        return new \Owl\Service\DB\Table($this, $table);
+    }
+
     public function insert($table, array $row)
     {
         $params = [];
@@ -272,8 +276,8 @@ abstract class Adapter extends \Owl\Service
     public function update($table, array $row, $where = null, $params = null)
     {
         $where_params = ($where === null || $params === null)
-                      ? []
-                      : is_array($params) ? $params : array_slice(func_get_args(), 3);
+        ? []
+        : is_array($params) ? $params : array_slice(func_get_args(), 3);
 
         $params = [];
         foreach ($row as $value) {
@@ -294,8 +298,8 @@ abstract class Adapter extends \Owl\Service
     public function delete($table, $where = null, $params = null)
     {
         $params = ($where === null || $params === null)
-                ? []
-                : is_array($params) ? $params : array_slice(func_get_args(), 2);
+        ? []
+        : is_array($params) ? $params : array_slice(func_get_args(), 2);
 
         $sth = $this->prepareDelete($table, $where);
 
@@ -365,7 +369,7 @@ abstract class Adapter extends \Owl\Service
 
     protected function rollbackAll()
     {
-        $max = 9;   // 最多9次，避免死循环
+        $max = 9; // 最多9次，避免死循环
         while ($this->in_transaction && $max-- > 0) {
             $this->rollback();
         }

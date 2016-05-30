@@ -1,5 +1,4 @@
 <?php
-
 namespace Owl\Service\DB\Sqlite;
 
 if (!extension_loaded('pdo_sqlite')) {
@@ -17,13 +16,19 @@ class Adapter extends \Owl\Service\DB\Adapter
 
     public function getTables()
     {
+        // @FIXME
+        throw new \Exception('Sqlite\Adapter::getTables() not implement');
     }
 
     public function getColumns($table)
     {
+        // @FIXME
+        throw new \Exception('Sqlite\Adapter::getColumns() not implement');
     }
 
     public function getIndexes($table)
     {
+        // @FIXME
+        throw new \Exception('Sqlite\Adapter::getIndexes() not implement');
     }
 }
