@@ -5,7 +5,7 @@
 ```json
 {
     "require": {
-        "yeaha/owl": "0.3.*"
+        "yeaha/owl": "1.0.*"
     }
 }
 ```
