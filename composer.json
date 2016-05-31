@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "yeaha/owl-core": "dev-master",
-        "yeaha/owl-mvc": "dev-master",
-        "yeaha/owl-service": "dev-master",
-        "yeaha/owl-orm": "dev-master"
+        "yeaha/owl-core": "1.0.*",
+        "yeaha/owl-mvc": "1.0.*",
+        "yeaha/owl-service": "1.0.*",
+        "yeaha/owl-orm": "1.0.*"
     },
     "suggest": {
         "monolog/monolog": "Allows more advanced logging of the application flow"
