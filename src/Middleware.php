@@ -106,6 +106,11 @@ class Middleware
 
             $generator->next();
 
+            // PHP7之前没有Generator::getReturn()
+            if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+                $return = true;
+            }
+
             if (!$return) {
                 $return = true;
                 $result = $generator->getReturn();
